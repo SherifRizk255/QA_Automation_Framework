@@ -1,0 +1,21 @@
+{
+  "name": "sherif-rizk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:portal": "playwright test tests/portal --headed",
+    "test:portal:report": "playwright test tests/portal --headed & node utils/reportGenerator.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0",
+    "@types/node": "^25.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
