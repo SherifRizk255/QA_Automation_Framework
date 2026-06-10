@@ -1,119 +1,404 @@
-# Intent Unit Schema — The Core Contract
+# Intent Unit Schema — Canonical QA Contract
 
-> Every skill in this system reads from and writes to Intent Units.
-> This file defines the canonical structure. Never deviate from it.
-
----
-
-## What is an Intent Unit?
-
-An Intent Unit (IU) is the smallest independently testable behavior extracted from any input artifact.
-
-It is the universal intermediate representation that decouples input format from test generation.
-The normalizer produces IUs. Every downstream skill consumes IUs.
+> Every skill in this system reads from and writes to Intent Units (IUs).
+> Intent Units are the universal intermediate representation used to normalize all requirement sources into independently testable behaviors.
+>
+> This schema is the single source of truth for the QA pipeline.
 
 ---
 
-## Intent Unit Structure
+# What is an Intent Unit?
 
-```
-IU-[ID]
+An Intent Unit (IU) is the smallest independently testable behavior extracted from an input artifact.
+
+Regardless of whether the source is:
+
+* BRD
+* FRD
+* Change Request (CR)
+* User Story
+* Feature List
+* SDD
+* Existing Test Cases
+* Free Text
+* Screenshot
+* URL Exploration
+
+the behavior must ultimately be represented as one or more Intent Units.
+
+---
+## Relationship to Intent Candidates
+
+Intent Units are generated only after:
+
+1. Input detection
+2. Intent Candidate extraction
+3. User confirmation
+4. Normalization
+
+Intent Candidates (ICs) are temporary structures produced by input-detector.md.
+
+Intent Units (IUs) are the canonical testability contract consumed by all downstream skills.
+
+---
+
+# Intent Unit Structure
+
+```text
+IU-[SOURCE]-[NUMBER]
 ──────────────────────────────────────────
-actor        : who performs the action (user role, system, API, scheduler)
-action       : what the actor does
-condition    : under what circumstances (optional but preferred)
-outcome      : what the system should do or return
-source       : [section/line/column reference in the original artifact]
-source_type  : BRD | FRD | CR | UserStory | FeatureList | SDD | SmokeSheet | FreeText | Visual
-domain_rules : [extracted constraints — limits, validations, eligibility rules, states]
-risk         : P1 | P2 | P3 | P4
-automate     : Yes | No | Partial
-notes        : [ambiguities, assumptions, what cannot be determined]
+
+id            : unique IU identifier
+
+actor         : who performs the action
+action        : what is performed
+condition     : under what circumstances
+outcome        : expected result
+
+iu_type       : Functional
+              | Validation
+              | Security
+              | Permission
+              | API
+              | Integration
+              | BusinessRule
+              | Reporting
+              | UI
+
+source        : original location reference
+
+source_type   : BRD
+              | FRD
+              | CR
+              | UserStory
+              | FeatureList
+              | SDD
+              | SmokeSheet
+              | FreeText
+              | Visual
+              | URL
+
+parent_ref    : AC / Requirement / Story / CR identifier
+
+status        : New
+              | Existing
+              | Modified
+              | Deprecated
+
+confidence    : High
+              | Medium
+              | Low
+
+domain_rules  : extracted constraints
+              validations
+              limits
+              permissions
+              business states
+
+risk          : P1
+              | P2
+              | P3
+              | P4
+
+automate      : Yes
+              | Partial
+              | No
+
+notes         : assumptions
+              ambiguities
+              missing information
+              analyst observations
+
 ──────────────────────────────────────────
 ```
 
 ---
 
-## Risk Classification Rules
+# IU Type Definitions
 
-Apply the highest applicable level:
+## Functional
 
-| Level | Apply when |
-|---|---|
-| P1 Critical | Authentication · authorization · payments · data loss · compliance · security · SLA-bound |
-| P2 High | Core user journeys · key validations · primary integrations · state transitions |
-| P3 Medium | Secondary flows · edge cases · admin/config functions · reporting |
-| P4 Low | Cosmetic · informational · rarely-used paths · help content |
+Primary business behavior.
 
----
+Examples:
 
-## Automate Flag Rules
-
-| Value | Meaning |
-|---|---|
-| Yes | Stable, repeatable, deterministic — automate first |
-| No | Exploratory, judgment-dependent, one-time, or requires visual human verification |
-| Partial | Core assertion automatable; some steps require manual verification |
+* Create transfer
+* Add beneficiary
+* Create CRM case
 
 ---
 
-## Examples
+## Validation
 
-```
-IU-001
-actor        : authenticated user with transfer permission
-action       : submits a fund transfer within the daily limit
-condition    : account has sufficient balance, beneficiary is pre-registered
-outcome      : transaction is processed, reference number returned, balance updated
-source       : BRD Section 4.2 — Fund Transfer, AC-3
-source_type  : BRD
-domain_rules : daily limit = [value from BRD]; STP eligibility applies; posting restricted 10pm–6am
-risk         : P1
-automate     : Yes
-notes        : limit value not specified in BRD — flagged as ❓ AMBIGUOUS
+Input and business validation rules.
 
-IU-002
-actor        : unauthenticated user
-action       : attempts to access the transfers page directly via URL
-condition    : no active session
-outcome      : system redirects to login page, no data exposed
-source       : BRD Section 3.1 — Auth Policy
-source_type  : BRD
-domain_rules : session must be validated before any protected route is served
-risk         : P1
-automate     : Yes
-notes        : none
+Examples:
 
-IU-003
-actor        : system
-action       : processes a change request to add a new validation rule to the payment form
-condition    : CR-042 delta — new rule: amount must be a multiple of 100
-outcome      : form rejects non-multiples, shows inline validation message
-source       : CR-042, Section 2 — Changed Behavior
-source_type  : CR
-domain_rules : existing IU-018 (amount field) is now outdated — retire TC-031, TC-032
-risk         : P2
-automate     : Yes
-notes        : regression scope includes IU-018, IU-019 (related payment flow)
+* Amount cannot exceed limit
+* Required fields
+* Invalid format handling
+
+---
+
+## Security
+
+Authentication, authorization, compliance, fraud controls.
+
+Examples:
+
+* Unauthorized access blocked
+* Session timeout
+* Permission restrictions
+
+---
+
+## Permission
+
+Role-specific access behavior.
+
+Examples:
+
+* CSR may edit customer profile
+* Supervisor may approve requests
+
+---
+
+## API
+
+Service contract behavior.
+
+Examples:
+
+* API request validation
+* Response structure
+* Status code handling
+
+---
+
+## Integration
+
+Interactions between systems.
+
+Examples:
+
+* CRM → Core Banking
+* CRM → Middleware
+* Portal → API Gateway
+
+---
+
+## BusinessRule
+
+Policy-driven behavior.
+
+Examples:
+
+* Daily transfer limit
+* Eligibility rules
+* STP qualification
+
+---
+
+## Reporting
+
+Reports, dashboards, exports, statements.
+
+Examples:
+
+* Generate statement
+* Export CSV
+
+---
+
+## UI
+
+Pure presentation behavior.
+
+Examples:
+
+* Tooltip visibility
+* Button enablement
+* Grid sorting
+
+---
+
+# Risk Classification Rules
+
+Apply the highest applicable level.
+
+| Level       | Description                                                                                |
+| ----------- | ------------------------------------------------------------------------------------------ |
+| P1 Critical | Authentication, authorization, payments, financial impact, compliance, data loss, security |
+| P2 High     | Core journeys, major validations, critical integrations, workflow transitions              |
+| P3 Medium   | Secondary flows, reporting, admin functions, edge behavior                                 |
+| P4 Low      | Cosmetic, informational, rarely-used features                                              |
+
+---
+
+# Automation Recommendation Rules
+
+| Value   | Meaning                                                   |
+| ------- | --------------------------------------------------------- |
+| Yes     | Stable, deterministic, repeatable                         |
+| Partial | Core automation possible, manual verification required    |
+| No      | Exploratory, subjective, visual-only, one-time validation |
+
+---
+
+# Confidence Rules
+
+## High
+
+Behavior explicitly stated.
+
+Example:
+
+"Amount must not exceed 100,000 EGP."
+
+---
+
+## Medium
+
+Behavior inferred from surrounding context.
+
+Example:
+
+Transfer flow implies balance validation.
+
+---
+
+## Low
+
+Behavior partially specified or ambiguous.
+
+Example:
+
+"The system should validate transfers."
+
+No validation details provided.
+
+Low confidence IUs should be flagged for clarification.
+
+---
+
+# Status Rules
+
+## New
+
+Behavior introduced for the first time.
+
+---
+
+## Existing
+
+Behavior already exists and remains unchanged.
+
+---
+
+## Modified
+
+Existing behavior changed by CR or enhancement.
+
+---
+
+## Deprecated
+
+Behavior removed, replaced, or retired.
+
+---
+
+# Traceability Requirements
+
+Every IU must maintain traceability back to its origin.
+
+Required chain:
+
+Requirement
+↓
+Intent Unit
+↓
+Test Case
+↓
+Automation Script
+↓
+Execution Result
+
+Example:
+
+BRD-4.2-AC3
+↓
+IU-BRD-003
+↓
+TC-045
+↓
+PW-045
+↓
+Execution Run #17
+
+---
+
+# Example Intent Unit
+
+```text
+IU-CR-001
+
+actor         : authenticated customer
+action        : submit transfer amount
+condition     : transfer amount entered
+outcome        : amount must be a multiple of 100
+
+iu_type       : Validation
+
+source        : CR-042 Section 2
+source_type   : CR
+
+parent_ref    : CR-042
+
+status        : Modified
+
+confidence    : High
+
+domain_rules  :
+- Amount multiple of 100
+- Existing validation replaced
+
+risk          : P2
+
+automate      : Yes
+
+notes         :
+Regression scope includes existing transfer validation suite
 ```
 
 ---
 
-## IU List Output Format
+# Standard IU Map Output
 
-When producing the IU list in any skill, always output as:
-
-```
+```text
 📋 INTENT UNIT MAP
-──────────────────────────────────────────────────────
-IU-001 | [actor] [action] [condition] | Risk: P1 | Source: [ref]
-IU-002 | [actor] [action] [condition] | Risk: P2 | Source: [ref]
-...
-──────────────────────────────────────────────────────
-Total IUs : [N]
-P1        : [N]
-P2        : [N]
-P3        : [N]
-P4        : [N]
-Flagged   : [N] ambiguous · [N] untestable · [N] missing info
+────────────────────────────────────────────
+
+IU-CR-001 | Validation | Authenticated user submits transfer amount | Risk: P2
+
+IU-BRD-004 | Security | Unauthenticated user accesses protected page | Risk: P1
+
+IU-US-002 | Functional | Customer adds beneficiary | Risk: P2
+
+────────────────────────────────────────────
+
+Total IUs : 3
+
+P1 : 1
+P2 : 2
+P3 : 0
+P4 : 0
+
+High Confidence   : 3
+Medium Confidence : 0
+Low Confidence    : 0
+
+Flagged :
+0 ambiguous
+0 untestable
+0 missing information
 ```
