@@ -1,72 +1,64 @@
 # QA Automation Agent Instructions
 
-## Role
-You are an expert QA Automation Engineer building a Playwright JavaScript framework for banking systems, web portals, and Microsoft Dynamics CRM.
+## Purpose
+This repository uses a modular AI QA workflow for Playwright JavaScript automation. `AGENTS.md` is the global rule file only. Detailed stage instructions live in reusable markdown skill files under `docs/ai-workflow/`.
 
-## Main Objective
-Generate maintainable, reliable, business-driven automated test cases based on BRD/FRD documents, manual test cases, live system behavior, the existing Page Object Model structure, and approved QA automation standards.
+## Modular Workflow
+Before doing any workflow task, read the specific skill file that matches the current stage:
+
+- `docs/ai-workflow/00-master-workflow.md`
+- `docs/ai-workflow/01-project-intake-agent.md`
+- `docs/ai-workflow/02-system-walkthrough-agent.md`
+- `docs/ai-workflow/03-requirement-analysis-agent.md`
+- `docs/ai-workflow/04-test-scenario-agent.md`
+- `docs/ai-workflow/05-manual-test-case-agent.md`
+- `docs/ai-workflow/06-automation-implementation-agent.md`
+- `docs/ai-workflow/07-test-execution-agent.md`
+- `docs/ai-workflow/08-failure-analysis-agent.md`
+- `docs/ai-workflow/09-self-healing-agent.md`
+- `docs/ai-workflow/10-final-report-agent.md`
+- `docs/ai-workflow/11-qa-review-agent.md`
+
+Do not mix all workflow stages in one response unless the user explicitly asks for an end-to-end workflow. Stop at approval gates when a skill requires review or sign-off before continuing.
+
+## Project Separation
+- Keep generic workflow instructions under `docs/ai-workflow/`.
+- Keep project-specific data under `docs/projects/<project-name>/`, `docs/requirements/`, `docs/analysis/`, `docs/test-design/`, and project-specific report folders.
+- Do not put project URLs, credentials, module names, customer data, or business-specific values inside generic skill files.
+- Each automation project may have its own URL, credentials strategy, BRD/FRD files, modules, test data, screenshots, reports, and execution notes.
 
 ## Framework Rules
-- Use Playwright with JavaScript only.
+- Use JavaScript only unless a project explicitly says otherwise.
+- Use Playwright only unless a project explicitly says otherwise.
 - Use ES module syntax with `import` and `export`.
-- Use Page Object Model for all UI automation.
-- Keep locators inside page object files.
-- Keep reusable test data inside `data`.
-- Keep reusable setup in `fixtures` and shared helpers in `utils`.
-- Do not hardcode credentials, customer data, NID, account numbers, card numbers, phone numbers, or secrets.
-- Read environment values from `.env` only.
-- Every test must have a clear business purpose and requirement ID when available.
+- Use Page Object Model for UI automation.
+- Keep locators inside Page Object files.
+- Keep reusable data in `data`, reusable setup in `fixtures`, and shared helpers in `utils`.
+- Do not hardcode credentials.
+- Read environment values from `.env` or project-specific config files.
+- Do not expose usernames, passwords, account numbers, NID, phone numbers, card numbers, or customer data in reports.
+- Mask sensitive values in screenshots and reports where possible.
+- Do not use hard-coded waits.
+- Do not hide real application defects.
+- Classify all failures.
+- Self-healing is allowed only for automation issues, not application defects.
+- Never perform destructive or risky actions unless explicitly approved.
 
-## Selector Strategy
-- Prefer Playwright recommended locators: `getByRole`, `getByLabel`, `getByText`, `getByPlaceholder`, and `getByTestId`.
-- Do not use absolute XPath.
-- Avoid brittle CSS selectors.
-- For Microsoft Dynamics CRM, prefer accessible names, labels, button text, tab names, form labels, and stable attributes.
-- If a selector is uncertain, inspect the real page in headed mode or with Playwright codegen before finalizing.
+## Failure Classification
+Classify every failure as one of:
 
-## Wait Strategy
-- Never use `page.waitForTimeout()`.
-- Use Playwright web-first assertions such as `expect(locator).toBeVisible()`, `expect(locator).toBeEnabled()`, and `expect(page).toHaveURL()`.
-- Wait for business-visible states, not arbitrary time.
-
-## Blocker Handling Rules
-- Detect known business blockers through visible text or accessible controls.
-- For the active session blocker text, `You have an active session. Do you want to close it?`, capture evidence before clicking a confirmation button.
-- Accept only visible confirmation controls with stable text such as `Proceed`, `OK`, `Yes`, or `Continue`.
-- Attach blocker screenshots to the Playwright report whenever `testInfo` is available.
-- Continue the login flow after approved blocker handling.
-- Do not hide the blocker; document it through logs, annotations, soft assertions, or reports.
-
-## Test Design Rules
-- Follow Arrange, Act, Assert structure.
-- Separate positive, negative, boundary, validation, permission, and integration scenarios.
-- Do not combine unrelated validations in one test.
-- Keep tests independent.
-- Use fixtures for login and shared setup where possible.
-- Clean up created test data when possible.
-
-## Reporting Rules
-- Enable Playwright list and HTML reporters.
-- Capture screenshots, videos, and traces on failure or retry according to project config.
-- Store custom evidence under `reports`.
-- Generate a structured execution summary at `reports/execution-summary.md` when requested.
-- Include failed test name, error message, screenshot path, video path, trace path, and failure classification.
-
-## Failure Investigation Rules
-When a Playwright test fails, classify the reason as one of:
 1. Automation script issue
 2. Application defect
 3. Test data issue
 4. Environment issue
 5. Requirement ambiguity
+6. Access/permission issue
+7. Known business blocker
 
-If it is an application defect, prepare a bug report with platform, module, title/description, steps to reproduce, actual result, expected result, severity, priority, and status.
-
-## Do Not
+## Safety Rules
 - Do not create fake locators.
 - Do not invent business rules.
-- Do not ignore BRD/FRD instructions.
-- Do not use hard-coded waits.
-- Do not hardcode credentials.
-- Do not create large unstable end-to-end tests without clear purpose.
-- Do not change framework architecture without explaining why.
+- Do not invent expected results.
+- Do not remove existing working tests or automation code unless explicitly requested.
+- Do not overwrite project-specific files unless necessary for the requested task.
+- Do not submit real transactions, delete data, change customer data, change passwords, or perform irreversible actions without explicit approval.
