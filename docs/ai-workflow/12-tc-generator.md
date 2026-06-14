@@ -14,6 +14,71 @@ In CR mode: generate delta TCs only.
 
 ---
 
+## Scenario Ownership Rule
+
+Scenario creation belongs to traceability-manager.md.
+
+TC Generator consumes approved Scenario Inventory entries and TC Coverage Allocation.
+
+Do not invent new scenarios unless:
+- A coverage gap is detected
+- Traceability Manager explicitly requests additional coverage
+
+Every generated TC must map to exactly one Scenario ID.
+
+---
+
+## INPUT CONTRACT
+
+CConsumes:
+
+- Traceability Plan
+- Traceability Matrix
+- TC Blueprint
+- TC Generator Handoff Contract
+- Run Context
+
+The handoff contract is authoritative.
+
+The generator must never independently determine:
+
+- which IUs are in scope
+- which IUs are blocked
+- regression scope
+- retirement scope
+
+Those decisions belong to upstream skills.
+
+---
+
+## PIPELINE GUARD
+
+Read TC_GENERATOR_HANDOFF first.
+
+IF proceed list is empty:
+
+🚫 TC GENERATION BLOCKED
+
+Reason:
+No approved IUs available for generation.
+
+STOP.
+
+Never generate TCs for:
+
+- blocked IUs
+- IC GAP IUs
+- UNTESTABLE IUs
+- unresolved rule-conflict IUs
+
+Only generate TCs for:
+
+proceed:
+  IU-[N]
+
+---
+
+
 ## TC Format
 
 Every test case uses this structure:
@@ -21,6 +86,7 @@ Every test case uses this structure:
 | Field | Content |
 |---|---|
 | TC ID | TC-[NNN] |
+| Scenario ID | SCN-[NNN] |
 | IU | IU-[NNN] |
 | Title | [Action] + [Context] + [Expected Outcome] — concise, business-readable |
 | Type | Positive / Negative / Boundary / Security / Integration / Performance |
@@ -31,6 +97,9 @@ Every test case uses this structure:
 | Expected Result | Exact observable outcome. Measurable. |
 | Automate | Yes / No / Partial |
 | Tags | See tagging taxonomy below |
+| Source IC | IC-[N] |
+| Confidence | High / Medium / Low |
+| Risk Basis | QA Analyzer Risk Decision |
 
 ---
 
@@ -90,6 +159,123 @@ For every IU, ensure you have considered (not all will apply — document why th
 
 ---
 
+## DEPENDENCY AWARENESS
+
+Read IU dependency map from qa-analyzer.
+
+When generating TCs:
+
+Do not duplicate coverage already provided by dependency TCs.
+
+Example:
+
+IU-005 depends on IU-002.
+
+If IU-002 already validates authentication:
+
+Do not recreate authentication TCs under IU-005.
+
+Instead:
+
+Reference dependency coverage.
+
+This prevents TC explosion.
+
+---
+
+## RULE CONFLICT HANDLING
+
+If TC_GENERATOR_HANDOFF contains:
+
+rule_conflicts_unresolved
+
+Then:
+
+Block affected IUs.
+
+Output:
+
+🚫 TC GENERATION BLOCKED
+
+IU:
+Conflicting Rules:
+Reason:
+
+Do not generate speculative test cases.
+
+---
+
+## DATA SENSITIVITY ENFORCEMENT
+
+Read data_sensitivity classification from handoff.
+
+PII-Sensitive
+
+Never expose:
+
+- account numbers
+- card numbers
+- national IDs
+- customer names
+- mobile numbers
+
+Use:
+
+[ENV: VARIABLE]
+
+Masked
+
+Use masked values.
+
+Synthetic
+
+Use generated test values.
+
+---
+
+## ENVIRONMENT ENFORCEMENT
+
+Read environment_requirements from handoff.
+
+Sandbox:
+  Generate standalone TCs.
+
+CBS-Connected:
+  Include CBS dependency in Preconditions.
+
+CMS-Connected:
+  Include CMS dependency in Preconditions.
+
+All-Systems:
+  Include all integration prerequisites.
+
+Never assume unavailable systems.
+
+---
+
+## ASSUMPTION ESCALATION
+
+If an IU contains unresolved assumptions:
+
+Generate:
+
+⚠ ASSUMPTION PRESENT
+
+Owner:
+Expiry:
+Impact:
+
+TC may be generated only if:
+
+- assumption is non-blocking
+- QA analyzer did not block the IU
+
+Otherwise:
+
+Move IU to blocked list.
+
+---
+
 ## TC Output Format
 
 ```markdown
@@ -118,12 +304,39 @@ Apply all relevant tags to every TC:
 
 ---
 
-## CR Mode Rules
+## CR MODE RULES
 
-- Generate only delta TCs (new + updated behaviors from the CR).
-- Mark updated TCs clearly: `UPDATED — replaces TC-[N] per CR-[ID]`
-- Do not regenerate TCs for unchanged behaviors — reference them in the regression list only.
-- Every delta TC must carry tag `@cr` and reference the CR ID in the IU field.
+CR mode is controlled exclusively by orchestrator.md and TC_GENERATOR_HANDOFF.
+
+Generate test cases only for:
+
+- NEW IUs
+- MODIFIED IUs
+
+Do not generate new TCs for:
+
+- regression-only IUs
+- unchanged IUs
+- retired IUs
+
+For MODIFIED IUs:
+
+Include:
+
+UPDATED — replaces TC-[N] per CR-[ID]
+
+For DEPRECATED IUs:
+
+Do not generate TCs.
+
+Generate retirement notice only:
+
+🗑 RETIREMENT REQUIRED
+
+IU:
+TC:
+Reason:
+CR Reference:
 
 ---
 
@@ -133,4 +346,45 @@ Apply all relevant tags to every TC:
 - Never combine two behaviors in one TC.
 - Never hardcode sensitive values — always reference environment variables or fixtures.
 - Never generate a TC for an IU flagged as `🚫 UNTESTABLE` — report it instead.
-- If a TC cannot be fully specified due to missing requirement detail, generate what is possible and flag: `⚠️ INCOMPLETE TC — requires: [what is missing]`
+- If a TC cannot be fully specified due to missing requirement detail, generate what is possible and flag: `⚠️ INCOMPLETE TC — requires: [what is missing]
+`
+- Never generate TCs for:
+  * Blocked IUs
+  * IC GAP IUs
+  * Untestable IUs
+  * IUs excluded by the TC Generator Handoff Contract
+
+---
+
+## TC GENERATION SUMMARY
+
+📋 TC GENERATION REPORT
+────────────────────────────────────────
+
+Generated:
+  TC-[N]
+
+Blocked:
+  IU-[N] — reason
+
+Retirement Required:
+  TC-[N]
+
+Regression Referenced:
+  IU-[N]
+
+Coverage Produced:
+  Positive : [N]
+  Negative : [N]
+  Boundary : [N]
+  Security : [N]
+  Integration : [N]
+
+Open Assumptions:
+  [N]
+
+Open Rule Conflicts:
+  [N]
+
+Ready For:
+  playwright-generator.md

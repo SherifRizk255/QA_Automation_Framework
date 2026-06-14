@@ -1,6 +1,11 @@
 # orchestrator.md
 
-> Thin routing layer. Runs after input-detector.md and normalizer.md.
+> Thin routing layer. Runs after:
+- input-detector.md
+- intent-preview.md
+- requirements-quality-checker.md
+- normalizer.md
+> Acts as the pipeline routing authority.
 > Decides which pipeline path to follow and sets the run context for all downstream skills.
 > Generic — works for any domain, any project.
 
@@ -8,10 +13,52 @@
 
 ## Responsibility
 
-Read the detection report from input-detector.md and the IU list from normalizer.md.
-Set the run context. Route to the correct pipeline. Do not generate anything.
+Read:
+
+- Detection Report
+- Intent Preview Summary
+- Requirements Quality Report
+- Intent Unit List
+
+Determine:
+
+- Pipeline route
+- Scope
+- Coverage strategy
+- Downstream skills
 
 ---
+# Quality Gate (Mandatory)
+
+Before routing:
+
+Review Requirements Quality Report.
+
+If any item is classified as:
+
+Critical Ambiguity
+Critical Missing Business Rule
+Critical Untestable Requirement
+
+Pipeline status becomes:
+
+BLOCKED
+
+Output:
+
+🚫 PIPELINE BLOCKED
+
+Reason:
+Requirements are not sufficiently testable.
+
+Issues:
+[List]
+
+Recommended Action:
+Clarify requirements and rerun pipeline.
+
+No downstream skill may execute.
+
 
 ## Run Context Block
 
@@ -29,7 +76,26 @@ P1 IUs           : [N] — automation-first, full coverage required
 CR scope limit   : [Yes — delta only | No — full suite]
 Baseline present : [Yes — existing TCs indexed | No]
 Skills to run    : [ordered list of skills for this run]
+Requirement      : PASS | WARNING | FAIL
+Quality          
+
+Quality Findings:
+- Ambiguities : [no. of ambiguities]
+- Missing Rules : [no. of missing rules]
+- Untestable Requirements : [no. of unstable]
 ──────────────────────────────────────────────────────
+IF Quality Status = FAIL
+
+STOP
+
+Do not execute:
+
+- qa-analyzer
+- traceability-manager
+- tc-generator
+- playwright-generator
+- reporter
+
 ```
 
 ---
@@ -39,12 +105,17 @@ Skills to run    : [ordered list of skills for this run]
 Activate when: input is BRD, FRD, User Story, Feature List, SDD, Free Text, Visual, or Mixed (without CR).
 
 ```
-Skills to run (in order):
-1. qa-analyzer.md
-2. traceability-manager.md
-3. tc-generator.md
-4. playwright-generator.md   ← only if automation is requested
-5. reporter.md
+Pipeline Definition Source:
+master-workflow.md
+
+Orchestrator Responsibilities:
+
+- Select Standard Mode
+- Build Run Context
+- Pass routing information to downstream skills
+
+Stage ordering is controlled by master-workflow.md.
+
 ```
 
 ---
@@ -54,13 +125,16 @@ Skills to run (in order):
 Activate when: input is a Change Request or Mixed with CR present.
 
 ```
-Skills to run (in order):
-1. cr-analyzer.md            ← produces delta IUs and regression scope
-2. qa-analyzer.md            ← runs on delta IUs only
-3. traceability-manager.md   ← updates existing matrix, flags retired TCs
-4. tc-generator.md           ← delta TCs only
-5. playwright-generator.md   ← updated specs only, plus regression run list
-6. reporter.md
+Pipeline Definition Source:
+master-workflow.md
+
+Orchestrator Responsibilities:
+
+- Select CR Delta Mode
+- Build Run Context
+- Pass CR routing information to downstream skills
+
+Stage ordering is controlled by master-workflow.md.
 ```
 
 ---

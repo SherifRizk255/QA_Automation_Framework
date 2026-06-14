@@ -1,0 +1,476 @@
+# Intent Unit Schema
+
+> Every skill in this system reads from and writes to Intent Units (IUs).
+>
+> Intent Units are the universal intermediate representation used to normalize all requirement sources into independently testable behaviors.
+>
+> This schema is the single source of truth for the QA pipeline.
+
+---
+
+# What is an Intent Unit?
+
+An Intent Unit (IU) is the smallest independently testable behavior extracted from an approved requirement source.
+
+Regardless of whether the source is:
+
+* BRD
+* FRD
+* Change Request (CR)
+* User Story
+* Feature List
+* SDD
+* Existing Test Cases
+* Free Text
+* Screenshot
+* URL Exploration
+
+the behavior must ultimately be represented as one or more Intent Units.
+
+---
+
+# Relationship to Intent Candidates
+
+Intent Units are generated only after:
+
+1. Input Detection
+2. Intent Candidate Extraction
+3. User Confirmation
+4. Normalization
+
+Intent Candidates (ICs) are temporary structures.
+
+Intent Units (IUs) are the canonical representation consumed by all downstream skills.
+
+Required Traceability:
+
+Requirement
+↓
+Intent Candidate
+↓
+Intent Unit
+↓
+Test Case
+↓
+Automation
+↓
+Execution Result
+
+---
+
+# Intent Unit Structure
+
+```text
+IU-[SOURCE]-[NUMBER]
+──────────────────────────────────────────
+
+id              : unique IU identifier
+
+actor           : who performs the action
+
+action          : what action occurs
+
+condition       : under what condition
+
+outcome         : observable expected outcome
+
+behavior_type   : Functional
+                | Validation
+                | Security
+                | Permission
+                | API
+                | Integration
+                | BusinessRule
+                | Reporting
+                | UI
+
+derived_from    : originating Intent Candidate
+
+source          : original source reference
+
+source_type     : BRD
+                | FRD
+                | CR
+                | UserStory
+                | FeatureList
+                | SDD
+                | ExistingTC
+                | FreeText
+                | Visual
+                | URL
+
+parent_ref      : Requirement ID
+                | AC ID
+                | Story ID
+                | CR ID
+
+status          : Confirmed
+                | Incomplete
+                | Deprecated
+
+confidence      : High
+                | Medium
+                | Low
+
+testability     : Testable
+                | Partially Testable
+                | Untestable
+
+quality_flags   : quality issues identified by
+                  requirements-quality-checker
+
+domain_rules    : extracted constraints
+                  validations
+                  limits
+                  permissions
+                  states
+
+notes           : ambiguities
+                  assumptions
+                  missing information
+                  analyst observations
+
+──────────────────────────────────────────
+```
+
+---
+
+# Behavior Type Definitions
+
+## Functional
+
+Primary business capability.
+
+Examples:
+
+* Create transfer
+* Add beneficiary
+* Create CRM case
+
+---
+
+## Validation
+
+Input validation and business validation.
+
+Examples:
+
+* Amount exceeds limit
+* Required field validation
+* Currency validation
+
+---
+
+## Security
+
+Authentication, authorization, compliance, fraud controls.
+
+Examples:
+
+* MFA required
+* Session timeout
+* Access restriction
+
+---
+
+## Permission
+
+Role-specific behavior.
+
+Examples:
+
+* CSR may edit customer profile
+* Supervisor may approve requests
+
+---
+
+## API
+
+Service contract behavior.
+
+Examples:
+
+* API request validation
+* Response validation
+* Status code handling
+
+---
+
+## Integration
+
+Interactions between systems.
+
+Examples:
+
+* CRM → CBS
+* Portal → API Gateway
+* Middleware → Core Banking
+
+---
+
+## BusinessRule
+
+Policy-driven logic.
+
+Examples:
+
+* Daily transfer limit
+* STP eligibility
+* Currency restrictions
+
+---
+
+## Reporting
+
+Reporting and exports.
+
+Examples:
+
+* Generate statement
+* Export report
+
+---
+
+## UI
+
+Presentation behavior only.
+
+Examples:
+
+* Button enablement
+* Tooltip visibility
+* Grid sorting
+
+---
+
+# Confidence Rules
+
+## High
+
+Explicitly stated.
+
+Example:
+
+"Transfer shall not be permitted when source currency is EGP and beneficiary currency is USD."
+
+---
+
+## Medium
+
+Mostly clear but partially dependent on context.
+
+---
+
+## Low
+
+Ambiguous or incomplete requirement.
+
+Must be flagged.
+
+---
+
+# Testability Rules
+
+## Testable
+
+Actor, action, condition, and observable outcome are present.
+
+---
+
+## Partially Testable
+
+Behavior exists but lacks one critical verification element.
+
+Example:
+
+"The system validates transfers."
+
+Validation criteria missing.
+
+---
+
+## Untestable
+
+Observable outcome cannot be verified.
+
+Example:
+
+"The system should handle transfers efficiently."
+
+No measurable behavior defined.
+
+---
+
+# Quality Flags
+
+Generated by requirements-quality-checker.md
+
+Examples:
+
+* Ambiguous Requirement
+* Missing Outcome
+* Missing Validation Rule
+* Missing Boundary Condition
+* Missing Error Handling
+* Conflicting Requirement
+* Untestable Requirement
+* Duplicate Requirement
+
+If no issues exist:
+
+quality_flags : None
+
+---
+
+# Status Rules
+
+## Confirmed
+
+Approved through Intent Preview and successfully normalized.
+
+---
+
+## Incomplete
+
+Requirement exists but information is missing.
+
+---
+
+## Deprecated
+
+Behavior removed or retired.
+
+---
+
+# Mandatory Traceability Rules
+
+Every IU MUST preserve:
+
+* Source Artifact
+* Source Section
+* Parent Requirement
+* Intent Candidate Reference
+
+No IU may exist without traceability.
+
+Example:
+
+Requirement:
+BRD-4.2-AC3
+
+↓
+
+Intent Candidate:
+IC-BRD-007
+
+↓
+
+Intent Unit:
+IU-BRD-007
+
+↓
+
+Test Case:
+TC-045
+
+↓
+
+Automation:
+PW-045
+
+↓
+
+Execution:
+Run-17
+
+---
+
+# Example Intent Unit
+
+```text
+IU-BRD-007
+
+actor:
+System
+
+action:
+Enforce currency validation
+
+condition:
+Transfer initiated between source and beneficiary accounts
+
+outcome:
+Transfer is evaluated against currency validation rules
+
+behavior_type:
+Validation
+
+derived_from:
+IC-BRD-008
+
+source:
+BRD Section 5.2
+
+source_type:
+BRD
+
+parent_ref:
+BRD-5.2
+
+status:
+Confirmed
+
+confidence:
+High
+
+testability:
+Testable
+
+quality_flags:
+None
+
+domain_rules:
+- Currency validation required
+
+notes:
+None
+```
+
+---
+
+# Standard IU Map Output
+
+```text
+📋 INTENT UNIT MAP
+────────────────────────────────────────────
+
+IU-BRD-001 | Functional   | Transfer to SAIB account
+
+IU-BRD-002 | Validation   | Validate beneficiary account
+
+IU-BRD-003 | Security     | Require MFA before submission
+
+IU-BRD-004 | BusinessRule | Block EGP → USD transfers
+
+────────────────────────────────────────────
+
+Total IUs : 4
+
+Confirmed           : 4
+Incomplete          : 0
+Deprecated          : 0
+
+High Confidence     : 4
+Medium Confidence   : 0
+Low Confidence      : 0
+
+Testable            : 4
+Partially Testable  : 0
+Untestable          : 0
+
+Quality Flags:
+0 Ambiguous
+0 Duplicate
+0 Untestable
+0 Missing Information
+```

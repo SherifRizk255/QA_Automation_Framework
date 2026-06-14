@@ -1,51 +1,728 @@
 # 00 - Master Workflow
 
-## Purpose
-Define the reusable end-to-end AI QA workflow for any Playwright JavaScript automation project in this repository.
+> Master coordinator for the AI QA Framework.
+>
+> Defines workflow order, routing rules, approval gates, execution constraints, and artifact flow.
+>
+> This skill never performs analysis itself.
+>
+> It only determines:
+>
+> * Which skill runs next
+> * Which artifacts are required
+> * Which outputs are expected
+> * Whether execution may continue
 
-## When to use this skill
-Use this skill when the user asks for the overall workflow, wants to start a new project, or asks Codex to coordinate multiple QA workflow stages.
+---
 
-## Required inputs
-- Project name or intended project context
-- Requested workflow stage or desired end-to-end scope
-- Approval status for each stage, when applicable
-- Location of project documents, requirements, or environment notes
+# PURPOSE
 
-## Required outputs
-- Clear workflow stage selection
-- Stage-specific next action
-- Approval gate status
-- Links or paths to stage outputs
+Provide a reusable end-to-end QA workflow for:
 
-## Step-by-step behavior
-1. Identify the requested workflow stage.
-2. Read the matching skill file before acting.
-3. Confirm whether previous stage outputs exist.
-4. Use only the needed stage unless the user explicitly asks for multiple stages.
-5. Stop at approval gates before moving to the next stage.
-6. Keep generic workflow content separate from project-specific content.
-7. Store outputs in the folder defined by the stage skill.
+* Requirements Engineering
+* Change Request Analysis
+* Test Design
+* Traceability
+* Manual Test Generation
+* Playwright Automation
+* Test Execution
+* Failure Analysis
+* Self-Healing
+* Reporting
+* QA Sign-Off
 
-## Quality gates
-- The selected skill file was read before work begins.
-- Project-specific data is not written into generic skill files.
-- The response does not mix unrelated workflow stages.
-- Approval gates are respected.
+Applicable to:
 
-## Do-not rules
-- Do not create automation code during intake, analysis, or design stages.
-- Do not run tests during design stages unless explicitly requested.
-- Do not self-heal failures before failure analysis is complete.
-- Do not bypass approvals.
+* Banking
+* CRM
+* ERP
+* Healthcare
+* E-Commerce
+* Government Systems
+* Enterprise Applications
+* Any future domain
 
-## Output file locations
-- Generic workflow: `docs/ai-workflow/`
-- Project data: `docs/projects/<project-name>/`
-- Requirements: `docs/requirements/`
-- Analysis: `docs/analysis/`
-- Test design: `docs/test-design/`
-- Reports: `docs/reports/` and `reports/`
+---
 
-## Example prompt to use this skill
-“Use the master workflow to start a new QA automation project and tell me which stage should run first.”
+# WORKFLOW MODES
+
+The framework supports two execution modes.
+
+---
+
+## STANDARD MODE
+
+Used when the source contains:
+
+* BRD
+* FRD
+* User Stories
+* Features
+* SDD
+* Business Rules
+* Screenshots
+* Free-Text Requirements
+* Test Cases sheet
+* Mixed Requirement Sources
+
+
+Pipeline:
+
+Project Intake
+↓
+
+(Optional)
+System Walkthrough
+↓
+
+Input Detection
+↓
+Intent Preview
+↓
+Approval Gate
+↓
+Normalizer
+↓
+Requirements Quality Checker
+↓
+Intent Preview Schema
+↓
+Orchestrator
+↓
+QA Analyzer
+↓
+Traceability Manager
+↓
+TC Generator
+↓
+Automation Implementation Agent (Optional)
+↓
+Test Execution Agent
+↓
+Failure Analysis Agent
+↓
+Self-Healing Agent (Optional)
+↓
+Final Report Agent
+↓
+QA Review Agent
+
+---
+
+## CR DELTA MODE
+
+Used when source contains:
+
+* Change Requests
+* Enhancements
+* Production Fix Requests
+* Maintenance Requests
+* Mixed Requirement + CR Inputs
+
+Pipeline:
+
+Project Intake
+↓
+
+(Optional)
+System Walkthrough
+↓
+
+Input Detection
+↓
+Intent Preview
+↓
+Approval Gate
+↓
+Normalizer
+↓
+Requirements Quality Checker
+↓
+Intent Preview Schema
+↓
+Orchestrator
+↓
+CR Analyzer
+↓
+Traceability Manager
+↓
+TC Generator
+↓
+Automation Implementation Agent
+↓
+Test Execution Agent
+↓
+Failure Analysis Agent
+↓
+Self-Healing Agent (Optional)
+↓
+Final Report Agent
+↓
+QA Review Agent
+
+---
+
+# APPROVAL GATES
+
+Intent approval is mandatory.
+
+Accepted values:
+
+APPROVE_INTENTS
+
+NORMALIZE
+
+RUN_NORMALIZER
+
+Without approval:
+
+STOP
+
+Output:
+
+Intent approval required before pipeline continuation.
+
+---
+
+# STAGE RESPONSIBILITIES
+
+## Stage 01 — Project Intake
+
+Purpose:
+
+* Initialize project context
+* Register modules
+* Register environments
+* Register roles
+* Register data ownership
+
+Output:
+
+* Project Profile
+* Environment Notes
+* Modules Inventory
+
+---
+
+## Stage 02 — System Walkthrough (Optional)
+
+Purpose:
+
+* Explore live application
+* Build navigation map
+* Build screen inventory
+* Discover stable locators
+* Build locator inventory
+
+Output:
+
+* System Map
+* Navigation Map
+* Screen Inventory
+* Locator Inventory
+* Blocker Inventory
+* Page Object Recommendations
+
+---
+
+## Stage 03 — Input Detection
+
+Purpose:
+
+* Detect artifact types
+* Extract Intent Candidates
+* Detect domain
+* Detect actors
+* Detect actions
+* Detect permissions
+* Detect business rules
+
+Output:
+
+* Detection Report
+* Intent Candidate Map
+
+---
+
+## Stage 04 — Intent Preview
+
+Purpose:
+
+* Present extracted Intent Candidates
+* Present detected behavior model
+* Await user approval
+
+Output:
+
+* Approved Intent Map
+
+---
+
+## Stage 05 — Normalizer
+
+Purpose:
+
+* Convert approved Intent Candidates into Intent Units
+* Create canonical behavior model
+
+Output:
+
+* Intent Unit List
+* Intent Unit Map
+
+---
+
+## Stage 06 — Requirements Quality Checker
+
+Purpose:
+
+* Detect ambiguity
+* Detect incompleteness
+* Detect missing business rules
+* Detect untestable requirements
+
+Output:
+
+* Requirements Quality Report
+
+Status:
+
+PASS
+
+PARTIAL_PASS
+
+FULL_FAIL
+
+---
+
+## Stage 07 — Intent Unit Schema
+
+Purpose:
+
+* Validate normalized Intent Units
+* Validate structure consistency
+* Validate IU completeness
+* Validate traceability integrity
+
+Output:
+
+* Intent Schema Validation Report
+
+---
+
+## Stage 08 — Orchestrator
+
+Purpose:
+
+* Select execution mode
+* Build run context
+* Route downstream skills
+
+Output:
+
+* Run Context
+
+---
+
+## Stage 09A — QA Analyzer
+
+Purpose:
+
+* Risk scoring
+* Dependency mapping
+* Gap analysis
+* Coverage intent identification
+* Domain rule extraction
+* Regression assessment
+
+Output:
+
+* QA Analysis Report
+
+---
+
+## Stage 09B — CR Analyzer
+
+Purpose:
+
+* Extract CR delta
+* Determine impact
+* Determine regression scope
+* Identify retired behavior
+* Identify superseded behavior
+
+Output:
+
+* CR Analysis Report
+
+---
+
+## Stage 10 — Traceability Manager
+
+Purpose:
+
+* Build canonical traceability matrix
+* Build scenario inventory
+* Allocate TC coverage
+* Build TC blueprint
+
+Output:
+
+* Traceability Matrix
+* Coverage Plan
+* Scenario Inventory
+* TC Blueprint
+
+---
+
+## Stage 11 — TC Generator
+
+Purpose:
+
+* Generate detailed manual test cases
+
+Output:
+
+* Manual Test Case Set
+
+---
+
+## Stage 12 — Automation Implementation Agent
+
+Purpose:
+
+* Convert approved test cases into Playwright TypeScript automation
+
+Output:
+
+* Page Objects
+* Fixtures
+* Utilities
+* Automated Test Suite
+* Automation Coverage Report
+
+---
+
+## Stage 12.5 — Execution Readiness Gate
+
+Purpose:
+
+* Validate:
+ 1. Automation generated successfully
+ 2. Locator inventory exists
+ 3. Traceability complete
+ 4. Required environment available
+ 5. Test data available
+
+
+Output:
+
+ * Execution Readiness Report
+
+Status:
+
+* READY
+BLOCKED
+
+---
+
+## Stage 13 — Test Execution Agent
+
+Purpose:
+
+* Execute Playwright suites
+* Collect evidence
+
+Output:
+
+* Execution Results
+* Screenshots
+* Videos
+* Traces
+* Raw Execution Report
+
+---
+
+## Stage 14 — Failure Analysis Agent
+
+Purpose:
+
+* Analyze failures
+* Determine root cause
+* Classify failures
+
+Output:
+
+* Failure Analysis Report
+* Recovery Recommendations
+* Defect Candidates
+* Self-Healing Candidates
+
+---
+
+## Stage 14.5 — Recovery Decision Gate
+
+Purpose:
+
+ * Determine:
+  1. Self-Healable
+  2. Healing Confidence
+  3. Recovery Strategy
+
+Output:
+* Recovery Decision
+
+Values:
+* AUTO_HEAL
+
+MANUAL_REVIEW
+* DEFECT_ESCALATION
+
+---
+
+## Stage 15 — Self-Healing Agent
+
+Purpose:
+
+* Repair automation failures only
+
+Never modify:
+
+* Requirements
+* Business Logic
+* Test Design
+
+Output:
+
+* Self-Healing Report
+* Updated Automation Artifacts
+* Healing Validation Results
+* Regression Verification Results
+
+---
+
+## Stage 16 — Final Report Agent
+
+Purpose:
+
+* Consolidate execution results
+* Consolidate defect findings
+* Consolidate automation findings
+
+Output:
+
+* Execution Summary
+* Defect Summary
+* Automation Health Summary
+* Coverage Summary
+* QA Summary
+
+---
+
+## Stage 17 — QA Review Agent
+
+Purpose:
+
+* Review overall QA readiness
+* Review coverage quality
+* Review execution quality
+* Provide approval recommendation
+
+Output:
+
+* QA Sign-Off Report
+
+---
+
+# EXECUTION RULES
+
+Rule 1
+
+Never skip Requirements Quality Checker.
+
+---
+
+Rule 2
+
+Never run Normalizer without Intent Approval.
+
+---
+
+Rule 3
+
+Never run Intent Preview Schema before Requirements Quality Checker.
+
+---
+
+Rule 4
+
+Never run QA Analyzer or CR Analyzer before Orchestrator.
+
+---
+
+Rule 5
+
+Never run Traceability Manager without Analyzer output.
+
+---
+
+Rule 6
+
+Never run TC Generator without Traceability Matrix.
+
+---
+
+Rule 7
+
+Never run Automation Implementation without approved test cases.
+
+---
+
+Rule 8
+
+Never execute Self-Healing before Failure Analysis.
+
+---
+
+Rule 9
+
+CR Analyzer must run whenever CR Delta Mode is selected.
+
+---
+
+Rule 10
+
+Never run Self-Healing when:
+
+Self-Healable = NO
+
+---
+
+Rule 11
+
+Never apply automatic healing when:
+
+Healing Confidence = LOW
+
+---
+
+Rule 12
+
+Every locator recovery must pass:
+
+count() == 1
+isVisible()
+isEnabled()
+Actionable
+
+before automation is updated.
+
+---
+
+Rule 13
+
+Recovery recommendations must originate from Failure Analysis.
+
+---
+
+# STORAGE MODEL
+
+Framework Skills:
+
+docs/ai-workflow/
+
+Project Artifacts:
+
+docs/projects/<project-name>/
+
+Requirements:
+
+docs/requirements/
+
+Analysis:
+
+docs/analysis/
+
+Traceability:
+
+docs/traceability/
+
+Test Design:
+
+docs/test-design/
+
+Automation:
+
+tests/
+pages/
+fixtures/
+utils/
+
+Execution Results:
+
+reports/
+test-results/
+playwright-report/
+
+Final Reports:
+
+docs/reports/
+
+---
+
+# Artifact Flow
+
+System Walkthrough
+↓
+Locator Inventory
+
+Automation Implementation
+↓
+Locator Chains
+
+Execution
+↓
+DOM Evidence
+
+Failure Analysis
+↓
+Recovery Strategy
+
+Self-Healing
+↓
+Validation Results
+
+Final Report
+↓
+QA Decision
+
+---
+
+# MASTER WORKFLOW OUTPUT
+
+Before any stage executes:
+
+⚙️ MASTER WORKFLOW CONTEXT
+────────────────────────────────────────
+
+Mode:
+[Standard | CR Delta]
+
+Current Stage:
+[stage]
+
+Previous Stage Complete:
+[Yes | No]
+
+Approval Status:
+[Approved | Pending]
+
+Next Skill:
+[skill name]
+
+Expected Output:
+[artifact]
+
+────────────────────────────────────────
+
+Only then may the selected skill execute.
