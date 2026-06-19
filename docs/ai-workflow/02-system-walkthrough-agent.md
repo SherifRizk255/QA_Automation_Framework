@@ -69,11 +69,13 @@ Observed application behavior must never override documented requirements.
 - `docs/analysis/navigation-map.md`
 - `docs/analysis/screen-inventory.md`
 - `docs/analysis/locator-inventory.md`
+- `docs/analysis/locator-repository.json`
 - `docs/analysis/blocker-inventory.md`
 - `docs/analysis/page-object-recommendations.md`
 - `docs/analysis/ui-behavior-inventory.md`
 - `docs/analysis/workflow-observations.md`
 - `docs/analysis/automation-readiness-report.md`
+
 
 ---
 
@@ -173,34 +175,43 @@ For every interactive element identify:
 
 ### Preferred Locators
 
+Locator discovery, automation generation, and self-healing must evaluate locator candidates in the following order.
+
+The objective is to maximize:
+
+- Stability
+- Maintainability
+- Uniqueness
+- Recovery capability
+
+while minimizing locator volatility.
+
+
 Priority order:
 
-```text
-1. Role + Accessible Name
-2. Test Attributes (data-testid, data-test, data-cy, data-qa)
-3. aria-label
-4. label
-5. placeholder
-6. stable id
-7. name
-8. text
-9. css
-10. xpath
+1. Stable ID
+2. Accessibility Locator
+3. Stable CSS Selector
+4. Alternative XPath
+5. Visible Text
+6. Test Attributes
+7. Placeholder
+8. Name Attribute
+9. Partial Text
+10. Contextual Locator
 
-Prefer semantic Playwright locators whenever possible.
+Always select the highest-priority locator that passes validation.
+
+A lower-priority locator may be selected only when all higher-priority candidates fail validation.
 
 Examples:
-
-getByRole('button', { name: 'Login' })
-
-getByLabel('Password')
-
-getByPlaceholder('Enter username')
-
-getByText('Submit')
-
 ```
-
+//button[@id='transferBtn']
+//tr[.//td='Ahmed']//button[text()='Edit']
+id="transferBtn"
+<input aria-label="Password">
+button[id='transferBtn']
+```
 For every locator record:
 
 ```For every locator record:
@@ -228,9 +239,9 @@ Automation Notes
 
 Locator uses:
 
-- data-testid
-- aria-label
-- stable id
+- Stable ID
+- Accessability Locator
+- Test Attributes
 
 Automation Risk:
 
@@ -244,9 +255,11 @@ LOW
 
 Locator uses:
 
-- name
-- role
-- stable CSS attributes
+- Alternative XPath
+- Visible Text
+- Stable CSS
+- Placeholder
+- Name Attribute
 
 Automation Risk:
 
@@ -260,10 +273,8 @@ MEDIUM
 
 Locator uses:
 
-- xpath
-- position-based selector
-- generated CSS classes
-- dynamic IDs
+- Partial Text
+- Contextual Locator
 
 Automation Risk:
 
@@ -274,6 +285,7 @@ HIGH
 Must be flagged for future improvement.
 
 ---
+
 ## Locator Discovery Standards
 
 For every interactive element:
@@ -299,18 +311,20 @@ Preferred locator strategies must be evaluated in the following order:
 
 | Priority | Locator Type | Score |
 |-----------|-------------|--------|
-| 1 | Role + Accessible Name | 100 |
-| 2 | Test Attributes (`data-testid`, `data-test`, `data-cy`, `data-qa`) | 98 |
-| 3 | Label-Based | 95 |
-| 4 | Placeholder-Based | 90 |
-| 5 | Stable ID | 85 |
-| 6 | Name Attribute | 80 |
-| 7 | Visible Text | 75 |
-| 8 | Partial Text | 70 |
-| 9 | Stable CSS Selector | 50 |
-| 10 | XPath | 20 |
+| 1 | Stable ID | 100 |
+| 2 | Accessibility Locator | 95 |
+| 3 | Stable CSS Selector| 90 |
+| 4 | Alternative XPath | 85 |
+| 5 | Visible Text | 80 |
+| 6 | Test Attributes (`data-testid`, `data-test`, `data-cy`, `data-qa`) | 75 |
+| 7 | Placeholder | 70 |
+| 8 | Name Attribute | 65 |
+| 9 | Partial Text | 50 |
+| 10 | Contextual Locator| 20 |
 
-Prefer semantic locators whenever possible.
+Always select the highest-priority locator that passes validation.
+
+A lower-priority locator may be selected only when all higher-priority candidates fail validation.
 
 ---
 
@@ -336,7 +350,9 @@ Prefer semantic locators whenever possible.
 
  2- These attributes may be documented only as discovery evidence.
 
- 3- Framework-generated attributes must be classified as HIGH volatility.
+
+
+---
 
 ## Forbidden Locator Patterns
 
@@ -376,11 +392,9 @@ These locators may be documented only as a last-resort fallback.
 
 Characteristics:
 
-- Role + Accessible Name
+- Stable ID
+- Accessability Locator
 - Test Attributes
-- Labels
-- aria-label
-- Stable semantic identifiers
 
 Automation Risk:
 
@@ -392,9 +406,12 @@ LOW
 
 Characteristics:
 
-- Stable IDs
-- Name attributes
-- Visible text
+- Alternative XPath
+- Visible Text
+- Stable CSS
+- Placeholder
+- Name Attribute
+
 
 Automation Risk:
 
@@ -406,10 +423,8 @@ MEDIUM
 
 Characteristics:
 
-- CSS selectors
-- XPath
-- Dynamic attributes
-- Generated framework identifiers
+- Partial Text
+- Contextual Locator
 
 Automation Risk:
 
@@ -427,69 +442,132 @@ Must be flagged for future improvement.
 
 Expected to remain stable across releases.
 
-Examples:
+Characteristics:
+ - Unique
+ - Business-owned
+ - Rarely affected by UI redesign
 
-- getByRole()
-- getByLabel()
-- getByTestId()
-- aria-label
+Examples:
+```
+1.Stable ID
+  - #transferBtn
+  - #customerSearch
+
+2.Accessibility Locators
+  - getByRole()
+  - getByLabel()
+  - aria-label
+
+3.Test Attributes
+
+ 
+```
 
 ### MEDIUM VOLATILITY
 
 May change when screens are redesigned.
 
 Examples:
+```
+ 1. Stable CSS Selectors
+    - button.primary-transfer
+    - input[name='password']
+ 2. Alternative XPath
+    - //button[@id='transferBtn']
+    - //input[@placeholder='Enter your password']
+ 3.Visible Text
+    - getByText('Transfer')
+ 4. Placeholder
+ 5. Name Attributes
 
-- Stable IDs
-- Name attributes
-- Visible text
-- Placeholder Text
-
+```
 ### HIGH VOLATILITY
 
-Likely to break after UI changes.
+Likely to break after:
+ - Layout changes
+ - Component replacement
+ - Framework upgrades
+ - UI modernization
 
 Examples:
-
-- CSS selectors
-- XPath selectors
-- Framework-generated classes
-- Dynamic IDs
-- Generated Attributes
-
+```
+ 1. Partial Text
+    - getByText(/Transfer/)
+ 2. Contextual Locator
+    - Account 123 → View
+    - Business-context XPath
+    - Positional relationships
+```
 ---
 
 ## Locator Uniqueness Classification
 
-Every locator must be classified for uniqueness.
+Every discovered locator must be classified for uniqueness.
+
+Uniqueness determines whether a locator can reliably identify a single target element within the current DOM.
+
+Uniqueness must be validated using:
+
+count()
+
+before a locator is accepted.
 
 ### UNIQUE: 
 
-Locator identifies exactly one element without additional context.
+Definition:
+
+ - The locator resolves exactly one element without requiring additional context.
+
+
+Characteristics:
+ - Self-sufficient
+ - Stable
+ - Preferred for Primary Locators
+ - Suitable for automation and self-healing
 
 Examples:
-
- - getByRole('button', { name: 'Login' })
- - [data-testid='submit-btn']
+ - page.locator('#transferBtn') 
+ - page.getByLabel('Password') 
+ - page.getByRole('button', { name: 'Transfer' })  
+ - page.locator("input[name='customerName']")
 
 ### CONTEXTUAL
-Locator requires parent context to become unique.
+
+Definition:
+ - The locator is not unique by itself but becomes unique when combined with business context, container context, or parent context.
+
+Characteristics:
+ - Acceptable when UNIQUE locators are unavailable
+ - Requires documented context
+ - Common in tables, cards, dialogs, and CRM grids
+ - Preferred over positional selectors
 
 Examples:
 
  - Edit Button inside Customer Row
  - Delete Button inside Account Table
  - Approve Button inside Transaction Card
+ - Playwright Example:
 
+    ```
+    page
+      .locator('tr')
+      .filter({ hasText: 'Ahmed' })
+      .getByRole('button', { name: 'Edit' }
+
+    ```
 Contextual locators are acceptable but must document the required context.
 
 ### NON-UNIQUE
-Locator matches multiple elements and cannot reliably identify a target element.
+Definition:
+ - Locator matches multiple elements and cannot reliably identify a target element.
 
-Examples:
- - getByText('Edit')
- - button
- - Non-unique locators must not be selected as Primary Locators.
+Characteristics:
+ - Ambiguous
+ - Unsafe for automation
+ - Unsafe for self-healing
+
+Non-unique locators must not be selected as Primary Locators.
 
 ---
 
@@ -507,7 +585,7 @@ Fallback Locator 1
 Fallback Locator 2
 
 Discovery Source 
- ROLE | LABEL | PLACEHOLDER | TESTID | ID | NAME | TEXT | CSS | XPATH 
+ ID | ACCESSIBILITY | CSS | ALT_XPath | TEXT | TESTID | PLACEHOLDER | NAME | PARTIAL_TEXT
  
 Uniqueness 
  UNIQUE | CONTEXTUAL | NON-UNIQUE
@@ -550,6 +628,142 @@ Known Risks: None
 Automation Notes:
 Preferred locator suitable for long-term Playwright automation.
 ```
+
+---
+
+## Locator Repository Metadata Model
+
+Every repository entry must contain:
+ - Element ID
+ - Screen Name
+ - Element Name
+ - Primary Locator
+ - Fallback Locator Chain
+ - Discovery Source
+ - Confidence
+ - Volatility
+ - Uniqueness
+ - Last Validated
+ - Validation Count
+ - Success Count
+ - Failure Count
+ - Last Updated By
+ - Repository Status
+
+Example:
+ ```
+ Element ID:
+ LOGIN.LOGIN_BUTTON
+
+ Screen Name:
+ Login
+
+ Element Name:
+ Login Button
+
+ Primary Locator:
+ #loginBtn
+
+ Fallbacks:
+ getByRole('button', { name: 'Login' })
+
+ Discovery Source:
+ ID
+
+ Confidence:
+ HIGH
+
+ Volatility:
+ LOW
+
+ Uniqueness:
+ UNIQUE
+
+ Last Validated:
+ 2026-06-17
+
+ Validation Count:
+ 18
+
+ Success Count:
+ 18
+
+ Failure Count:
+ 0
+
+ Last Updated By:
+ SYSTEM_WALKTHROUGH
+
+ Repository Status:
+ ACTIVE
+```
+
+---
+
+## Repository Health Classification
+
+Every repository entry must be assigned a health status.
+
+### ACTIVE
+
+Locator validated successfully.
+
+Criteria:
+
+- Validation successful
+- Success Rate >= 90%
+
+### DEGRADED
+
+Locator occasionally fails.
+
+Criteria:
+
+- Success Rate between 60% and 89%
+
+### STALE
+
+Locator has not been validated recently.
+
+Criteria:
+
+- Validation overdue
+- No recent successful executions
+
+### OBSOLETE
+
+Locator repeatedly fails validation.
+
+Criteria:
+
+- Success Rate < 60%
+- Multiple recovery attempts failed
+
+Obsolete entries must be flagged for rediscovery.
+
+---
+
+## Locator Repository Synchronization
+
+After locator discovery:
+
+1. Load locator-repository.json if it exists.
+2. Check whether the discovered element already exists.
+3. Validate repository locators against the current DOM.
+4. Reuse valid repository locators.
+5. Update outdated locator entries.
+6. Create new entries for previously unknown elements.
+7. Save updated locator metadata.
+
+Repository updates must preserve:
+
+- Primary Locator
+- Fallback Chain
+- Confidence
+- Volatility
+- Uniqueness
+- Discovery Source
+- Last Validation Timestamp
 
 ---
 

@@ -30,7 +30,7 @@ Every generated TC must map to exactly one Scenario ID.
 
 ## INPUT CONTRACT
 
-CConsumes:
+Consumes:
 
 - Traceability Plan
 - Traceability Matrix

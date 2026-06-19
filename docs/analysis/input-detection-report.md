@@ -1,75 +1,114 @@
-# Input Detection Report - Credit Card Payment
+# Input Detection Report - SAIB Internet Banking Login & Authentication
 
 Detected Type:
-BRD/FRD
+Baseline Test Asset
 
 Mode Activated:
-Full Requirements Mode
+Baseline Mode
 
 Detection Confidence:
-93%
+98%
 
 Information Sufficiency:
 MEDIUM
 
 Artifact Inventory:
-- ART-001 | BRD/FRD Requirement Text | User-provided requirement: "Feature: Credit Card Payment" | 93%
+- ART-001 | Existing Test Case Sheet | `agent-automation- excel.xlsx` | 98%
 
 Domain Context:
 Retail Banking
 
 System Type:
-Digital banking payment system
+Web
 
 Tech Hints:
-- None explicitly provided
+- Playwright TypeScript
+- Existing test execution tracker
+
+Project Context:
+- Project: SAIB Internet Banking
+- Module: Login & Authentication
+- Feature: Credentials Login
+- Platform: Web
+- Framework: Playwright TypeScript
+
+Workbook Inventory:
+- Sheet: Sheet1
+- Rows detected: 8
+- Header row detected: row 3
+- Test case rows detected: 5
+
+Columns Found:
+- #
+- TC ID
+- Module
+- Sub-Module
+- Test Case Title
+- Expected Result
+- Type
+- Priority
+- Assigned To
+- Status
+- Actual Result/Notes
+- Bug / Enh ID
+- Bug Type
+- Date Executed
+- Remarks
+
+Detected Test Case IDs:
+- SAIB-0209
+- SAIB-0212
+- SAIB-0214
+- SAIB-0217
+- SAIB-0218
 
 Sections Found:
-- Feature title
-- Payment capability
-- Inputs
-- Validation rules
+- Workbook title
+- Customer/vendor/tester metadata
+- Test case table
+- Execution tracking columns
+- Defect tracking columns
 
 Signals Detected:
-- Present: feature title
-- Present: customer payment capability
-- Present: input list
-- Present: validation list
-- Present: banking/payment domain terms
+- Present: TC ID column
+- Present: Test Case Title column
+- Present: Expected Result column
+- Present: Type column
+- Present: Priority column
+- Present: Status column
+- Present: Actual Result/Notes column
+- Present: Bug / Enh ID column
+- Present: Bug Type column
 
 Ambiguities:
-- Partial: "own credit card" eligibility is not defined.
-- Partial: payment type supports Immediate/Scheduled, but scheduling rules are not provided.
-- Partial: "currency must match account currency" does not define card currency source or allowed currencies.
-- Partial: sufficient balance calculation timing is not defined.
+- Partial: Detailed test steps are not present in the visible workbook rows.
+- Partial: Preconditions are not present.
+- Partial: Test data is not present.
+- Partial: Expected results are generic and may need strengthening before automation.
+- Partial: Execution status fields appear blank in the sampled rows.
 
 Missing Information:
-- Missing: card status eligibility rules.
-- Missing: source account eligibility rules.
-- Missing: minimum and maximum payment amount rules.
-- Missing: scheduled payment date, cutoff, weekend, and holiday rules.
-- Missing: currency list and cross-currency handling.
-- Missing: payment confirmation/receipt behavior.
-- Missing: failure/error handling behavior.
-- Missing: security/MFA requirement, if applicable.
+- Missing: step-by-step manual actions.
+- Missing: test data references for valid and invalid credentials.
+- Missing: environment URL/configuration.
+- Missing: authentication policy details such as lockout count, retry limits, and generic error wording.
+- Missing: locator strategy or page object references for Playwright implementation.
+- Missing: actual execution results, if this workbook is intended as an execution record.
 
 What I Cannot Determine:
-- Whether only active cards are eligible.
-- Whether the source account must be owned by the same customer.
-- Whether scheduled payments validate balance at setup time, execution time, or both.
-- Whether payment amount can exceed outstanding balance.
-- Whether partial, minimum due, or full statement balance payment options are in scope.
-- Whether currency matching is source account to card currency, source account to selected payment currency, or both.
+- Whether these test cases are approved baseline cases or draft cases.
+- Whether the expected generic error message text is defined elsewhere.
+- Whether audit trail validation is observable through UI, API, logs, or database.
+- Whether MFA, CAPTCHA, account lockout, or session controls are in scope for credentials login.
+- Whether Status/Actual Result columns are intentionally blank or not yet executed.
 
 Recommended Route:
-Intent Preview
+Intent Preview in Baseline Mode
 
 Clarifying Questions:
-- Should only active own cards be eligible for payment?
-- Should scheduled payments validate balance at setup time, execution time, or both?
-- Is payment currency restricted to specific currencies, such as EGP only?
-- Can the payment amount exceed outstanding balance?
-- Are partial, minimum due, and full statement balance amount options in scope?
+- Should the five detected test cases be converted into baseline Intent Candidates?
+- Should missing steps/test data be filled from a separate requirements source, or preserved as quality gaps?
+- Is automation generation expected after review, or should the workflow stop at QA review of the existing test cases?
 
 ---
 
@@ -79,17 +118,17 @@ Ready For Intent Preview:
 YES
 
 Confidence Level:
-MEDIUM
+HIGH
 
 Reasons:
-- The artifact clearly describes a credit card payment feature.
-- Required inputs and validation themes are explicitly listed.
-- There is enough information to preview explicit candidate intents after approval.
+- The workbook clearly matches an existing test case sheet/test execution tracker.
+- Test case IDs, titles, expected results, type, priority, and execution tracking columns are present.
+- Project/module/feature context aligns with the workbook rows.
 
 Risks:
-- Several business rules are under-specified.
-- Validation outcomes and failure handling are missing.
-- Scheduled payment rules are not defined.
+- Missing detailed steps and test data may limit direct automation readiness.
+- Generic expected results may be too broad for reliable Playwright assertions.
+- Security and audit expectations may need a supporting requirement or test data source.
 
 ---
 

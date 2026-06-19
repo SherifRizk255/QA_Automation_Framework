@@ -250,16 +250,16 @@ Business context
 
 Preferred locator order:
 
-1. Role + Accessible Name
-2. Test Attributes (data-testid, data-test, data-cy, data-qa)
-3. aria-label
-4. Label
-5. Placeholder
-6. Stable ID
-7. Name Attribute
-8. Visible Text
-9. Stable CSS
-10. XPath
+1. Stable ID
+2. Accessibility Locator
+3. Stable CSS Selector
+4. Alternative XPath
+5. Visible Text
+6. Test Attributes
+7. Placeholder
+8. Name Attribute
+9. Partial Text
+10. Contextual Locator
 
 ---
 
@@ -270,7 +270,6 @@ Every discovered locator should include:
  - Fallback Locators
  - Confidence
  - Volatility
- - Locator Score
  - Known Risks
 
 ---
@@ -378,7 +377,7 @@ Never classify without evidence.
 
 ---
 
-# ecovery Governance
+# Recovery Governance
 
 Recovery decisions originate from Failure Analysis.
 

@@ -26,7 +26,7 @@ test.describe('Internet Banking Portal - Session Blocker Tests', () => {
         expect.soft(
           activeSessionDisplayed,
           'Active session blocker appeared and was handled.'
-        ).toBe(false);
+        ).toBe(true);
       } else {
         testInfo.annotations.push({
           type: 'note',

@@ -15,15 +15,18 @@ Use this skill only after TC generation is complete.
 ---
 
 ## Inputs
+
 ### Mandatory
 - Approved Test Cases
 - Traceability Matrix
 - QA Analysis Report
 - IU Catalog
 - Locator Inventory
+- Locator Repository
 - System Map
 - Navigation Map
 - Page Object Recommendations
+
 ### Optional
 - Existing Playwright Framework
 - Existing Page Objects
@@ -35,6 +38,7 @@ Use this skill only after TC generation is complete.
 ---
 
 ## Consumes
+
  * From QA Analyzer
    - Risk
    - Automation Feasibility
@@ -55,6 +59,7 @@ Use this skill only after TC generation is complete.
    - Tags
  * From System Walkthrough
    - Locator Inventory
+   - Locator Repository
    - Locator Confidence
    - Locator Volatility
    - Locator Uniqueness
@@ -146,23 +151,64 @@ Every automated test must be traceable back to its originating TC.
 
 ## Locator Strategy
 
-Use Locator Inventory first.
-Never invent locators.
+Use Locator Repository first.
+
+If a valid repository locator exists:
+
+- Reuse it.
+- Validate uniqueness and actionability.
+
+If no repository locator exists:
+
+- Use Locator Inventory.
+
+If neither provides a valid locator:
+
+- Generate locator candidates.
+- Validate candidates.
+- Update Locator Repository.
+
+---
+
+## Locator Repository Lookup Rules
+
+Before generating or selecting a locator:
+
+1. Search locator-repository.json.
+2. Match using:
+   - Screen Name
+   - Element Name
+   - Business Context
+   - Workflow Context (if available)
+3. Validate repository locator.
+4. Reuse repository locator if validation succeeds.
+5. Use Locator Inventory only when:
+   - Repository entry does not exist
+   - Repository locator fails validation
+6. Rediscover locators only when repository and inventory locators are invalid.
+
+Repository validation must verify:
+
+- count() == 1
+- Visible
+- Attached to DOM
+- Actionable
+
+Repository reuse is preferred over locator rediscovery.
 
 ---
 
 ## Locator Priority
-1. Role + Accessible Name
-2. Test Attributes (data-testid, data-test, data-cy, data-qa)
-3. aria-label
-4. Label
-5. Placeholder
-6. Stable ID
-7. Name Attribute
-8. Visible Text
+1. Stable ID
+2. Accessibility Locator
+3. Stable CSS Selector
+4. Alternative XPath
+5. Visible Text
+6. Test Attributes
+7. Placeholder
+8. Name Attribute
 9. Partial Text
-10. Stable CSS
-11. XPath
+10. Contextual Locator
 
 ---
 
@@ -252,30 +298,232 @@ Confidence:
 ## Locator Fallback Chain Generation
 
 Every interactive element must contain:
- - Primary Locator
- - Fallback Locator 1
- - Fallback Locator 2
- - Fallback Locator 3
+
+* Primary Locator
+* Fallback Locator 1
+* Fallback Locator 2
+* Fallback Locator 3
 
 Fallback locators must be selected from Locator Inventory metadata.
 
-Prefer:
- - Role
- - Label
- - Placeholder
- - Stable ID
- - Name
- - Text
+Fallback candidates must be:
+
+* Validated
+* Unique or Contextual
+* Actionable
+* Compatible with the current DOM
+
+Locator chains must be synchronized with locator-repository.json.
+
+When a new fallback chain is generated, repository entries must be updated.
+
+---
+
+### Fallback Selection Priority
+
+Fallback locators should be selected using the highest-confidence validated alternatives available.
+
+Preferred order:
+ 1. ID
+ 2. ACCESSIBILITY
+ 3. CSS
+ 4. ALT_XPATH
+ 5. TEXT
+ 6. TESTID
+ 7. PLACEHOLDER
+ 8. NAME
+ 9. PARTIAL_TEXT
+ 10. CONTEXTUAL
+
+
+Fallback chains should attempt to preserve priority order.
+
+However, if a lower-priority locator has:
+
+- Higher Confidence
+- Lower Volatility
+- Better Uniqueness
+
+it may be selected ahead of a higher-priority locator.
+
+Example:
+
+Primary:
+ID
+
+Available Fallbacks:
+
+CSS
+(Confidence: MEDIUM)
+
+TESTID
+(Confidence: HIGH)
+
+Preferred Fallback:
+TESTID
+
+Reason:
+Higher confidence and lower volatility
+
+---
+
+### Fallback Diversity Rule
+
+Do not generate fallback chains using the same locator strategy repeatedly.
+
+Example:
+
+Bad
+
+```text
+Primary:
+ID
+
+Fallback 1:
+ID
+
+Fallback 2:
+ID
+
+Fallback 3:
+ID
+```
+
+Preferred
+
+```text
+Primary:
+ID
+
+Fallback 1:
+ACCESSIBILITY
+
+Fallback 2:
+CSS
+
+Fallback 3:
+ALT_XPATH
+```
+
+Fallback chains should maximize recovery options.
+
+---
+
+### Fallback Confidence Rule
+
+Fallback chains must preserve confidence order whenever possible.
+
+Example:
+
+```text
+HIGH
+↓
+HIGH
+↓
+MEDIUM
+↓
+MEDIUM
+```
 
 Avoid:
- - CSS
- - XPath
 
-unless no alternative exists.
+```text
+HIGH
+↓
+LOW
+↓
+HIGH
+```
 
-Fallback chains must preserve locator confidence order.
+unless no higher-confidence alternative exists.
 
-Store fallback chains in Page Objects to support Self-Healing Agent recovery.
+---
+
+### Forbidden Fallback Candidates
+
+Never use:
+
+```text
+Absolute XPath
+
+Positional XPath
+
+nth-child
+
+nth-of-type
+
+Framework-generated classes
+
+Dynamic IDs
+
+Runtime-generated attributes
+
+Non-Unique Locators
+```
+
+Examples:
+
+```text
+/html/body/div[2]/button
+
+button:nth-child(3)
+
+react-123
+
+ng-star-inserted
+
+pc13
+
+pc14
+```
+
+---
+
+### Fallback Chain Example
+
+```text
+Element:
+Transfer Button
+
+Primary Locator:
+#transferBtn
+
+Fallback Locator 1:
+getByRole('button', { name: 'Transfer' })
+
+Fallback Locator 2:
+button.primary-transfer
+
+Fallback Locator 3:
+//button[text()='Transfer']
+
+Confidence:
+HIGH
+HIGH
+MEDIUM
+MEDIUM
+```
+
+---
+
+### Self-Healing Support
+
+Fallback chains must be stored in Page Objects and Locator Inventory metadata.
+
+The Self-Healing Agent must evaluate fallback locators before initiating locator rediscovery.
+
+Locator rediscovery should occur only when:
+
+```text
+All fallback locarors fail validation.
+```
+
+or
+
+```text
+Fallback Chain Exhausted = YES
+```
+
 
 ---
 
@@ -284,7 +532,7 @@ Store fallback chains in Page Objects to support Self-Healing Agent recovery.
 Every locator candidate must pass:
 
 * Validation 1 — Uniqueness
-  - count() === 1
+   - count() === 1
 
   Reject:
    - count() == 0 

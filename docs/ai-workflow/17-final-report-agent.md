@@ -206,9 +206,45 @@ List:
 - Locator instability observations
 
 ---
+### 7. ### Generate Locator Repository Health Summary
+
+Summarize:
+
+- Total Repository Entries
+- Active Entries
+- Degraded Entries
+- Stale Entries
+- Obsolete Entries
+- Entries Updated By Self-Healing
+- Most Volatile Screens
+- Most Frequently Recovered Elements
+
+Example:
+
+Locator Repository Health
+
+Total Entries:
+420
+
+Active:
+388
+
+Degraded:
+21
+
+Stale:
+8
+
+Obsolete:
+3
+
+Recovered This Cycle:
+11
+
+---
 
 
-### 7. Generate Coverage Summary
+### 8. Generate Coverage Summary
 
 Summarize:
 
@@ -235,7 +271,7 @@ Uncovered IUs:
 
 ---
 
-### 8. Assess Release Readiness
+### 9. Assess Release Readiness
 
 Determine:
 
@@ -265,7 +301,7 @@ Based on:
 
 ---
 
-### 9. Produce Recommendations
+### 10. Produce Recommendations
 
 Provide:
 
@@ -279,7 +315,7 @@ Recommendations must be actionable.
 
 ---
 
-### 10. Generate Final QA Decision
+### 11. Generate Final QA Decision
 
 Provide final QA assessment.
 

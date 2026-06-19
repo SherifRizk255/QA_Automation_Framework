@@ -26,6 +26,7 @@ Use this skill when the user asks to run selected tests or a test suite and coll
  - Automation Coverage Report
  - Environment configuration
  - Browser/project selection
+
 ### Optional
  - Specific test file
  - Specific test suite
@@ -118,14 +119,16 @@ traceability.
 11. Record retries.
 12. Record blocker occurrences.
 13. Record locator execution behavior.
-14. Record locator failures.
-15. Record screenshots when required.
-16. Record videos when required.
-17. Record traces when required.
-18. Preserve raw failure messages.
-19. Generate failure-analysis-input.md.
-20. Preserve all execution evidence.
-21. Stop and hand off to Failure Analysis Agent.
+14. Validate repository locator usage.
+15. Record locator failures.
+16. Update locator validation results. 
+17. Record screenshots when required.
+18. Record videos when required.
+19. Record traces when required.
+20. Preserve raw failure messages.
+21. Generate failure-analysis-input.md.
+22. Preserve all execution evidence.
+23. Stop and hand off to Failure Analysis Agent.
 
 ---
 
@@ -333,6 +336,42 @@ HIGH
 
 This output is consumed by Self-Healing Agent.
 
+---
+
+## Repository Validation Recording
+
+For every locator interaction capture:
+
+- Repository Entry
+- Locator Used
+- Validation Result
+- Match Count
+- Visibility Result
+- Actionability Result
+
+Example:
+```
+Element:
+Transfer Button
+
+Repository Entry:
+TRANSFER.TRANSFER_BUTTON
+
+Locator:
+#transferBtn
+
+Validation:
+PASSED
+
+Match Count:
+1
+
+Visible:
+YES
+
+Actionable:
+YES
+```
 ---
 
 ## DOM Evidence Collection

@@ -8,11 +8,11 @@ export class TransferBetweenOwnAccountsPage {
     this.transferLandingHeading = page.getByText(/^Transfer Money$/i).first();
     this.betweenMyAccountsCard = page.getByRole('button', { name: /between my accounts/i });
 
-    this.fromAccountDropdown = this.dropdownByLabel(/from account/i);
-    this.toAccountDropdown = this.dropdownByLabel(/to account/i);
+    this.fromAccountDropdown = this.dropdownByLabel(/from account/i).or(page.getByText(/select source account/i));
+    this.toAccountDropdown = this.dropdownByLabel(/to account/i).or(page.getByText(/select destination account/i));
     this.dropdownOptions = page
       .getByRole('option')
-      .or(page.locator('.p-select-option, .p-dropdown-item, [role="listbox"] li'));
+      .or(page.locator('.p-select-option, .p-dropdown-item, [role="listbox"] li, .dialog-account-item'));
     this.loadingIndicator = page.getByText(/loading|please wait/i);
   }
 

@@ -220,6 +220,7 @@ Output:
 * Navigation Map
 * Screen Inventory
 * Locator Inventory
+* Locator Repository
 * Blocker Inventory
 * Page Object Recommendations
 

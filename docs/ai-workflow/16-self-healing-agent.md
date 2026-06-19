@@ -30,6 +30,7 @@ Use this skill after failure analysis confirms a failure is an automation script
  - `docs/analysis/locator-inventory.md`
  - `playwright-report/`
  - `test-results/`
+ - `docs/analysis/locator-repository.json`
 
 ### Optional
  - docs/analysis/page-object-recommendations.md 
@@ -262,13 +263,14 @@ AUT_ASYNC_RENDER
 9. Validate recovery candidates.
 10. Select safest valid repair.
 11. Apply smallest safe fix.
-12. Re-run failed test.
-13. Verify failure resolved.
-14. Run impacted related tests.
-15. Assess healing risk.
-16. Generate self-healing report.
-17. Update automation coverage if required.
-18. Record remaining risks.
+12. Update locator repository if locator changes.
+13. Re-run failed test.
+14. Verify failure resolved.
+15. Run impacted related tests.
+16. Assess healing risk.
+17. Generate self-healing report.
+18. Update automation coverage if required.
+19. Record remaining risks.
 
 ---
 
@@ -283,6 +285,24 @@ Classification:
 Never immediately edit the locator.
 
 Perform locator rediscovery.
+
+---
+
+### Repository Lookup Rules
+
+Before generating new locator candidates:
+
+1. Search locator-repository.json.
+2. Locate matching element entry.
+3. Validate repository locator.
+4. Validate repository fallback chain.
+5. Attempt recovery using repository metadata.
+6. Initiate locator rediscovery only if:
+   - Repository locator fails
+   - Fallback chain exhausted
+   - Context no longer valid
+
+Repository recovery must be attempted before full rediscovery.
 
 ---
 
@@ -326,55 +346,125 @@ Never rely on a single candidate.
 
 Always attempt locator strategies in this order.
 
-- Priority 1
+- Priority 1 
+
+  Stable ID
+
+  Examples:
   ```
-   Role + Accessible Name
+   HTML
+    id="transferBtn"
+
+   Playwright
+    page.locator('#transferBtn')
+
   ```
 
 - Priority 2
+
+  Accessibility Locator
+
+  Example
+
    ```
-   Test Attribures
+   HTML:
+    - aria-label="Password"
+   Playwright
+    - page.getByRole('button', { name: 'Transfer' })
    ```
 
 - Priority 3
+   
+  Stable CSS Selector
+
+  Examples:
    ```
-   aria-label
+   CSS:
+    - button[id='transferBtn']
+    - button.primary-transfer
+   
    ```
 
 - Priority 4
-  ```
-   Label
-  ```
+  
+  Alternative XPath
+
+  Relative XPath built from stable attributes,
+  business context,
+  or meaningful text.
+
+  Examples:
+
+   ```
+   - //button[@id='transferBtn']
+   - //input[@placeholder='Enter your password']
+   - //button[text()='Transfer']
+   - //tr[.//td='Ahmed']//button[text()='Edit']
+   ```
 
 - Priority 5
-   ```
-   Placeholder
-   ```
+  
+  Visible Text
+
+  Example:
+    ```
+   page.getByText('Transfer')
+
+    ```
+  Use only when the text is:
+   - Unique
+   - Stable
+   - Business meaningful
+
 
 - Priority 6
-  ```
-   Stable ID
-  ```
+  
+  Test Attributes
+
+  Examples:
+
+   ```
+   page.getByTestId('transfer-btn')
+
+   ```
 
 - Priority 7
+  
+  Placeholder
+
+  Example:
    ```
-   Name Attribute
+   page.getByPlaceholder('Enter your password')
    ```
 
 - Priority 8
-  ```
-   Visible Text
-  ```
+  
+  Name Attribute
+
+  Example:
+   ```
+   page.locator('[name="customerName"]')
+
+   ```
 
 - Priority 9
-  ```
-  Stable CSS
-  ```
+  
+  Partial Text
+
+  Example:
+
+   ```
+   page.getByText(/Transfer/)
+   ```
 
 - Priority 10
-  ```
-   XPath
-  ```
+  
+  Contextual Locator
+
+  Example:
+   ```
+   Contextual Locator
+   ```
 ---
 
 ### Forbidden Locator Types
@@ -481,6 +571,44 @@ When Primary Locator fails:
 Document all locator chain modifications.
 
 ---
+
+### Repository Synchronization
+
+Whenever locator recovery succeeds:
+
+1. Update locator-repository.json.
+2. Preserve historical locator metadata.
+3. Record old locator.
+4. Record new locator.
+5. Update validation timestamp.
+
+Repository updates must occur only after successful test validation.
+
+---
+### Repository Statistics Update
+
+After successful healing:
+
+Update:
+
+- Primary Locator
+- Fallback Chain
+- Last Validated
+- Validation Count
+- Success Count
+- Last Updated By
+- Repository Status
+
+If healing fails:
+
+Increment:
+
+- Failure Count
+
+Repository updates are allowed only after successful validation and test execution.
+
+---
+
 ## Timing Recovery Framework
 ### Wait Optimization Rules
 
@@ -687,6 +815,12 @@ Before completion verify:
        isVisible()
        isEnabled()
        Actionable
+  
+ - Self-healing success is determined by one of the following:
+     1. Failure count decreases
+     2. Failure classification changes from automation issue to non-automation issue
+     3. Root cause confidence increases
+
 ---
 
 ## Do-not rules

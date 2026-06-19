@@ -11,6 +11,7 @@ export class LoginPage {
       .or(page.locator('input[type="text"], input[name*="user" i], input[id*="user" i]').first());
     this.passwordInput = page.locator('input[type="password"]').first();
     this.loginButton = page.getByRole('button', { name: /login|sign in/i });
+    this.blockingOverlay = page.locator('.p-blockui, .p-overlay-mask');
 
     this.activeSessionDialog = page
       .getByRole('alertdialog')
@@ -27,7 +28,11 @@ export class LoginPage {
   async goto() {
     const baseUrl = process.env.PORTAL_BASE_URL ?? '';
     const loginPath = process.env.PORTAL_LOGIN_PATH ?? '';
-    const loginUrl = `${baseUrl}${loginPath}`;
+    const loginUrl = process.env.PORTAL_LOGIN_URL ?? `${baseUrl}${loginPath}`;
+
+    if (!loginUrl) {
+      throw new Error('PORTAL_LOGIN_URL or PORTAL_BASE_URL/PORTAL_LOGIN_PATH must be configured in .env');
+    }
 
     console.log(`[LoginPage] Navigating to portal login page: ${loginUrl}`);
     await this.page.goto(loginUrl);
@@ -48,11 +53,38 @@ export class LoginPage {
     console.log('[LoginPage] Filling login form with .env credentials.');
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
+    await expect(this.blockingOverlay).toBeHidden({ timeout: 20000 });
     await expect(this.loginButton).toBeEnabled();
     console.log('[LoginPage] Submitting login form.');
     await this.loginButton.click();
 
     return this.handleActiveSessionPopupIfVisible(testInfo);
+  }
+
+  async attemptLogin(username, password) {
+    console.log('[LoginPage] Attempting login form submission.');
+    await this.usernameInput.fill(username);
+    await this.passwordInput.fill(password);
+
+    const isLoginButtonEnabled = await this.loginButton.isEnabled();
+    if (isLoginButtonEnabled) {
+      await this.loginButton.click();
+    } else {
+      console.log('[LoginPage] Login button is disabled; submission is blocked by the UI.');
+    }
+
+    return isLoginButtonEnabled;
+  }
+
+  async expectUsernameRequiredValidation() {
+    await expect(this.usernameInput).toBeVisible();
+    await expect(this.page).toHaveURL(/login/);
+  }
+
+  async expectCredentialsRequiredValidation() {
+    await expect(this.usernameInput).toBeVisible();
+    await expect(this.passwordInput).toBeVisible();
+    await expect(this.page).toHaveURL(/login/);
   }
 
   async handleActiveSessionPopupIfVisible(testInfo) {

@@ -26,7 +26,8 @@ This skill does not:
  - requirements/ 
  - analysis/ 
  - traceability reports 
- - automation coverage repor
+ - automation coverage report
+ - `docs/analysis/locator-repository.json`
 
 ---
 
@@ -41,6 +42,7 @@ This skill does not:
   - Retry Information 
   - Blocker Records 
   - Locator Failure Records
+  - Locator Repository Metadata
   - Locator Confidence 
   - Locator Volatility 
   - Locator Uniqueness 
@@ -118,25 +120,27 @@ Use this skill after test execution produces failures.
 7. Identify associated Requirement.
 8. Read Playwright error message.
 9. Review locator metadata. 
-10. Review DOM context evidence. 
-11. Review accessible roles and nearby interactive elements. 
-12. Review retry information. 
-13. Review blocker records. 
-14. Review locator failure records. 
-15. Review traces. 
-16. Review screenshots if required. 
-17. Review videos if required. 
-18. Compare actual behavior with expected behavior. 
-19. Classify root cause. 
-20. Assign severity.
-21. Assign owner.
-22. Determine self-healing eligibility.
-23. Assign self-healing confidence.
-24. Determine recovery recommendation.
-25. Generate failure-analysis.md.
-26. Generate self-healing-candidates.md.
-27. Generate defect-candidates.md.
-28. Hand off eligible failures to Self-Healing Agent.
+10. Compare locator metadata with repository records.
+11. Detect locator drift.
+12. Review DOM context evidence. 
+13. Review accessible roles and nearby interactive elements. 
+14. Review retry information. 
+15. Review blocker records. 
+16. Review locator failure records. 
+17. Review traces. 
+18. Review screenshots if required. 
+19. Review videos if required. 
+20. Compare actual behavior with expected behavior. 
+21. Classify root cause. 
+22. Assign severity.
+23. Assign owner.
+24. Determine self-healing eligibility.
+25. Assign self-healing confidence.
+26. Determine recovery recommendation.
+27. Generate failure-analysis.md.
+28. Generate self-healing-candidates.md.
+29. Generate defect-candidates.md.
+30. Hand off eligible failures to Self-Healing Agent.
 
 ---
 
@@ -555,6 +559,83 @@ Assessment: Locator text changed.
 Recovery Recommendation: 
 REDISCOVER_LOCATOR
 ```
+---
+
+## Locator Drift Analysis
+
+When locator failures occur:
+
+Compare:
+
+- Failed Locator
+- Repository Locator
+- Current DOM Evidence
+
+Determine:
+
+Locator Drift:
+YES | NO
+
+Drift Type:
+- Renamed
+- Removed
+- Duplicated
+- Context Changed
+
+Example:
+
+Repository:
+#transferBtn
+
+Current DOM:
+#transferFundsBtn
+
+Locator Drift:
+YES
+
+Recommendation:
+REDISCOVER_LOCATOR
+
+---
+
+## ## Repository Drift Classification
+
+When locator drift is detected classify:
+
+### RENAMED
+
+Element exists.
+
+Locator value changed.
+
+Example:
+```
+#transferBtn
+
+↓
+
+#transferFundsBtn
+```
+
+### REMOVED
+
+Element no longer exists.
+
+### DUPLICATED
+
+Locator resolves multiple elements.
+
+### CONTEXT_CHANGED
+
+Element exists inside different container context.
+
+### ACCESSIBILITY_CHANGED
+
+Accessible Name, Label, or Role changed.
+
+
+Every drift event must include a recovery recommendation.
+
 ---
 
 ## Blocker Analysis
