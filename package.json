@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test:portal": "playwright test tests/portal --headed",
-    "test:portal:report": "playwright test tests/portal --headed & node utils/reportGenerator.js"
+    "test:portal:report": "playwright test tests/portal --headed & node utils/reportGenerator.js",
+    "report:generate": "node utils/reportGenerator.js"
   },
   "keywords": [],
   "author": "",
