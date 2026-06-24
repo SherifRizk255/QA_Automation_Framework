@@ -21,6 +21,7 @@ This skill does not:
  - `reports/execution-metadata.md`
  - `playwright-report/`
  - `test-results/`
+ - `docs/test-design/test-lifecycle.md`
 
 ### Optional
  - requirements/ 
@@ -66,19 +67,35 @@ This skill does not:
   - Regression Scope
   - Coverage Intent
 
+* From Test Lifecycle
+
+  - Setup Requirements
+  - Teardown Requirements
+  - Retry Eligibility
+  - Retry Rules
+  - Self-Healing Scope
+  - Evidence Requirements
+  - Environment Dependencies
+  - Test Data Dependencies
+  - Execution Constraints
+  - Lifecycle Phase Definitions
+
 ---
 
 ## Responsibility
 
 Determine:
- - What failed 
- - Why it failed 
- - Who owns the failure 
- - Whether it is self-healable 
- - Whether it impacts requirements 
+ - What failed
+ - Why it failed
+ - Who owns the failure
+ - Whether it is self-healable
+ - Whether it impacts requirements
  - Whether it impacts regression scope
  - Recommended recovery strategy
  - Recovery confidence
+ - Whether lifecycle rules were followed
+ - Whether failure occurred during setup, execution, or teardown
+ - Whether retry behavior complied with lifecycle policy
 
 while preserving:
 ```
@@ -113,6 +130,17 @@ Use this skill after test execution produces failures.
 ## Step-by-step behavior
 1. Read failure-analysis-input.md.
 2. Read execution metadata.
+    2.1 Read test-lifecycle.md.
+
+    2.2 Determine lifecycle phase of failure:
+     - Setup
+     - Test Execution
+     - Teardown
+
+    2.3 Validate retry behavior against lifecycle retry rules.
+
+    2.4 Validate self-healing eligibility against lifecycle self-healing scope.
+
 3. Identify failed automation test.
 4. Identify associated TC.
 5. Identify associated Scenario.
@@ -317,6 +345,28 @@ Missing wait condition
 → AUT_WAIT_STRATEGY
 ```
 ---
+## Lifecycle Failure Classification
+
+Determine where the failure occurred.
+
+Possible values:
+
+SETUP_FAILURE
+TEST_EXECUTION_FAILURE
+TEARDOWN_FAILURE
+
+Examples:
+```
+Missing prerequisite account
+→ SETUP_FAILURE
+
+Assertion failure during test
+→ TEST_EXECUTION_FAILURE
+
+Cleanup failure
+→ TEARDOWN_FAILURE
+```
+---
 
 ## Root Cause Analysis Rules
 
@@ -389,6 +439,32 @@ QA Automation
 
 Reason:
 Locator drift detected
+```
+---
+## Lifecycle Self-Healing Scope Validation
+
+Validate candidate against:
+
+Test Lifecycle Self-Healing Scope
+
+Output:
+
+Lifecycle Self-Healing Eligible:
+YES | NO
+
+Reason:
+[reason]
+
+Examples:
+```
+Locator drift
+→ YES
+
+Business validation defect
+→ NO
+
+Missing test data
+→ NO
 ```
 ---
 
@@ -685,6 +761,35 @@ Potential timing instability
 ```
 ---
 
+## Retry Policy Validation
+
+Compare execution retry behavior against
+Test Lifecycle retry rules.
+
+Output:
+```
+Retry Eligible:
+YES | NO
+
+Retry Executed:
+YES | NO
+
+Retry Policy Compliant:
+YES | NO
+```
+Example:
+```
+Retry Eligible:
+YES
+
+Retry Executed:
+YES
+
+Retry Policy Compliant:
+YES
+```
+---
+
 ## Traceability Preservation
 
 Every failure must retain:
@@ -793,9 +898,28 @@ test-results/traces/tc032.zip
 Root Cause: 
 Transfer button locator no longer resolves.
 
-Recommendation: 
-Forward to Self-Healing Agent.
+Lifecycle Phase:
+TEST_EXECUTION_FAILURE
 
+Retry Policy Compliant:
+YES
+
+Lifecycle Self-Healing Eligible:
+YES
+
+
+---
+## SELF-HEALING HANDOFF
+
+For every eligible failure provide:
+
+ - Failure ID
+ - Lifecycle Phase
+ - Retry Status
+ - Retry Compliance
+ - Recovery Recommendation
+ - Lifecycle Self-Healing Eligibility
+ - Self-Healing Confidence
 
 ---
 
@@ -809,6 +933,10 @@ Before completion verify:
 - Automation issues and application defects are separated.
 - Recommendations are actionable.
 - Traceability Preserved
+- Lifecycle phase identified.
+- Retry policy validated.
+- Self-healing scope validated.
+- Lifecycle rules referenced before recovery recommendation.
 
 ## Do-not rules
 - Do not modify automation code.

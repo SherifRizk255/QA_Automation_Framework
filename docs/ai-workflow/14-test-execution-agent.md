@@ -26,6 +26,8 @@ Use this skill when the user asks to run selected tests or a test suite and coll
  - Automation Coverage Report
  - Environment configuration
  - Browser/project selection
+ - Test Lifecycle Report 
+   `docs/test-design/test-lifecycle.md`
 
 ### Optional
  - Specific test file
@@ -61,6 +63,17 @@ Use this skill when the user asks to run selected tests or a test suite and coll
   - Dependencies
   - Regression Scope
   - Pipeline Mode
+
+* From Test Lifecycle
+
+ - Setup Requirements
+ - Teardown Requirements
+ - Retry Eligibility
+ - Self-Healing Scope
+ - Evidence Requirements
+ - Environment Dependencies
+ - Test Data Dependencies
+ - Execution Constraints
 
 ---
 
@@ -102,6 +115,7 @@ traceability.
 - `test-results/screenshots/`
 - `test-results/videos/`
 - `test-results/traces/`
+- `reports/lifecycle-execution-report.md`
 
 ---
 
@@ -111,24 +125,28 @@ traceability.
 3. Confirm browser/project selection.
 4. Read Automation Traceability Report.
 5. Read Automation Coverage Report.
-6. Execute requested Playwright command.
-7. Capture command used.
-8. Capture execution timestamp.
-9. Capture browser and environment.
-10. Record pass/fail/skip counts.
-11. Record retries.
-12. Record blocker occurrences.
-13. Record locator execution behavior.
-14. Validate repository locator usage.
-15. Record locator failures.
-16. Update locator validation results. 
-17. Record screenshots when required.
-18. Record videos when required.
-19. Record traces when required.
-20. Preserve raw failure messages.
-21. Generate failure-analysis-input.md.
-22. Preserve all execution evidence.
-23. Stop and hand off to Failure Analysis Agent.
+6. Read Test Lifecycle Report.
+7. Execute Lifecycle Setup Phase.
+8. Determine Retry Eligibility Rules.
+9. Determine Self-Healing Eligibility Scope.
+10. Execute requested Playwright command.
+11. Capture command used.
+12. Capture execution timestamp.
+13. Capture browser and environment.
+14. Record pass/fail/skip counts.
+15. Record retries.
+16. Record blocker occurrences.
+17. Record locator execution behavior.
+18. Validate repository locator usage.
+19. Record locator failures.
+20. Update locator validation results.
+21. Record screenshots when required.
+22. Record videos when required.
+23. Record traces when required.
+24. Preserve raw failure messages.
+25. Generate failure-analysis-input.md.
+26. Preserve all execution evidence.
+27. Stop and hand off to Failure Analysis Agent.
 
 ---
 
@@ -219,6 +237,18 @@ Reason:
 Maintenance Window Banner
 ```
 
+Lifecycle setup failures must be reported separately.
+
+Example:
+```
+BLOCKED
+
+Reason:
+Lifecycle Setup Failure
+
+Details:
+Required beneficiary test data unavailable.
+```
 ---
 
 ## Retry Tracking
@@ -244,6 +274,42 @@ Execution Agent records only.
 
 No retry analysis occurs here.
 
+---
+
+## Lifecycle Execution Tracking
+
+Capture lifecycle execution details.
+
+For every test execution record:
+
+ - Setup Executed
+ - Setup Result
+ - Setup Failures
+ - Teardown Executed
+ - Teardown Result
+ - Retry Eligibility
+ - Retry Attempts
+ - Self-Healing Eligible
+
+Example:
+```
+Lifecycle
+
+Setup:
+PASSED
+
+Teardown:
+PASSED
+
+Retry Eligible:
+YES
+
+Retry Attempts:
+1
+
+Self-Healing Eligible:
+YES
+```
 ---
 
 ## Blocker Recording
@@ -374,6 +440,31 @@ YES
 ```
 ---
 
+## Self-Healing Eligibility Recording
+For every failed test record:
+
+ - Self-Healing Eligible
+ - Lifecycle Self-Healing Scope
+ - Exclusion Reason (if not eligible)
+
+Example:
+```
+Self-Healing Eligible:
+YES
+
+Scope:
+Locator Recovery
+```
+or
+```
+Self-Healing Eligible:
+NO
+
+Reason:
+Application Defect
+```
+---
+
 ## DOM Evidence Collection
 
 When a locator failure occurs:
@@ -401,6 +492,10 @@ Required:
 - Console Errors
 - Network Failures
 - Locator Execution Data
+- Setup Execution Logs
+- Teardown Execution Logs
+- Retry Decision Logs
+- Lifecycle Validation Results
 
 Conditional:
 - Screenshots
@@ -440,6 +535,12 @@ For every failed test include:
  - Screenshot Path
  - Video Path
  - Trace Path
+ - Lifecycle Setup Result
+ - Lifecycle Teardown Result
+ - Retry Eligibility
+ - Retry Attempts
+ - Retry Outcome
+ - Self-Healing Eligible
 
 This document becomes the direct input for Failure Analysis Agent.
 
@@ -483,6 +584,10 @@ Before completion verify:
  - All blockers documented.
  - Locator failures preserved.
  - No code changes are made in this stage.
+ -  Lifecycle setup executed when required.
+ - Lifecycle teardown executed when required.
+ - Retry execution follows lifecycle rules.
+ - Self-healing eligibility recorded.
 
 ## Do-not rules
 - Do not modify automation code.
@@ -505,6 +610,7 @@ Before completion verify:
 - `test-results/screenshots/`
 - `test-results/videos/` 
 - `test-results/traces/`
+- `reports/lifecycle-execution-report.md`
 
 
 ## Example prompt to use this skill

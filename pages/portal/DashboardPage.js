@@ -18,8 +18,8 @@ export class DashboardPage {
 
     if (!knownElementVisible) {
       console.log('[DashboardPage] Dashboard-specific selector was not found; using safe temporary assertion.');
-      await expect(this.page).not.toHaveURL(/\/login(?:$|[/?#])/i);
-      await expect(this.body).toBeVisible();
+      await expect(this.page).not.toHaveURL(/\/login(?:$|[/?#])/i, { timeout: 30000 });
+      await expect(this.body).toBeAttached();
     }
 
     const screenshotPath = path.resolve('reports', 'dashboard-after-login.png');

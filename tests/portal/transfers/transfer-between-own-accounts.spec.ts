@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { LoginPage } from '../../pages/portal/LoginPage.js';
-import { DashboardPage } from '../../pages/portal/DashboardPage.js';
-import { TransferBetweenOwnAccountsPage } from '../../pages/portal/TransferBetweenOwnAccountsPage.js';
-import { handleFailureEvidence } from '../../utils/failureHandler.js';
+import { LoginPage } from '../../../pages/portal/LoginPage.js';
+import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
+import { TransferBetweenOwnAccountsPage } from '../../../pages/portal/TransferBetweenOwnAccountsPage.js';
+import { handleFailureEvidence } from '../../../utils/failureHandler.js';
 
 async function loginAndOpenTransferPage(page, testInfo) {
   const loginPage = new LoginPage(page);
@@ -14,7 +14,7 @@ async function loginAndOpenTransferPage(page, testInfo) {
   await dashboardPage.expectLoaded(testInfo);
   await transferPage.navigateToTransferBetweenOwnAccounts(testInfo);
 
-  return transferPage;
+  return transferPage; 
 }
 
 test.describe('Internet Banking Portal - Transfer Between Own Accounts', () => {

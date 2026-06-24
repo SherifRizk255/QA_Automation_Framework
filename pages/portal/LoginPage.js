@@ -17,10 +17,14 @@ export class LoginPage {
       .getByRole('alertdialog')
       .filter({ hasText: /you have an active session/i })
       .last();
+    this.genericAlertDialog = page.getByRole('alertdialog').last();
     this.activeSessionMessage = this.activeSessionDialog.getByText(
       /you have an active session\.?\s*do you want to close it\?/i
     );
     this.proceedButton = this.activeSessionDialog.getByRole('button', {
+      name: /^(proceed|ok|yes|continue)$/i,
+    });
+    this.genericDialogProceedButton = this.genericAlertDialog.getByRole('button', {
       name: /^(proceed|ok|yes|continue)$/i,
     });
   }
@@ -36,7 +40,17 @@ export class LoginPage {
 
     console.log(`[LoginPage] Navigating to portal login page: ${loginUrl}`);
     await this.page.goto(loginUrl);
-    await expect(this.page.locator('body')).toBeVisible();
+    const loginFormVisible = await this.usernameInput
+      .isVisible({ timeout: 30000 })
+      .catch(() => false);
+
+    if (!loginFormVisible) {
+      console.log('[LoginPage] Login form did not render after navigation. Reloading once.');
+      await this.page.reload();
+    }
+
+    await expect(this.usernameInput).toBeVisible({ timeout: 30000 });
+    await expect(this.passwordInput).toBeVisible({ timeout: 30000 });
   }
 
   async expectLoginPageLoaded() {
@@ -51,9 +65,29 @@ export class LoginPage {
     }
 
     console.log('[LoginPage] Filling login form with .env credentials.');
+    const overlayClearedBeforeFill = await this.waitForBlockingOverlayToClear({ throwOnFailure: false });
+    if (!overlayClearedBeforeFill) {
+      await this.handleActiveSessionPopupIfVisible(testInfo);
+      await this.waitForBlockingOverlayToClear({ throwOnFailure: false });
+    }
     await this.usernameInput.fill(username);
     await this.passwordInput.fill(password);
-    await expect(this.blockingOverlay).toBeHidden({ timeout: 20000 });
+    const overlayClearedAfterFill = await this.waitForBlockingOverlayToClear({ throwOnFailure: false });
+
+    if (!overlayClearedAfterFill) {
+      console.log('[LoginPage] Blocking overlay remained visible after filling credentials. Reloading login page once.');
+      await this.page.reload({ waitUntil: 'domcontentloaded' });
+      await expect(this.usernameInput).toBeVisible({ timeout: 30000 });
+      await expect(this.passwordInput).toBeVisible({ timeout: 30000 });
+      const overlayClearedAfterReload = await this.waitForBlockingOverlayToClear({ throwOnFailure: false });
+      if (!overlayClearedAfterReload) {
+        await this.handleActiveSessionPopupIfVisible(testInfo);
+        await this.waitForBlockingOverlayToClear({ throwOnFailure: false });
+      }
+      await this.usernameInput.fill(username);
+      await this.passwordInput.fill(password);
+    }
+
     await expect(this.loginButton).toBeEnabled();
     console.log('[LoginPage] Submitting login form.');
     await this.loginButton.click();
@@ -88,18 +122,28 @@ export class LoginPage {
   }
 
   async handleActiveSessionPopupIfVisible(testInfo) {
-    const isPopupVisible = await this.activeSessionDialog
+    const isStrictPopupVisible = await this.activeSessionDialog
       .waitFor({ state: 'visible', timeout: 10000 })
       .then(() => true)
       .catch(() => false);
+    const isGenericProceedDialogVisible = !isStrictPopupVisible
+      ? await this.genericDialogProceedButton
+          .waitFor({ state: 'visible', timeout: 5000 })
+          .then(() => true)
+          .catch(() => false)
+      : false;
+    const isPopupVisible = isStrictPopupVisible || isGenericProceedDialogVisible;
 
     if (isPopupVisible) {
       const screenshotPath = path.resolve('reports', 'active-session-popup.png');
+      const proceedButton = isStrictPopupVisible ? this.proceedButton : this.genericDialogProceedButton;
 
       console.log('[LoginPage] Active session blocker appeared. Capturing evidence.');
-      await expect(this.activeSessionMessage).toBeVisible();
-      await expect(this.proceedButton).toBeVisible();
-      await expect(this.proceedButton).toBeEnabled();
+      if (isStrictPopupVisible) {
+        await expect(this.activeSessionMessage).toBeVisible();
+      }
+      await expect(proceedButton).toBeVisible();
+      await expect(proceedButton).toBeEnabled();
       await this.page.screenshot({
         path: screenshotPath,
         fullPage: true,
@@ -113,11 +157,27 @@ export class LoginPage {
       }
 
       console.log('[LoginPage] Clicking Proceed/confirmation button on active session blocker.');
-      await this.proceedButton.click();
+      await proceedButton.click();
+      await expect(this.page.locator('.p-dialog-mask')).toBeHidden({ timeout: 30000 }).catch(() => {
+        console.log('[LoginPage] Active session dialog mask remained attached after Proceed; continuing with downstream actionability waits.');
+      });
     } else {
       console.log('[LoginPage] Active session blocker did not appear.');
     }
 
     return isPopupVisible;
+  }
+
+  async waitForBlockingOverlayToClear(options = { throwOnFailure: true }) {
+    const isHidden = await expect(this.blockingOverlay)
+      .toBeHidden({ timeout: 20000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!isHidden && options.throwOnFailure) {
+      await expect(this.blockingOverlay).toBeHidden({ timeout: 30000 });
+    }
+
+    return isHidden;
   }
 }

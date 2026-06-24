@@ -30,6 +30,7 @@ Consumes:
 * Requirements Quality Report
 * Intent Unit List
 * Run Context (from orchestrator)
+* `docs\test-design\test-lifecycle.md`
 
 Run Context Authority:
 
@@ -67,13 +68,13 @@ Evaluate Requirements Quality Report.
 
 If:
 
-```text
+```
 Quality Status = FULL_FAIL
 ```
 
 Output:
 
-```text
+```
 🚫 QA ANALYSIS BLOCKED
 
 Reason:
@@ -94,13 +95,13 @@ STOP.
 
 If:
 
-```text
+```
 Quality Status = PARTIAL_PASS
 ```
 
 Output:
 
-```text
+```
 ⚠ PARTIAL QA ANALYSIS
 
 Blocked IUs:
@@ -118,7 +119,7 @@ Only analyze non-blocked IUs.
 
 If:
 
-```text
+```
 Quality Status = PASS
 ```
 
@@ -135,13 +136,32 @@ Perform:
 1. IC → IU consistency validation
 2. 7-layer analysis
 3. Dependency mapping
-4. Risk scoring
-5. Volatility scoring
-6. Coverage intent identification
-7. Domain rule extraction
-8. Regression impact assessment
-9. Gap detection
-10. Ambiguity detection
+4. Lifecycle Dependency Identification
+
+   ```
+   Determine:
+
+     - Authentication dependencies
+     - Authorization dependencies
+     - Test Data dependencies
+     - Environment dependencies
+     - External service dependencies
+
+   Generate lifecycle candidates for:
+     - SUITE_SETUP
+     - TC_SETUP
+     - TC_TEARDOWN
+     - SUITE_TEARDOWN
+
+   Output lifecycle candidates for downstream lifecycle generation and traceability.
+    ```
+5. Risk scoring
+6. Volatility scoring
+7. Coverage intent identification
+8. Domain rule extraction
+9. Regression impact assessment
+10. Gap detection
+11. Ambiguity detection
 
 ---
 
@@ -172,7 +192,7 @@ Check:
 
 ## Output Format
 
-```text
+```
 IC Check: OK
 
 IC Check: BLOCKED
@@ -195,7 +215,7 @@ Provided by orchestrator.
 
 Possible values:
 
-```text
+```
 NEW
 MODIFIED
 DEPRECATED
@@ -217,7 +237,7 @@ Existing behavior changed.
 
 Determine:
 
-```text
+```
 Regression Scope:
 FULL
 TARGETED
@@ -234,7 +254,7 @@ Behavior removed.
 
 Flag:
 
-```text
+```
 Test Retirement Required
 ```
 
@@ -364,7 +384,7 @@ For every IU:
 
 Output:
 
-```text
+```
 Depends On:
 IU-001
 
@@ -375,7 +395,7 @@ IU-006
 
 or
 
-```text
+```
 Depends On:
 None
 
@@ -385,11 +405,98 @@ None
 
 ---
 
+# Risk Scoring
+
+## LIFECYCLE DEPENDENCY IDENTIFICATION
+
+For every IU:
+
+Identify execution dependencies.
+
+Possible dependency categories:
+
+- AUTHENTICATION
+- AUTHORIZATION
+- TEST_DATA
+- ENVIRONMENT_STATE
+- EXTERNAL_DEPENDENCY
+
+Determine recommended lifecycle action:
+
+AUTHENTICATION
+→ TC_SETUP
+
+AUTHORIZATION
+→ TC_SETUP
+
+TEST_DATA
+→ TC_SETUP
+→ TC_TEARDOWN
+
+ENVIRONMENT_STATE
+→ SUITE_SETUP
+
+EXTERNAL_DEPENDENCY
+→ SUITE_SETUP
+
+## Lifecycle Candidate Output
+
+Lifecycle Candidates:
+
+TC_SETUP
+- Login User
+
+TC_SETUP
+- Create Beneficiary
+
+TC_TEARDOWN
+- Delete Beneficiary
+
+## Shared Resource Detection
+
+When a dependency is consumed by multiple test cases:
+
+Promote lifecycle action to:
+
+SUITE_SETUP
+
+and
+
+SUITE_TEARDOWN
+
+Example:
+```
+Shared Customer Account
+→ SUITE_SETUP
+
+Shared Test User
+→ SUITE_SETUP
+
+Shared Banking Profile
+→ SUITE_SETUP
+```
+## Lifecycle Traceability
+Maintain:
+```
+REQ
+↓
+IU
+↓
+DEPENDENCY
+↓
+LIFECYCLE CANDIDATE
+```
+mapping.
+
+Lifecycle candidates must retain IU traceability.
+
+---
+
 ## Risk Propagation
 
 Rules:
 
-```text
+```
 Dependency P1
 → current IU minimum P2
 
@@ -403,7 +510,7 @@ Current IU P1
 
 If detected:
 
-```text
+```
 ⚠ DEPENDENCY CYCLE DETECTED
 
 IU-001
@@ -429,7 +536,7 @@ Apply Intent Schema rules.
 
 ## Risk Levels
 
-```text
+```
 P1
 P2
 P3
@@ -442,7 +549,7 @@ P4
 
 Apply in order:
 
-```text
+```
 Untestable
 → Force P1
 
@@ -463,7 +570,7 @@ Otherwise
 
 ## Risk Confidence
 
-```text
+```
 HIGH
 MEDIUM
 LOW
@@ -487,7 +594,7 @@ Multiple flags.
 
 Output:
 
-```text
+```
 Risk: P1
 Confidence: LOW
 ```
@@ -524,7 +631,7 @@ Measures likelihood of future change.
 
 Output:
 
-```text
+```
 Volatility:
 HIGH
 ```
@@ -544,7 +651,7 @@ Derived from risk.
 
 Output:
 
-```text
+```
 Test Design Priority:
 CRITICAL
 ```
@@ -561,7 +668,7 @@ Do NOT generate scenarios.
 
 Example:
 
-```text
+```
 Coverage Intents:
 
 ✓ Happy Path
@@ -583,7 +690,7 @@ Use standard flags.
 
 ## GAP
 
-```text
+```
 ⚠ GAP
 
 Missing rule.
@@ -595,7 +702,7 @@ Missing condition.
 
 ## AMBIGUOUS
 
-```text
+```
 ❓ AMBIGUOUS
 
 Outcome unclear.
@@ -607,7 +714,7 @@ Actor unclear.
 
 ## UNTESTABLE
 
-```text
+```
 🚫 UNTESTABLE
 
 Required information absent.
@@ -617,7 +724,7 @@ Required information absent.
 
 ## ASSUMPTION
 
-```text
+```
 💡 ASSUMPTION
 
 Owner:
@@ -631,7 +738,7 @@ Before TC generation.
 
 ## SIDE EFFECT
 
-```text
+```
 ⚡ SIDE EFFECT
 
 External write detected.
@@ -650,7 +757,7 @@ Extract rules from all IUs.
 
 ## Rule Registry Output
 
-```text
+```
 📐 DOMAIN RULES
 
 RULE-001
@@ -668,7 +775,7 @@ IU-004
 
 For every rule:
 
-```text
+```
 RULE-001
 
 Impacts:
@@ -686,7 +793,7 @@ HIGH
 
 If conflicts exist:
 
-```text
+```
 ⚔ RULE CONFLICT
 
 RULE-001 conflicts with RULE-002
@@ -701,7 +808,7 @@ BA Review
 
 Otherwise:
 
-```text
+```
 No rule conflicts detected.
 ```
 
@@ -713,7 +820,7 @@ Always output.
 
 Format:
 
-```text
+```
 ❌ CANNOT DETERMINE
 
 - Missing threshold
@@ -725,7 +832,7 @@ Format:
 
 # PER-IU OUTPUT FORMAT
 
-```text
+```
 IU-001
 
 Type:
@@ -756,7 +863,7 @@ Risk         ⚠
 Security     ✅
 
 Dependencies:
-
+```
 Depends On:
 IU-001
 
@@ -765,6 +872,19 @@ IU-005
 
 IC Check:
 OK
+```
+
+Lifecycle Candidates:
+```
+TC_SETUP:
+- Login User
+
+TC_SETUP:
+- Create Beneficiary
+
+TC_TEARDOWN:
+- Delete Beneficiary
+```
 
 Coverage Intents:
 
@@ -783,7 +903,7 @@ None
 
 # SUMMARY OUTPUT
 
-```text
+```
 🔍 QA ANALYSIS REPORT
 
 Quality Gate:
@@ -856,6 +976,20 @@ HIGH : 10
 MEDIUM : 8
 LOW : 7
 
+Lifecycle Candidates:
+
+SUITE_SETUP:
+[n]
+
+TC_SETUP:
+[n]
+
+TC_TEARDOWN:
+[n]
+
+SUITE_TEARDOWN:
+[n]
+
 ```
 ## Output Summary File Location
 docs/analysis/qa-analysis-report.md
@@ -866,7 +1000,7 @@ docs/analysis/qa-analysis-report.md
 
 Final section.
 
-```text
+```
 QA READINESS
 
 Ready For TC Generation:
@@ -907,12 +1041,10 @@ Manual Candidates:
 * Every IU must produce coverage intents.
 * A blocked IU is preferable to a false assumption.
 
-```
-```
 ---
 
 # TC_GENERATOR_HANDOFF
-
+```
 Proceed:
 IU-001
 IU-002
@@ -934,3 +1066,4 @@ IU-007: TARGETED
 Retire:
 
 IU-010
+```

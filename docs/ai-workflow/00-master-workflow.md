@@ -373,6 +373,7 @@ Output:
 * Coverage Plan
 * Scenario Inventory
 * TC Blueprint
+* Test Lifecycle Report
 
 ---
 
@@ -414,7 +415,10 @@ Purpose:
  3. Traceability complete
  4. Required environment available
  5. Test data available
-
+ 6. Test Lifecycle Report exists
+ 7. Setup requirements satisfied
+ 8. Teardown requirements defined
+ 9. Test isolation requirements satisfied
 
 Output:
 
@@ -581,17 +585,29 @@ Never run Automation Implementation without approved test cases.
 
 Rule 8
 
-Never execute Self-Healing before Failure Analysis.
+Never run Test Execution Agent without:
+
+- Test Lifecycle Report
+- Setup requirements
+- Teardown requirements
+
+Execution lifecycle must be defined before execution begins.
 
 ---
 
 Rule 9
 
-CR Analyzer must run whenever CR Delta Mode is selected.
+Never execute Self-Healing before Failure Analysis.
 
 ---
 
 Rule 10
+
+CR Analyzer must run whenever CR Delta Mode is selected.
+
+---
+
+Rule 11
 
 Never run Self-Healing when:
 
@@ -599,7 +615,7 @@ Self-Healable = NO
 
 ---
 
-Rule 11
+Rule 12
 
 Never apply automatic healing when:
 
@@ -607,7 +623,7 @@ Healing Confidence = LOW
 
 ---
 
-Rule 12
+Rule 13
 
 Every locator recovery must pass:
 
@@ -620,7 +636,18 @@ before automation is updated.
 
 ---
 
-Rule 13
+Rule 14
+
+Self-Healing must not:
+
+- Remove lifecycle-required setup
+- Remove lifecycle-required teardown
+- Introduce cross-test dependencies
+- Violate test isolation rules
+
+---
+
+Rule 15
 
 Recovery recommendations must originate from Failure Analysis.
 
@@ -629,46 +656,54 @@ Recovery recommendations must originate from Failure Analysis.
 # STORAGE MODEL
 
 Framework Skills:
-
+```
 docs/ai-workflow/
-
+```
 Project Artifacts:
-
+```
 docs/projects/<project-name>/
-
+```
 Requirements:
-
+```
 docs/requirements/
-
+```
 Analysis:
-
+```
 docs/analysis/
-
+```
 Traceability:
-
+```
 docs/traceability/
-
+```
 Test Design:
-
+```
 docs/test-design/
+```
+
+Artifacts:
+- traceability-matrix.md
+- tc-blueprint.md
+- test-lifecycle.md
+- automation-coverage.md
+- automation-traceability.md
 
 Automation:
-
+```
 tests/
 pages/
 fixtures/
 utils/
-
+```
 Execution Results:
-
+```
 reports/
 test-results/
 playwright-report/
-
+```
 Final Reports:
-
+```
 docs/reports/
-
+```
 ---
 
 # Artifact Flow
@@ -677,25 +712,32 @@ System Walkthrough
 ↓
 Locator Inventory
 
+Traceability Manager
+↓
+TC Blueprint
+↓
+Test Lifecycle Report
+
 Automation Implementation
 ↓
-Locator Chains
+Lifecycle-Aware Automation
 
 Execution
 ↓
-DOM Evidence
+Lifecycle Execution Results
 
 Failure Analysis
 ↓
-Recovery Strategy
+Lifecycle Impact Assessment
 
 Self-Healing
 ↓
-Validation Results
+Lifecycle Validation
 
 Final Report
 ↓
-QA Decision
+Lifecycle Compliance Summary
+
 
 ---
 
@@ -717,6 +759,12 @@ Previous Stage Complete:
 
 Approval Status:
 [Approved | Pending]
+
+Lifecycle Status:
+[Available | Missing]
+
+Lifecycle Compliance:
+[Pass | Fail | N/A]
 
 Next Skill:
 [skill name]

@@ -26,6 +26,8 @@ Use this skill only after TC generation is complete.
 - System Map
 - Navigation Map
 - Page Object Recommendations
+- Test Lifecycle Definition
+   `docs/test-design/test-lifecycle.md`
 
 ### Optional
 - Existing Playwright Framework
@@ -68,17 +70,30 @@ Use this skill only after TC generation is complete.
    - Known Risks
    - Navigation Paths
    - Page Object Recommendations
+  * From Test Lifecycle
+   - Lifecycle Stage
+   - Retry Eligibility
+   - Self-Healing Scope
+   - Setup Requirements
+   - Teardown Requirements
+   - Environment Dependencies
+   - Test Data Dependencies
+   - OTP Handling Rules
+   - Posting Restrictions
+   - Evidence Requirements
 
 ---
 
 ## Responsibility
 
  Generate:
-  - pages/
-  - tests/
-  - fixtures/
-  - utils/
-  - data/
+ - pages/
+ - tests/
+ - fixtures/
+ - utils/
+ - data/
+ - setup helpers
+ - teardown helpers
 
 while preserving:
  Requirement → IU → Scenario → TC → Automation traceability.
@@ -111,6 +126,26 @@ Every automated test must be traceable back to its originating TC.
 6. Read existing Playwright framework structure.
 7. Read existing Page Objects, Fixtures, Utilities, and Shared Components.
 8. Determine automation scope and impacted business flows.
+
+    8.1 Read Test Lifecycle definitions.
+
+    8.2 Determine lifecycle stage for every automated test:
+
+     - Setup
+     - Execution
+     - Verification
+     - Cleanup
+
+   8.3 Determine retry eligibility.
+
+   8.4 Determine self-healing eligibility.
+
+   8.5 Determine environment requirements.
+
+   8.6 Determine required setup and teardown actions.
+
+   8.7 Determine evidence collection obligations.
+
 9. Reuse existing Page Objects where possible.
 10. Create new Page Objects only when required.
 11. Define Page Object responsibilities and reusable methods.
@@ -129,6 +164,82 @@ Every automated test must be traceable back to its originating TC.
 23. Update automation traceability report.
 24. Validate all quality gates before completion.
 25. Generate implementation summary and automation handoff artifacts.
+
+---
+
+## Test Lifecycle Automation Rules
+
+Automation must align with test-lifecycle.md.
+
+For every automated test:
+
+Determine:
+
+- Lifecycle Stage
+- Retry Eligibility
+- Self-Healing Scope
+- Setup Requirements
+- Teardown Requirements
+
+Generate automation that respects lifecycle boundaries.
+
+### Setup Rules
+
+Required setup actions must be implemented using:
+
+- Fixtures
+- Factories
+- Test Data Builders
+- API Preparation Steps
+
+Never depend on execution order.
+
+Tests must be independently executable.
+
+### Teardown Rules
+
+Required cleanup actions must be implemented using:
+
+- Fixture cleanup
+- API cleanup
+- Data reset utilities
+
+Cleanup must execute even if test execution fails.
+
+Avoid environment contamination.
+
+### Retry Rules
+
+Read Retry Eligibility from Test Lifecycle.
+
+Allowed:
+
+- Locator instability
+- Known environment instability
+- Transient infrastructure failures
+
+Not Allowed:
+
+- Business validation failures
+- Assertion failures
+- Missing requirements
+- Product defects
+
+### Lifecycle Self-Healing Scope
+
+Self-healing is permitted only for:
+
+- Locator failures
+- Navigation failures
+- Dynamic rendering issues
+
+Self-healing is NOT permitted for:
+
+- Business rule failures
+- Incorrect calculations
+- Authorization failures
+- Validation failures
+- Functional defects
 
 ---
 
@@ -712,8 +823,19 @@ IU-001
 ↓
 REQ-001
 ```
+Verify every generated test also maps to:
+```
+Lifecycle Definition
+↓
+Setup Logic
+↓
+Execution Logic
+↓
+Verification Logic
+↓
+Cleanup Logic
+```
 ---
-
 
 ## Automation Traceability Output
 
@@ -733,6 +855,26 @@ AUT-LOGIN-001.spec.ts
 
 Status:
 Automated
+
+Lifecycle
+
+Setup:
+Fixture: transferBeneficiarySetup
+
+Execution:
+AUT-SAIB-1818.spec.ts
+
+Verification:
+Projected Balance Assertion
+
+Cleanup:
+Beneficiary Cleanup Utility
+
+Retry Eligible:
+YES
+
+Self-Healing:
+LOCATOR_ONLY
 ```
 ---
 

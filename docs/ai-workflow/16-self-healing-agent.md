@@ -16,14 +16,14 @@ This skill does not:
  - Suppress defects
  - Bypass validations
 
- ---
+---
 
 ## When to use this skill
 Use this skill after failure analysis confirms a failure is an automation script issue.
 
 ---
 
- ## Required inputs
+## Required inputs
 
 ### Mandatory
  - `reports/failure-analysis.md`
@@ -31,6 +31,7 @@ Use this skill after failure analysis confirms a failure is an automation script
  - `playwright-report/`
  - `test-results/`
  - `docs/analysis/locator-repository.json`
+ - `docs/test-design/test-lifecycle.md`
 
 ### Optional
  - docs/analysis/page-object-recommendations.md 
@@ -45,6 +46,7 @@ If absent, derive recovery strategy from failure-analysis.md.
 ---
 
 ## Consumes
+
 * From Failure Analysis Agent
   - Classification 
   - Locator Subclassification
@@ -79,6 +81,15 @@ If absent, derive recovery strategy from failure-analysis.md.
   - Test Files
   - Locator Metadata
 
+* From Test Lifecycle
+  - Setup Requirements
+  - Teardown Requirements
+  - Retry Eligibility
+  - Self-Healing Scope
+  - Environment Dependencies
+  - Test Data Dependencies
+  - Execution Constraints
+
 ---
 
 ## Required outputs
@@ -109,11 +120,15 @@ TC
 ↓
 AUT
 ↓
+SETUP
+↓
 EXEC
 ↓
 FAILURE
 ↓
 HEALING
+↓
+TEARDOWN
 ```
 traceability.
 
@@ -137,6 +152,42 @@ Classification is one of:
  - AUT_TIMING
  - AUT_ASSERTION
  - TEST_DATA
+
+---
+
+## Lifecycle Protection Rules
+
+Before applying any fix:
+
+1. Read lifecycle metadata for the affected test.
+
+2. Verify the proposed fix does not alter:
+   - Required setup steps
+   - Required teardown steps
+   - Test data lifecycle
+   - Environment lifecycle
+   - Execution ownership
+
+3. Self-healing may update:
+   - Locators
+   - Wait strategies
+   - Automation assertions
+   - Test data fixtures
+
+4. Self-healing must not:
+   - Remove lifecycle-required setup
+   - Remove lifecycle-required teardown
+   - Bypass prerequisite creation steps
+   - Skip cleanup obligations
+   - Convert isolated tests into dependent tests
+
+If lifecycle compliance would be broken:
+
+Healing Allowed:
+NO
+
+Reason:
+Lifecycle violation.
 
 ---
 
@@ -203,6 +254,14 @@ Possible fixes:
 - Fixture corrections
 - Data generation fixes
 - Environment-safe test data refresh
+- Lifecycle-approved setup data creation
+
+Restrictions:
+
+- Must respect setup ownership defined in test-lifecycle.md
+- Must respect teardown ownership defined in test-lifecycle.md
+- Must not create persistent data unless lifecycle explicitly allows it
+- Must not depend on data created by another test
 
 ---
 
@@ -253,24 +312,27 @@ AUT_ASYNC_RENDER
 ## Step-by-step behavior
 
 1. Read failure-analysis.md.
-2. Verify self-healing eligibility.
-3. Identify failure classification.
-4. Identify recovery strategy.
-5. Collect locator metadata and DOM evidence.
-6. Identify affected automation asset.
-7. Identify affected Page Object.
-8. Generate recovery candidates.
-9. Validate recovery candidates.
-10. Select safest valid repair.
-11. Apply smallest safe fix.
-12. Update locator repository if locator changes.
-13. Re-run failed test.
-14. Verify failure resolved.
-15. Run impacted related tests.
-16. Assess healing risk.
-17. Generate self-healing report.
-18. Update automation coverage if required.
-19. Record remaining risks.
+2. Read test-lifecycle.md.
+3. Verify self-healing eligibility.
+4. Verify healing is allowed by lifecycle rules.
+5. Verify setup and teardown requirements remain intact.
+6. Identify failure classification.
+7. Identify recovery strategy.
+8. Collect locator metadata and DOM evidence.
+9. Identify affected automation asset.
+10. Identify affected Page Object.
+11. Generate recovery candidates.
+12. Validate recovery candidates.
+13. Select safest valid repair.
+14. Apply smallest safe fix.
+15. Update locator repository if locator changes.
+16. Re-run failed test.
+17. Verify failure resolved.
+18. Run impacted related tests.
+19. Assess healing risk.
+10. Generate self-healing report.
+11. Update automation coverage if required.
+12. Record remaining risks.
 
 ---
 
@@ -689,6 +751,13 @@ Healing Risk:
 
 After healing:
 
+Verify:
+
+ - Setup executed successfully
+ - Teardown executed successfully
+ - No orphaned data remains
+ - No lifecycle violations introduced
+
 Run:
  - Failed Test
 
@@ -821,6 +890,10 @@ Before completion verify:
      2. Failure classification changes from automation issue to non-automation issue
      3. Root cause confidence increases
 
+ - Lifecycle requirements preserved.
+ - Setup behavior unchanged unless explicitly approved.
+ - Teardown behavior unchanged unless explicitly approved.
+ - No lifecycle violations introduced.
 ---
 
 ## Do-not rules
@@ -837,6 +910,10 @@ Before completion verify:
 - Do not increase timeout without reason.
 - Do not use `page.waitForTimeout()`.
 - Do not fix application defects in automation.
+- Do not remove lifecycle-required setup.
+- Do not remove lifecycle-required teardown.
+- Do not bypass lifecycle ownership rules.
+- Do not create cross-test dependencies.
 
 ---
 

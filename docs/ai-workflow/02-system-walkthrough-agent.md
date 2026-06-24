@@ -530,6 +530,7 @@ Examples:
  - page.getByLabel('Password') 
  - page.getByRole('button', { name: 'Transfer' })  
  - page.locator("input[name='customerName']")
+ 
 
 ### CONTEXTUAL
 

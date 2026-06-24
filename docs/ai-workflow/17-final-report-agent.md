@@ -52,6 +52,10 @@ Typical triggers:
 
 - `docs/test-design/automation-coverage.md`
 
+### Lifecycle Inputs
+
+- `docs/test-design/test-lifecycle.md`
+
 ### Project Inputs
 
 - Project profile
@@ -65,6 +69,10 @@ Typical triggers:
 - CR references
 - Requirement references
 - Traceability matrix
+
+### Traceability Inputs
+
+- `docs/test-design/automation-traceability.md`
 
 ---
 
@@ -110,8 +118,28 @@ Verify:
 Counts must match execution artifacts.
 
 ---
+### 3. Validate Lifecycle Compliance
 
-### 3. Aggregate Failure Analysis
+Verify:
+
+- Setup execution status
+- Teardown execution status
+- Test isolation compliance
+- Data cleanup compliance
+- Environment cleanup compliance
+- Lifecycle violations
+
+Capture:
+
+- Setup Success Rate
+- Teardown Success Rate
+- Lifecycle Exceptions
+- Orphaned Test Data
+- Unreleased Environment Resources
+
+---
+
+### 4. Aggregate Failure Analysis
 
 For every failed test:
 
@@ -126,7 +154,7 @@ Capture:
 
 ---
 
-### 4. Aggregate Self-Healing Results
+### 5. Aggregate Self-Healing Results
 
 If self-healing occurred:
 
@@ -181,7 +209,7 @@ Manual Review:
 ```
 ---
 
-### 5. Generate Defect Summary
+### 6. Generate Defect Summary
 
 List:
 
@@ -196,7 +224,7 @@ Exclude:
 
 ---
 
-### 6. Generate Automation Summary
+### 7. Generate Automation Summary
 
 List:
 
@@ -206,7 +234,44 @@ List:
 - Locator instability observations
 
 ---
-### 7. ### Generate Locator Repository Health Summary
+### 8. Generate Lifecycle Summary
+
+Summarize:
+
+- Tests requiring setup
+- Tests requiring teardown
+- Setup success rate
+- Teardown success rate
+- Lifecycle violations
+- Cleanup failures
+- Orphaned test data incidents
+- Environment cleanup issues
+
+Example:
+```
+Lifecycle Summary
+
+Tests With Setup:
+120
+
+Tests With Teardown:
+120
+
+Setup Success:
+120
+
+Teardown Success:
+119
+
+Lifecycle Violations:
+1
+
+Cleanup Failures:
+1
+```
+---
+
+### 9.Generate Locator Repository Health Summary
 
 Summarize:
 
@@ -244,7 +309,7 @@ Recovered This Cycle:
 ---
 
 
-### 8. Generate Coverage Summary
+### 10. Generate Coverage Summary
 
 Summarize:
 
@@ -258,7 +323,7 @@ If traceability exists:
 
 Include:
 
-```text
+```
 Coverage Rate:
 92%
 
@@ -268,10 +333,24 @@ Covered IUs:
 Uncovered IUs:
 4
 ```
+Lifecycle Coverage:
 
+- Lifecycle-Compliant Tests
+- Setup Coverage
+- Teardown Coverage
+- Isolated Test Coverage
+
+Example:
+```
+Lifecycle Compliance:
+97%
+
+Lifecycle-Compliant Tests:
+145 / 150
+```
 ---
 
-### 9. Assess Release Readiness
+### 11. Assess Release Readiness
 
 Determine:
 
@@ -301,7 +380,7 @@ Based on:
 
 ---
 
-### 10. Produce Recommendations
+### 12. Produce Recommendations
 
 Provide:
 
@@ -310,12 +389,17 @@ Provide:
 - Automation improvements
 - Coverage improvements
 - Environment improvements
+- Lifecycle improvements
+- Setup standardization
+- Teardown standardization
+- Test isolation improvements
+- Test data cleanup improvements
 
 Recommendations must be actionable.
 
 ---
 
-### 11. Generate Final QA Decision
+### 13. Generate Final QA Decision
 
 Provide final QA assessment.
 
@@ -408,6 +492,21 @@ Executed:
 
 Coverage:
 98.7%
+────────────────────────────────────
+
+Lifecycle
+
+Setup Success:
+148 / 148
+
+Teardown Success:
+148 / 148
+
+Lifecycle Violations:
+0
+
+Cleanup Failures:
+0
 
 ────────────────────────────────────
 
@@ -435,6 +534,8 @@ Environment Issues:
 Requirement Ambiguities:
 1
 
+Lifecycle Issues:
+0
 ────────────────────────────────────
 
 P1:
@@ -481,6 +582,8 @@ Requirements:
 - No critical automation blockers
 - Coverage acceptable
 - Execution completed successfully
+- No critical lifecycle violations
+- No unresolved cleanup failures
 
 ---
 
@@ -491,6 +594,8 @@ Requirements:
 - No open P1 defects
 - Some P2/P3 defects remain
 - Risks documented
+- Minor lifecycle issues documented
+- Cleanup risks documented
 
 ---
 
@@ -502,6 +607,9 @@ Requirements:
 - Critical functionality failing
 - Major coverage gaps
 - Blocking environment issues
+- Critical lifecycle violations
+- Persistent test data contamination
+- Failed teardown causing environment instability
 
 ---
 
@@ -525,9 +633,16 @@ Every reported issue links to:
 
 ### Accuracy
 
-No estimated values.
+- No estimated values.
+- No invented metrics.
 
-No invented metrics.
+### Lifecycle Accuracy
+
+- Lifecycle metrics match execution artifacts
+- Setup counts are accurate
+- Teardown counts are accurate
+- Lifecycle violations are reported
+- Cleanup failures are reported
 
 ---
 

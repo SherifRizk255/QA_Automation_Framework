@@ -80,6 +80,8 @@ Translate QA output into:
 3. Test generation blueprint
 4. Regression requirements
 5. Retirement requirements
+6. Lifecycle planning
+7. Lifecycle traceability generation
 
 Do NOT:
 
@@ -243,6 +245,99 @@ Failure propagation scenarios required:
 
 ---
 
+## LIFECYCLE PLANNING
+
+Consume lifecycle dependency candidates from QA Analyzer.
+
+Reference:
+
+docs/test-design/test-lifecycle.md
+
+For every IU:
+
+Determine whether execution requires:
+
+- SUITE_SETUP
+- SUITE_TEARDOWN
+- TC_SETUP
+- TC_TEARDOWN
+
+Lifecycle generation must be based on:
+
+- Authentication dependencies
+- Authorization dependencies
+- Test Data dependencies
+- Environment dependencies
+- External Dependency requirements
+
+Lifecycle actions must remain traceable to:
+
+REQ
+↓
+IU
+↓
+SCN
+↓
+TC
+↓
+LIFECYCLE ACTION
+
+---
+
+## Lifecycle Classification Rules
+
+Authentication Dependency
+→ TC_SETUP
+
+Authorization Dependency
+→ TC_SETUP
+
+Test Data Dependency
+→ TC_SETUP
+
+Created Test Data
+→ TC_TEARDOWN
+
+Shared Test Data
+→ SUITE_SETUP
+and
+→ SUITE_TEARDOWN
+
+Environment Dependency
+→ SUITE_SETUP
+
+External Dependency
+→ SUITE_SETUP
+
+---
+## Lifecycle Candidate Output
+Example:
+```
+IU-021
+
+Lifecycle Requirements
+
+TC_SETUP
+
+ - Login Retail User
+ - Select Source Account
+ - Select Beneficiary
+
+TC_TEARDOWN
+
+ - Remove Beneficiary
+
+SUITE_SETUP
+
+ - Verify UAT Environment
+
+SUITE_TEARDOWN
+
+ - Persist Locator Repository
+```
+
+---
+
 # REGRESSION PLANNING
 
 Consume:
@@ -356,6 +451,28 @@ Dependencies
 ──────────────────────────────────────────────────
 IU-002
 IU-003
+──────────────────────────────────────────────────
+
+Lifecycle Requirements
+──────────────────────────────────────────────────
+
+TC_SETUP
+
+ - Login Retail User
+ - Select Beneficiary
+
+TC_TEARDOWN
+
+ - Remove Beneficiary
+
+SUITE_SETUP
+
+ - Verify Environment
+
+SUITE_TEARDOWN
+
+ - Persist Locator Repository
+
 ──────────────────────────────────────────────────
 
 Regression Scope
@@ -486,6 +603,22 @@ data_classification:
   IU-001:
     PII-Sensitive
 
+lifecycle:
+
+  IU-001:
+
+    tc_setup:
+      - Login User
+      - Select Beneficiary
+
+    tc_teardown:
+      - Remove Beneficiary
+
+    suite_setup:
+      - Verify Environment
+
+    suite_teardown:
+      - Persist Locator Repository
 ────────────────────────────────────────
 ```
 

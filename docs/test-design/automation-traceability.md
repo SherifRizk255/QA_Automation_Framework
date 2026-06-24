@@ -101,3 +101,43 @@ Automated
 - Active tests use Page Object methods only for UI interactions.
 - Sensitive account identifiers are not logged; assertions use count/visibility and masked identifier patterns.
 - No hard-coded credentials are used; login consumes `.env` variables through existing `LoginPage`.
+
+## Transfer - Local Transfer To Another SAIB Account
+
+Source artifact:
+- Approved workbook rows: `C:\Users\malak Mohamed\OneDrive\Documents\Local transfer to another saib account.xlsx`
+
+```text
+Transfer
+â†“
+Local Transfers
+â†“
+To another SAIB account
+â†“
+SAIB-1803 ... SAIB-1820
+â†“
+tests/portal/transfers/local-transfer-to-saib-account.spec.ts
+â†“
+pages/portal/LocalTransferToSaibAccountPage.ts
+
+Status:
+Reopened after system walkthrough. Safe non-transaction scenarios implemented with traceability.
+```
+
+| TC ID | Automation Status | Reason |
+| --- | --- | --- |
+| SAIB-1803 | Automated | Validates reachable To Another SAIB Account form and required controls. |
+| SAIB-1804 | Automated | Validates source account selector exposes account entries with currency and amount evidence. |
+| SAIB-1805 | Automated | Existing saved beneficiaries are selectable through UI and masking is asserted. |
+| SAIB-1806 | Automated | Validates Add New Beneficiary popup is locked to Another SAIB / Account Number. |
+| SAIB-1807 | Automated | Validates amount min/max limits and summary update. |
+| SAIB-1808 | Automated | Validates quick-add amount behavior and summary update. |
+| SAIB-1809 | Automated | Validates reason option selection and summary update. |
+| SAIB-1810 | Automated - Failing | Dependencies are satisfied through UI; `Continue` remains disabled before review/OTP. |
+| SAIB-1814 | Automated - Failing | Scheduled transfer state is selected through UI; `Continue` remains disabled before review. |
+| SAIB-1815 | Automated - Failing | Recurring transfer state is selected through UI; `Continue` remains disabled before review. |
+| SAIB-1816 | Automated - Failing | Same-currency setup is selected through UI; `Continue` remains disabled before review. |
+| SAIB-1817 | Automated | Multiple beneficiaries are visible as separate selectable rows. |
+| SAIB-1818 | Automated | Projected balance is calculated from displayed source balance and visible transfer amount. |
+| SAIB-1819 | Automated | Cross-currency mismatch is blocked before posting. |
+| SAIB-1820 | Automated | Transfer amount above displayed available balance is blocked before posting. |

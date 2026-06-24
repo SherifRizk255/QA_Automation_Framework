@@ -55,13 +55,13 @@ CR Analyzer is only valid in CR Delta Mode.
 
 Required:
 
-```text
+```
 Pipeline Mode = CR Delta
 ```
 
 If pipeline mode is not CR Delta:
 
-```text
+```
 CR Analyzer skipped.
 Reason:
 Not a Change Request workflow.
@@ -100,7 +100,7 @@ Every IU must be classified.
 
 Possible values:
 
-```text
+```
 NEW
 MODIFIED
 DEPRECATED
@@ -115,7 +115,7 @@ Behavior did not previously exist.
 
 Requires:
 
-```text
+```
 New test coverage
 ```
 
@@ -127,7 +127,7 @@ Existing behavior changed.
 
 Requires:
 
-```text
+```
 Regression analysis
 Update existing tests
 Potential new tests
@@ -141,7 +141,7 @@ Behavior removed.
 
 Requires:
 
-```text
+```
 Test retirement analysis
 Traceability update
 ```
@@ -154,7 +154,7 @@ Behavior exists but remains unaffected.
 
 Requires:
 
-```text
+```
 No new coverage
 May participate in regression
 ```
@@ -165,7 +165,7 @@ May participate in regression
 
 Produce:
 
-```text
+```
 🔁 DELTA SUMMARY
 ────────────────────────────────────────────
 
@@ -207,7 +207,7 @@ For every MODIFIED or DEPRECATED IU:
 
 Determine:
 
-```text
+```
 Business Impact
 Technical Impact
 Integration Impact
@@ -217,7 +217,7 @@ Security Impact
 
 Output:
 
-```text
+```
 IU-[N]
 
 Classification:
@@ -251,7 +251,7 @@ For every MODIFIED IU determine:
 
 Values:
 
-```text
+```
 FULL
 TARGETED
 SMOKE_ONLY
@@ -294,7 +294,7 @@ Use when:
 
 Output:
 
-```text
+```
 IU-[N]
 
 Regression Scope:
@@ -312,7 +312,7 @@ Identify dependent areas.
 
 Output:
 
-```text
+```
 💥 BLAST RADIUS
 ────────────────────────────────────────────
 
@@ -347,13 +347,13 @@ For DEPRECATED IUs:
 
 Determine:
 
-```text
+```
 Should existing tests be retired?
 ```
 
 Output:
 
-```text
+```
 🗑 TEST RETIREMENT
 
 IU-[N]
@@ -376,7 +376,7 @@ Determine required traceability updates.
 
 Output:
 
-```text
+```
 TRACEABILITY IMPACT
 
 IU-[N]
@@ -393,7 +393,7 @@ Validation rule updated.
 
 Actions:
 
-```text
+```
 SUPERSEDE
 RETAIN
 RETIRE
@@ -419,7 +419,7 @@ Automatically elevate blast radius to HIGH when CR affects:
 
 Output:
 
-```text
+```
 ⚠ HIGH-RISK CR DETECTED
 
 Reason:
@@ -440,7 +440,7 @@ Check for contradictions between:
 
 Output:
 
-```text
+```
 ⚔ CR CONFLICT
 
 Existing IU:
@@ -462,7 +462,7 @@ Business confirmation required.
 
 Produce structured handoff.
 
-```text
+```
 CR_ANALYZER_HANDOFF
 ────────────────────────────────────────────
 
@@ -509,7 +509,7 @@ affected_modules:
 
 # OUTPUT FORMAT
 
-```text
+```
 🔁 CR ANALYSIS REPORT
 ══════════════════════════════════════════
 
