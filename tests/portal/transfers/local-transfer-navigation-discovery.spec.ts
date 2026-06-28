@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { test, type Page, type Locator } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
 import { LoginPage } from '../../../pages/portal/LoginPage.js';
@@ -6,7 +6,7 @@ import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
 
 const evidenceDir = path.resolve('reports', 'system-walkthrough', 'transfers-local-transfer');
 
-async function captureStep(page, name) {
+async function captureStep(page: Page, name: string) {
   fs.mkdirSync(evidenceDir, { recursive: true });
 
   const screenshotPath = path.join(evidenceDir, `${name}.png`);
@@ -14,7 +14,7 @@ async function captureStep(page, name) {
 
   await page.screenshot({ path: screenshotPath, fullPage: true });
 
-  const evidence = await page.locator('body').evaluate((body) =>
+  const evidence = await page.locator('body').evaluate((body: HTMLElement) =>
     Array.from(body.querySelectorAll('a,button,input,textarea,select,[role],label,div,span'))
       .map((element) => {
         const htmlElement = element as HTMLElement;
@@ -49,7 +49,7 @@ async function captureStep(page, name) {
   console.log(JSON.stringify(evidence.slice(0, 80), null, 2));
 }
 
-async function clickIfVisible(page, locator, label) {
+async function clickIfVisible(page: Page, locator: Locator, label: string) {
   const count = await locator.count().catch(() => 0);
 
   for (let index = 0; index < count; index += 1) {
@@ -67,7 +67,7 @@ async function clickIfVisible(page, locator, label) {
   return false;
 }
 
-async function waitForTransferDetailOrStableSelector(page) {
+async function waitForTransferDetailOrStableSelector(page: Page) {
   await Promise.race([
     page.waitForURL(/local-transfers\/.+|another-saib|saib-account/i, { timeout: 15000 }).catch(() => undefined),
     page

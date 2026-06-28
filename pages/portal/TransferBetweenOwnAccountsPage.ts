@@ -1,8 +1,17 @@
-import { expect } from '@playwright/test';
+import { expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import path from 'node:path';
 
 export class TransferBetweenOwnAccountsPage {
-  constructor(page) {
+  readonly page: Page;
+  readonly transferMenu: Locator;
+  readonly transferLandingHeading: Locator;
+  readonly betweenMyAccountsCard: Locator;
+  readonly fromAccountDropdown: Locator;
+  readonly toAccountDropdown: Locator;
+  readonly dropdownOptions: Locator;
+  readonly loadingIndicator: Locator;
+
+  constructor(page: Page) {
     this.page = page;
     this.transferMenu = page.locator('.p-panelmenu-header-link[href="#/transfers"]').first();
     this.transferLandingHeading = page.getByText(/^Transfer Money$/i).first();
@@ -16,7 +25,7 @@ export class TransferBetweenOwnAccountsPage {
     this.loadingIndicator = page.getByText(/loading|please wait/i);
   }
 
-  dropdownByLabel(labelPattern) {
+  dropdownByLabel(labelPattern: RegExp): Locator {
     return this.page
       .getByLabel(labelPattern)
       .or(this.page.getByRole('combobox', { name: labelPattern }))
@@ -28,7 +37,7 @@ export class TransferBetweenOwnAccountsPage {
       );
   }
 
-  async navigateToTransferBetweenOwnAccounts(testInfo) {
+  async navigateToTransferBetweenOwnAccounts(testInfo?: TestInfo): Promise<void> {
     console.log('[TransferBetweenOwnAccountsPage] Navigating to Transfer Money page.');
     await this.transferMenu.click();
     await expect(this.transferLandingHeading).toBeVisible();
@@ -43,11 +52,11 @@ export class TransferBetweenOwnAccountsPage {
     ).toBeVisible();
   }
 
-  async waitForLoadingToFinish() {
+  async waitForLoadingToFinish(): Promise<void> {
     await expect(this.loadingIndicator).toBeHidden({ timeout: 20000 }).catch(() => {});
   }
 
-  async openFromAccountDropdown(testInfo) {
+  async openFromAccountDropdown(testInfo?: TestInfo): Promise<void> {
     await this.waitForLoadingToFinish();
     await expect(this.fromAccountDropdown).toBeVisible();
     await this.fromAccountDropdown.click();
@@ -55,11 +64,11 @@ export class TransferBetweenOwnAccountsPage {
     await this.captureTransferScreenScreenshot('from-account-dropdown-opened', testInfo);
   }
 
-  async getFromAccountOptions() {
+  async getFromAccountOptions(): Promise<string[]> {
     return this.getVisibleDropdownOptionTexts();
   }
 
-  async selectFirstFromAccount() {
+  async selectFirstFromAccount(): Promise<string> {
     const firstOption = this.dropdownOptions.first();
     await expect(firstOption).toBeVisible();
     const selectedText = this.normalizeText(await firstOption.innerText());
@@ -67,7 +76,7 @@ export class TransferBetweenOwnAccountsPage {
     return selectedText;
   }
 
-  async openToAccountDropdown(testInfo) {
+  async openToAccountDropdown(testInfo?: TestInfo): Promise<void> {
     await this.waitForLoadingToFinish();
     await expect(this.toAccountDropdown).toBeVisible();
     await this.toAccountDropdown.click();
@@ -75,15 +84,15 @@ export class TransferBetweenOwnAccountsPage {
     await this.captureTransferScreenScreenshot('to-account-dropdown-opened', testInfo);
   }
 
-  async getToAccountOptions() {
+  async getToAccountOptions(): Promise<string[]> {
     return this.getVisibleDropdownOptionTexts();
   }
 
-  async getSelectedFromAccountText() {
+  async getSelectedFromAccountText(): Promise<string> {
     return this.normalizeText(await this.fromAccountDropdown.innerText());
   }
 
-  async verifyFromAccountEntriesHaveRequiredDetails(options) {
+  async verifyFromAccountEntriesHaveRequiredDetails(options: string[]): Promise<void> {
     const maskedAccountPattern = /(?:\*{2,}|•{2,}|x{2,})\s*\d{2,}|(?:\d{2,}\s*(?:\*{2,}|•{2,}|x{2,}))/i;
     const accountTypePattern = /\b(current|savings|investment|account|overdraft|deposit)\b/i;
     const balancePattern = /\b[A-Z]{3}\s*[+-]?\d{1,3}(?:,\d{3})*(?:\.\d{2})?\b|\b[+-]?\d{1,3}(?:,\d{3})*(?:\.\d{2})?\s*[A-Z]{3}\b/i;
@@ -98,7 +107,7 @@ export class TransferBetweenOwnAccountsPage {
     }
   }
 
-  async captureTransferScreenScreenshot(name, testInfo) {
+  async captureTransferScreenScreenshot(name: string, testInfo?: TestInfo): Promise<string> {
     const screenshotPath = path.resolve('reports', 'transfer', `${name}.png`);
     await this.page.screenshot({ path: screenshotPath, fullPage: true });
 
@@ -112,7 +121,7 @@ export class TransferBetweenOwnAccountsPage {
     return screenshotPath;
   }
 
-  async getVisibleDropdownOptionTexts() {
+  async getVisibleDropdownOptionTexts(): Promise<string[]> {
     const texts = await this.dropdownOptions.evaluateAll((options) =>
       options
         .filter((option) => {
@@ -126,7 +135,7 @@ export class TransferBetweenOwnAccountsPage {
     return texts.map((text) => this.normalizeText(text)).filter(Boolean);
   }
 
-  normalizeText(value) {
+  normalizeText(value: string): string {
     return value.replace(/\s+/g, ' ').trim();
   }
 }

@@ -1,8 +1,19 @@
-import { expect } from '@playwright/test';
+import { expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import path from 'node:path';
 
 export class LoginPage {
-  constructor(page) {
+  readonly page: Page;
+  readonly usernameInput: Locator;
+  readonly passwordInput: Locator;
+  readonly loginButton: Locator;
+  readonly blockingOverlay: Locator;
+  readonly activeSessionDialog: Locator;
+  readonly genericAlertDialog: Locator;
+  readonly activeSessionMessage: Locator;
+  readonly proceedButton: Locator;
+  readonly genericDialogProceedButton: Locator;
+
+  constructor(page: Page) {
     this.page = page;
 
     this.usernameInput = page
@@ -29,7 +40,7 @@ export class LoginPage {
     });
   }
 
-  async goto() {
+  async goto(): Promise<void> {
     const baseUrl = process.env.PORTAL_BASE_URL ?? '';
     const loginPath = process.env.PORTAL_LOGIN_PATH ?? '';
     const loginUrl = process.env.PORTAL_LOGIN_URL ?? `${baseUrl}${loginPath}`;
@@ -53,13 +64,13 @@ export class LoginPage {
     await expect(this.passwordInput).toBeVisible({ timeout: 30000 });
   }
 
-  async expectLoginPageLoaded() {
+  async expectLoginPageLoaded(): Promise<void> {
     await expect(this.page).toHaveURL(/login/);
     await expect(this.usernameInput).toBeVisible();
     await expect(this.passwordInput).toBeVisible();
   }
 
-  async login(username, password, testInfo) {
+  async login(username: string | undefined, password: string | undefined, testInfo?: TestInfo): Promise<boolean> {
     if (!username || !password) {
       throw new Error('PORTAL_USERNAME and PORTAL_PASSWORD must be configured in .env');
     }
@@ -95,10 +106,10 @@ export class LoginPage {
     return this.handleActiveSessionPopupIfVisible(testInfo);
   }
 
-  async attemptLogin(username, password) {
+  async attemptLogin(username: string | undefined, password: string | undefined): Promise<boolean> {
     console.log('[LoginPage] Attempting login form submission.');
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
+    await this.usernameInput.fill(username ?? '');
+    await this.passwordInput.fill(password ?? '');
 
     const isLoginButtonEnabled = await this.loginButton.isEnabled();
     if (isLoginButtonEnabled) {
@@ -110,18 +121,18 @@ export class LoginPage {
     return isLoginButtonEnabled;
   }
 
-  async expectUsernameRequiredValidation() {
+  async expectUsernameRequiredValidation(): Promise<void> {
     await expect(this.usernameInput).toBeVisible();
     await expect(this.page).toHaveURL(/login/);
   }
 
-  async expectCredentialsRequiredValidation() {
+  async expectCredentialsRequiredValidation(): Promise<void> {
     await expect(this.usernameInput).toBeVisible();
     await expect(this.passwordInput).toBeVisible();
     await expect(this.page).toHaveURL(/login/);
   }
 
-  async handleActiveSessionPopupIfVisible(testInfo) {
+  async handleActiveSessionPopupIfVisible(testInfo?: TestInfo): Promise<boolean> {
     const isStrictPopupVisible = await this.activeSessionDialog
       .waitFor({ state: 'visible', timeout: 10000 })
       .then(() => true)
@@ -168,7 +179,7 @@ export class LoginPage {
     return isPopupVisible;
   }
 
-  async waitForBlockingOverlayToClear(options = { throwOnFailure: true }) {
+  async waitForBlockingOverlayToClear(options: { throwOnFailure: boolean } = { throwOnFailure: true }): Promise<boolean> {
     const isHidden = await expect(this.blockingOverlay)
       .toBeHidden({ timeout: 20000 })
       .then(() => true)

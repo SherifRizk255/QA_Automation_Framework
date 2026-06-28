@@ -1,6 +1,7 @@
+import { type Page, type TestInfo } from '@playwright/test';
 import path from 'node:path';
 
-export async function handleFailureEvidence(page, testInfo, failureName) {
+export async function handleFailureEvidence(page: Page, testInfo: TestInfo | undefined, failureName: string): Promise<void> {
   const safeName = failureName.replace(/[^a-z0-9-_]/gi, '-').toLowerCase();
   const screenshotPath = path.resolve('reports', `${safeName}-failure.png`);
 

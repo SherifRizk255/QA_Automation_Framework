@@ -1,10 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { LoginPage } from '../../../pages/portal/LoginPage.js';
 import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
 import { TransferBetweenOwnAccountsPage } from '../../../pages/portal/TransferBetweenOwnAccountsPage.js';
 import { handleFailureEvidence } from '../../../utils/failureHandler.js';
 
-async function loginAndOpenTransferPage(page, testInfo) {
+async function loginAndOpenTransferPage(page: Page, testInfo: TestInfo) {
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
   const transferPage = new TransferBetweenOwnAccountsPage(page);

@@ -1,10 +1,63 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+interface Attachment {
+  name?: string;
+  path?: string;
+  contentType?: string;
+}
+
+interface TestResult {
+  duration?: number;
+  errors?: { message?: string }[];
+  error?: { message?: string };
+  attachments?: Attachment[];
+}
+
+interface TestEntry {
+  status: string;
+  results: TestResult[];
+}
+
+interface Spec {
+  title: string;
+  tests: TestEntry[];
+}
+
+interface Suite {
+  specs?: Spec[];
+  suites?: Suite[];
+}
+
+interface PlaywrightJsonResult extends Suite {}
+
+interface TestSummaryEntry {
+  title: string;
+  status: string;
+  duration: number;
+  error?: { message?: string };
+  attachments: Attachment[];
+}
+
+interface Summary {
+  total: number;
+  passed: number;
+  failed: number;
+  skipped: number;
+  duration: number;
+  failures: TestSummaryEntry[];
+}
+
+interface CollectedAttachments {
+  screenshots: string[];
+  videos: string[];
+  traces: string[];
+}
+
 const resultsDir = path.resolve('test-results');
 const reportPath = path.resolve('reports', 'execution-summary.md');
 
-function findFiles(dir, predicate) {
+function findFiles(dir: string, predicate: (filePath: string) => boolean): string[] {
   if (!fs.existsSync(dir)) {
     return [];
   }
@@ -15,7 +68,7 @@ function findFiles(dir, predicate) {
   });
 }
 
-function classifyFailure(message) {
+function classifyFailure(message: string): string {
   const text = message.toLowerCase();
 
   if (/active session blocker appeared and was handled/i.test(text)) {
@@ -41,22 +94,22 @@ function classifyFailure(message) {
   return 'Requirement ambiguity';
 }
 
-function stripAnsi(value) {
-  return value.replace(/\u001b\[[0-9;]*m/g, '');
+function stripAnsi(value: string): string {
+  return value.replace(/\[[0-9;]*m/g, '');
 }
 
-function extractJsonResults() {
+function extractJsonResults(): PlaywrightJsonResult[] {
   const jsonFiles = findFiles(resultsDir, (filePath) => filePath.endsWith('.json'));
   return jsonFiles.flatMap((filePath) => {
     try {
-      return [JSON.parse(fs.readFileSync(filePath, 'utf8'))];
+      return [JSON.parse(fs.readFileSync(filePath, 'utf8')) as PlaywrightJsonResult];
     } catch {
       return [];
     }
   });
 }
 
-function collectAttachments() {
+function collectAttachments(): CollectedAttachments {
   const files = findFiles(resultsDir, () => true);
   return {
     screenshots: files.filter((filePath) => filePath.endsWith('.png')),
@@ -65,7 +118,7 @@ function collectAttachments() {
   };
 }
 
-function flattenSpecs(suite, specs = []) {
+function flattenSpecs(suite: Suite | undefined, specs: Spec[] = []): Spec[] {
   if (!suite) {
     return specs;
   }
@@ -81,14 +134,14 @@ function flattenSpecs(suite, specs = []) {
   return specs;
 }
 
-function summarizeFromJson(results) {
+function summarizeFromJson(results: PlaywrightJsonResult[]): Summary {
   const specs = results.flatMap((result) => flattenSpecs(result));
-  const tests = specs.flatMap((spec) =>
+  const tests: TestSummaryEntry[] = specs.flatMap((spec) =>
     spec.tests.map((test) => ({
       title: spec.title,
       status: test.status,
       duration: test.results.reduce((total, run) => total + (run.duration ?? 0), 0),
-      error: test.results.flatMap((run) => run.errors ?? run.error ?? []).at(0),
+      error: test.results.flatMap((run) => run.errors ?? (run.error ? [run.error] : [])).at(0),
       attachments: test.results.flatMap((run) => run.attachments ?? []),
     }))
   );
@@ -103,7 +156,7 @@ function summarizeFromJson(results) {
   };
 }
 
-function writeMarkdown(summary, attachments) {
+function writeMarkdown(summary: Summary, attachments: CollectedAttachments): void {
   const lines = [
     '# Execution Summary',
     '',
@@ -149,7 +202,7 @@ function writeMarkdown(summary, attachments) {
   fs.writeFileSync(reportPath, `${lines.join('\n')}\n`);
 }
 
-function recommendationFor(classification, message) {
+function recommendationFor(classification: string, message: string): string {
   if (classification === 'Application defect') {
     if (/transfer between my accounts form did not display/i.test(message)) {
       return 'Validate the Between My Accounts card action and ensure the From/To Account form is rendered for the authenticated retail customer.';

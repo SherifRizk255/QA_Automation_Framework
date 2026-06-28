@@ -1,8 +1,12 @@
-import { expect } from '@playwright/test';
+import { expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import path from 'node:path';
 
 export class DashboardPage {
-  constructor(page) {
+  readonly page: Page;
+  readonly body: Locator;
+  readonly knownDashboardElement: Locator;
+
+  constructor(page: Page) {
     this.page = page;
     this.body = page.locator('body');
     this.knownDashboardElement = page
@@ -10,7 +14,7 @@ export class DashboardPage {
       .or(page.getByText(/dashboard|account summary|available balance|last login/i));
   }
 
-  async expectLoaded(testInfo) {
+  async expectLoaded(testInfo?: TestInfo): Promise<void> {
     const knownElementVisible = await this.knownDashboardElement
       .first()
       .isVisible({ timeout: 15000 })

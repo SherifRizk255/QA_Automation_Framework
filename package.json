@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test:portal": "playwright test tests/portal --headed",
-    "test:portal:report": "playwright test tests/portal --headed & node utils/reportGenerator.js"
+    "test:portal:report": "playwright test tests/portal --headed & node utils/reportGenerator.ts"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +14,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.9.2",
+    "httpntlm": "^1.8.13",
     "typescript": "^6.0.3"
   },
   "dependencies": {

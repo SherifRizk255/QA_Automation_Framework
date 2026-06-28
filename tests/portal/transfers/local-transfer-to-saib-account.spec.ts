@@ -1,10 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { LoginPage } from '../../../pages/portal/LoginPage.js';
 import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
 import { LocalTransferToSaibAccountPage } from '../../../pages/portal/LocalTransferToSaibAccountPage';
 import { handleFailureEvidence } from '../../../utils/failureHandler.js';
 
-async function loginAndOpenLocalTransferToSaibAccount(page, testInfo) {
+async function loginAndOpenLocalTransferToSaibAccount(page: Page, testInfo: TestInfo) {
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
   const transferPage = new LocalTransferToSaibAccountPage(page);
