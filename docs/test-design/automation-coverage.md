@@ -36,3 +36,20 @@ Automation file:
 | Transfer Between My Accounts - To Account exclusion | Automated | `tests/portal/transfer-between-own-accounts.spec.ts` |
 | Transfer Between My Accounts - Account entry details | Existing APP_UI failure from prior execution | `tests/portal/transfer-between-own-accounts.spec.ts` |
 | Locator Repository Validation | Automated | `tests/portal/transfer-locator-repository.spec.ts` |
+
+## Instant Transfer Coverage
+
+Source workbook: `C:\Users\malak Mohamed\OneDrive\Documents\instant transfers - codex.xlsx`
+
+| Coverage Area | Status | Automation File |
+| --- | --- | --- |
+| Instant Transfer method tiles | Automated | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Method switching and beneficiary reset | Automated | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Beneficiary method filtering | Automated | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Add Beneficiary type lock and nickname validation | Automated | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Mobile Number negative validation | Automated | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Card Number negative validation | Automated - app validation defects found | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Bank Account negative validation | Automated - app validation defect found | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Payment Address negative validation | Automated | `tests/portal/transfers/instant-transfer.spec.ts` |
+| Wallet required validation | Automated | `tests/portal/transfers/instant-transfer.spec.ts` |
+| OTP, transaction posting, API tampering, external positive resolution | Blocked | Documented in `data/portal/instantTransferTestData.ts` |

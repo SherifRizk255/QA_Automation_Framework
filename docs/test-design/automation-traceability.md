@@ -141,3 +141,40 @@ Reopened after system walkthrough. Safe non-transaction scenarios implemented wi
 | SAIB-1818 | Automated | Projected balance is calculated from displayed source balance and visible transfer amount. |
 | SAIB-1819 | Automated | Cross-currency mismatch is blocked before posting. |
 | SAIB-1820 | Automated | Transfer amount above displayed available balance is blocked before posting. |
+
+## Instant Transfer
+
+Source artifact:
+- Approved workbook rows: `C:\Users\malak Mohamed\OneDrive\Documents\instant transfers - codex.xlsx`
+
+```text
+Transfers
+|
+Instant Transfer
+|
+SAIB-2184 through SAIB-2232
+|
+tests/portal/transfers/instant-transfer.spec.ts
+|
+pages/portal/InstantTransferPage.ts
+|
+docs/analysis/locator-repository.json
+```
+
+| TC ID | Automation Status | Result |
+| --- | --- | --- |
+| SAIB-2184 | Automated | Passed |
+| SAIB-2185 | Automated | Passed after targeted rerun |
+| SAIB-2186 | Automated | Executed |
+| SAIB-2187 | Automated | Passed after targeted rerun |
+| SAIB-2188 | Automated | Executed |
+| SAIB-2190, SAIB-2191, SAIB-2192 | Automated | Executed |
+| SAIB-2198 | Automated | Passed after healing |
+| SAIB-2203, SAIB-2206, SAIB-2207 | Automated | Passed after healing/rerun |
+| SAIB-2208 | Automated | Failed - APP_VALIDATION |
+| SAIB-2209 | Automated | Failed - APP_VALIDATION |
+| SAIB-2211, SAIB-2212, SAIB-2213, SAIB-2214, SAIB-2215, SAIB-2217 | Automated | Passed after healing/rerun |
+| SAIB-2216 | Automated | Failed - APP_VALIDATION |
+| SAIB-2220, SAIB-2221, SAIB-2222, SAIB-2223, SAIB-2225, SAIB-2229 | Automated | Passed after healing/rerun |
+| SAIB-2232 | Automated | Passed after healing |
+| SAIB-2189, SAIB-2193 to SAIB-2197, SAIB-2200 to SAIB-2202, SAIB-2204, SAIB-2205, SAIB-2210, SAIB-2219, SAIB-2224, SAIB-2226 to SAIB-2228, SAIB-2230 | Skipped | Blocked by OTP, posting, API tampering, external registry data, or unsafe dependency |

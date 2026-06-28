@@ -116,6 +116,7 @@ traceability.
 - `test-results/videos/`
 - `test-results/traces/`
 - `reports/lifecycle-execution-report.md`
+- `reports/execution-blockers.md`
 
 ---
 
@@ -136,6 +137,15 @@ traceability.
 14. Record pass/fail/skip counts.
 15. Record retries.
 16. Record blocker occurrences.
+
+   16.1 Classify execution blockers.
+
+   16.2 Assign blocker owner.
+
+   16.3 Record blocker remediation requirements.
+
+   16.4 Generate execution-blockers.md.
+
 17. Record locator execution behavior.
 18. Validate repository locator usage.
 19. Record locator failures.
@@ -349,6 +359,45 @@ active-session-warning.png
 Do not hide blockers.
 
 Do not suppress blockers.
+
+---
+
+## Execution Blocker Report
+
+Generate:
+
+reports/execution-blockers.md
+
+For every blocked test capture:
+
+- TC ID
+- IU ID
+- Scenario ID
+- Automation File
+- Blocker Type
+- Blocker Description
+- Owner
+- Required Action
+- Dependency Type
+- Environment
+- Timestamp
+
+Example:
+
+TC:
+TC-041
+
+Blocker Type:
+OTP Service
+
+Owner:
+Environment Team
+
+Required Action:
+Provide OTP retrieval API.
+
+Status:
+BLOCKED
 
 ---
 

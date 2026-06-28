@@ -161,7 +161,7 @@ Lifecycle actions must be derived from scenario dependencies whenever possible.
 
 Dependencies identified during analysis become lifecycle requirements.
 
-Dependency flow:
+Dependency flow
 ```
 REQ
 ↓

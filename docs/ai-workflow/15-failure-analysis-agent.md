@@ -22,6 +22,7 @@ This skill does not:
  - `playwright-report/`
  - `test-results/`
  - `docs/test-design/test-lifecycle.md`
+ - `reports/execution-blockers.md`
 
 ### Optional
  - requirements/ 
@@ -33,6 +34,7 @@ This skill does not:
 ---
 
 ## Consumes
+
 * From Test Execution Agent
   - Execution Results 
   - Execution Metadata 
@@ -53,6 +55,10 @@ This skill does not:
   - Accessible Role Inventory 
   - Locator Fallback Chains 
   - Recovery Metadata
+  - Execution Blocker Report
+  - Blocker Owner
+  - Blocker Dependency
+  - Blocker Remediation
 
 * From Traceability Manager
   - REQ Mapping
@@ -154,6 +160,13 @@ Use this skill after test execution produces failures.
 13. Review accessible roles and nearby interactive elements. 
 14. Review retry information. 
 15. Review blocker records. 
+     
+    15.1 Review execution blocker report.
+
+    15.2 Validate blocker classification.
+    
+    15.3 Determine blocker ownership.
+
 16. Review locator failure records. 
 17. Review traces. 
 18. Review screenshots if required. 

@@ -38,6 +38,7 @@ Typical triggers:
 - `reports/execution-raw-results.md`
 - `playwright-report/`
 - `test-results/`
+- `reports/execution-blockers.md`
 
 ### Analysis Inputs
 
@@ -224,7 +225,40 @@ Exclude:
 
 ---
 
-### 7. Generate Automation Summary
+### 7. Generate Blocker Summary
+
+Summarize:
+
+- Total Blocked Tests
+- Blocker Categories
+- OTP Dependencies
+- Test Data Dependencies
+- External Service Dependencies
+- Environment Dependencies
+- Pending Approvals
+
+Example:
+```
+BLOCKER SUMMARY
+
+Blocked Tests:
+18
+
+OTP Dependencies:
+7
+
+External Validation:
+5
+
+Registry Data:
+4
+
+Real Transaction Posting:
+2
+```
+---
+
+### 8. Generate Automation Summary
 
 List:
 
@@ -234,7 +268,7 @@ List:
 - Locator instability observations
 
 ---
-### 8. Generate Lifecycle Summary
+### 9. Generate Lifecycle Summary
 
 Summarize:
 
@@ -271,7 +305,7 @@ Cleanup Failures:
 ```
 ---
 
-### 9.Generate Locator Repository Health Summary
+### 10.Generate Locator Repository Health Summary
 
 Summarize:
 
@@ -285,7 +319,7 @@ Summarize:
 - Most Frequently Recovered Elements
 
 Example:
-
+```
 Locator Repository Health
 
 Total Entries:
@@ -305,11 +339,11 @@ Obsolete:
 
 Recovered This Cycle:
 11
-
+```
 ---
 
 
-### 10. Generate Coverage Summary
+### 11. Generate Coverage Summary
 
 Summarize:
 
@@ -350,7 +384,7 @@ Lifecycle-Compliant Tests:
 ```
 ---
 
-### 11. Assess Release Readiness
+### 12. Assess Release Readiness
 
 Determine:
 
@@ -380,7 +414,7 @@ Based on:
 
 ---
 
-### 12. Produce Recommendations
+### 13. Produce Recommendations
 
 Provide:
 
@@ -399,7 +433,7 @@ Recommendations must be actionable.
 
 ---
 
-### 13. Generate Final QA Decision
+### 14. Generate Final QA Decision
 
 Provide final QA assessment.
 

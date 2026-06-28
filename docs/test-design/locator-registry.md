@@ -49,3 +49,27 @@ Source: `docs/analysis/accounts-management-locator-inventory.md`
 | Account Details | Full account identifier | Blocked | Details screen content and masking behavior not confirmed. |
 | Account Statements | Statement date controls | Blocked | Statement screen and controls not discovered. |
 | Account Statements | Download button | Blocked | Download control not discovered. |
+
+## Instant Transfer
+
+Repository source: `docs/analysis/locator-repository.json`
+
+| Element ID | Primary Locator Strategy | Fallback Chain | Confidence | Used By |
+| --- | --- | --- | --- | --- |
+| TRANSFER.INSTANT_TRANSFERS_CARD | Text/card context | Transfer landing card text fallback | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_TRANSFER_FORM | Form text context | Method tile visibility | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_MOBILE_NUMBER_TILE | Text locator | Contextual method tile | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_CARD_NUMBER_TILE | Text locator | Contextual method tile | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_BANK_ACCOUNT_TILE | Text locator | Contextual method tile | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_PAYMENT_ADDRESS_TILE | Text locator | Contextual method tile | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_WALLET_TILE | Text locator | Contextual method tile | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_BENEFICIARY_SELECTOR | Label/context | Combobox fallback | Medium | `InstantTransferPage` |
+| TRANSFER.INSTANT_ADD_NEW_BENEFICIARY_LINK | Text locator | Link/button text fallback | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_ADD_BENEFICIARY_DIALOG | Dialog role/text | Popup text fallback | High | `InstantTransferPage` |
+| TRANSFER.INSTANT_NICKNAME_INPUT | Label/context | Textbox fallback | Medium | `InstantTransferPage` |
+| TRANSFER.INSTANT_PHONE_INPUT | Repository lookup then contextual dialog label | Label-adjacent textbox | High after healing | `InstantTransferPage` |
+| TRANSFER.INSTANT_CARD_INPUT | Repository lookup then contextual dialog label | Label-adjacent textbox | High after healing | `InstantTransferPage` |
+| TRANSFER.INSTANT_ACCOUNT_NUMBER_INPUT | Repository lookup then contextual dialog label | Label-adjacent textbox | High after healing | `InstantTransferPage` |
+| TRANSFER.INSTANT_BANK_NAME_SELECTOR | Label/context | Combobox fallback | Medium | `InstantTransferPage` |
+| TRANSFER.INSTANT_PAYMENT_ADDRESS_INPUT | Repository lookup then contextual dialog label | Label-adjacent textbox | High after healing | `InstantTransferPage` |
+| TRANSFER.INSTANT_WALLET_INPUT | Repository lookup then contextual dialog label | Label-adjacent textbox | High after healing | `InstantTransferPage` |

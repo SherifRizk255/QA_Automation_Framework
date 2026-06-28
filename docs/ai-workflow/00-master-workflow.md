@@ -699,10 +699,13 @@ Execution Results:
 reports/
 test-results/
 playwright-report/
+reports/execution-blockers.md
+
 ```
 Final Reports:
 ```
 docs/reports/
+
 ```
 ---
 
@@ -738,6 +741,19 @@ Final Report
 ↓
 Lifecycle Compliance Summary
 
+Execution
+↓
+Execution Blockers
+
+Failure Analysis
+↓
+Blocker Validation
+
+Final Report
+↓
+Blocker Summary
+↓
+QA Decision
 
 ---
 
