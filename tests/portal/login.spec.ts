@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { ENV } from '../../config/resources';
 import { LoginPage } from '../../pages/portal/LoginPage.js';
 import { DashboardPage } from '../../pages/portal/DashboardPage.js';
 import { handleFailureEvidence } from '../../utils/failureHandler.js';
@@ -23,8 +24,8 @@ test.describe('Internet Banking Portal - Login Tests', () => {
     try {
       await loginPage.goto();
       const activeSessionDisplayed = await loginPage.login(
-        process.env.PORTAL_USERNAME,
-        process.env.PORTAL_PASSWORD,
+        ENV.portal.username,
+        ENV.portal.password,
         testInfo
       );
 

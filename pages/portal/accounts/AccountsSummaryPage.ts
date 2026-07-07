@@ -1,5 +1,6 @@
 import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import path from 'node:path';
+import { ROUTES, portalHashRoute } from '../../../config/resources';
 
 export class AccountsSummaryPage {
   readonly page: Page;
@@ -41,11 +42,8 @@ export class AccountsSummaryPage {
   }
 
   async goto(testInfo?: TestInfo) {
-    const baseUrl = process.env.PORTAL_BASE_URL ?? '';
-    const loginPath = process.env.PORTAL_LOGIN_PATH ?? '';
-    const appPath = loginPath.split('#')[0];
-
-    await this.page.goto(`${baseUrl}${appPath}#/accounts`, { waitUntil: 'domcontentloaded' });
+    // Route built from the central resource file — skill 24.
+    await this.page.goto(portalHashRoute(ROUTES.portal.accounts), { waitUntil: 'domcontentloaded' });
 
     await this.waitForAccountsScreen();
     await this.captureScreenshot('accounts-summary-loaded', testInfo);

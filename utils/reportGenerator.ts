@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { classifyFailureMessage, stripAnsi } from './failureClassification';
 
 interface Attachment {
   name?: string;
@@ -66,36 +67,6 @@ function findFiles(dir: string, predicate: (filePath: string) => boolean): strin
     const fullPath = path.join(dir, entry.name);
     return entry.isDirectory() ? findFiles(fullPath, predicate) : predicate(fullPath) ? [fullPath] : [];
   });
-}
-
-function classifyFailure(message: string): string {
-  const text = message.toLowerCase();
-
-  if (/active session blocker appeared and was handled/i.test(text)) {
-    return 'Application defect';
-  }
-
-  if (/transfer between my accounts form did not display|from account dropdown|to account dropdown/i.test(text)) {
-    return 'Application defect';
-  }
-
-  if (/timeout|net::|err_|dns|certificate|connection|navigation/i.test(text)) {
-    return 'Environment issue';
-  }
-
-  if (/portal_username|portal_password|credentials|unauthorized|invalid user|invalid password/i.test(text)) {
-    return 'Test data issue';
-  }
-
-  if (/locator|strict mode|expected.*visible|not.tohaveurl|tohaveurl/i.test(text)) {
-    return 'Automation script issue';
-  }
-
-  return 'Requirement ambiguity';
-}
-
-function stripAnsi(value: string): string {
-  return value.replace(/\[[0-9;]*m/g, '');
 }
 
 function extractJsonResults(): PlaywrightJsonResult[] {
@@ -192,38 +163,16 @@ function writeMarkdown(summary: Summary, attachments: CollectedAttachments): voi
       lines.push(`- Screenshot path: ${screenshot}`);
       lines.push(`- Video path: ${video}`);
       lines.push(`- Trace path: ${trace}`);
-      lines.push(`- Failure classification: ${classifyFailure(message)}`);
-      lines.push(`- Recommendation: ${recommendationFor(classifyFailure(message), message)}`);
+      const classification = classifyFailureMessage(message);
+      lines.push(`- Failure classification: ${classification.code} — ${classification.label}`);
+      lines.push(`- Verdict: ${classification.verdict}`);
+      lines.push(`- Recommendation: ${classification.recommendation}`);
       lines.push('');
     }
   }
 
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
   fs.writeFileSync(reportPath, `${lines.join('\n')}\n`);
-}
-
-function recommendationFor(classification: string, message: string): string {
-  if (classification === 'Application defect') {
-    if (/transfer between my accounts form did not display/i.test(message)) {
-      return 'Validate the Between My Accounts card action and ensure the From/To Account form is rendered for the authenticated retail customer.';
-    }
-
-    return 'Raise or review an application defect with the captured screenshot, video, and trace.';
-  }
-
-  if (classification === 'Automation script issue') {
-    return 'Inspect the live page locator and update the Page Object with a stable accessible selector.';
-  }
-
-  if (classification === 'Test data issue') {
-    return 'Verify the .env credentials and that the authenticated customer has eligible source and destination accounts.';
-  }
-
-  if (classification === 'Environment issue') {
-    return 'Check portal availability, HTTPS access, browser connectivity, and test environment health.';
-  }
-
-  return 'Clarify the expected business behavior or provide backend/API data for stronger validation.';
 }
 
 const results = extractJsonResults();

@@ -33,15 +33,17 @@ All skills live in `docs/ai-workflow/`. Match the request to the row(s) below:
 | Risk, coverage, gap, or dependency analysis | 09-qa-analyzer |
 | Traceability, RTM, coverage plans | 11-traceability-manager |
 | Writing/generating manual test cases | 12-tc-generator, 11-traceability-manager |
-| Writing/editing ANY Playwright code (page objects, specs, fixtures) | 13-automation-implementation-agent, 23-clean-code-standard, 21-allure-reporting-standard |
+| Writing/editing ANY Playwright code (page objects, specs, fixtures) | 13-automation-implementation-agent, 23-clean-code-standard, 21-allure-reporting-standard, 24-centralized-resource-standard |
 | Anything touching login, credentials, sessions, NTLM, storage state | 19-authentication-session-manager |
 | Tests spanning Portal AND CRM (or any two systems) | 20-cross-system-orchestration, 19-authentication-session-manager |
-| Running tests, collecting results | 14-test-execution-agent, 21-allure-reporting-standard |
-| Investigating failures, flaky tests, root cause | 15-failure-analysis-agent |
-| Fixing broken locators / self-healing | 16-self-healing-agent, 23-clean-code-standard |
-| Reports, summaries, sign-off, release readiness | 17-final-report-agent, 18-qa-review-agent |
-| Env files, URLs, switching between SAIB/ABK/HDB/etc. | 22-multi-project-configuration |
-| ANY code creation or modification (always, in addition to above) | 23-clean-code-standard |
+| Running tests, collecting results | 14-test-execution-agent, 21-allure-reporting-standard, 25-execution-report-standard |
+| Investigating failures, flaky tests, root cause | 15-failure-analysis-agent, 25-execution-report-standard |
+| Fixing broken locators / self-healing | 16-self-healing-agent, 23-clean-code-standard, 24-centralized-resource-standard |
+| Reports, summaries, sign-off, release readiness | 17-final-report-agent, 18-qa-review-agent, 25-execution-report-standard |
+| Env files, URLs, switching between SAIB/ABK/HDB/etc. | 22-multi-project-configuration, 24-centralized-resource-standard |
+| Adding a URL/route/test-data value, or anything about `config/resources.ts` / the locator repository | 24-centralized-resource-standard |
+| The Cubic HTML report, execution reporting, failure classification (F1–F5) | 25-execution-report-standard |
+| ANY code creation or modification (always, in addition to above) | 23-clean-code-standard, 24-centralized-resource-standard |
 
 Pipeline order, approval gates, and the stage↔file mapping are authoritative in `00-master-workflow.md`.
 
@@ -58,7 +60,8 @@ Every code task ends with:
 2. Run the touched spec in isolation
 3. Skill 23 review checklist passed
 4. Allure metadata present (skill 21)
-5. No hardcoded URLs/credentials
+5. No hardcoded URLs/credentials/locators outside the central resources — `config/resources.ts` + locator repository (skill 24)
+6. Runs produce the Cubic HTML report automatically (skill 25) — never unregister the reporter
 
 ## RULE 3 — STOP CONDITIONS
 

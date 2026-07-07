@@ -1,19 +1,28 @@
 import { test as base } from '@playwright/test';
+import { ENV } from '../config/resources';
 import { LoginPage } from '../pages/portal/LoginPage.js';
 import { DashboardPage } from '../pages/portal/DashboardPage.js';
 import { TransferRepositoryPage } from '../pages/portal/TransferRepositoryPage';
 
 type PortalRepositoryFixtures = {
+  loginPage: LoginPage;
+  dashboardPage: DashboardPage;
+  /** Logged-in portal session already on the Transfer hub. */
   authenticatedTransferPage: TransferRepositoryPage;
 };
 
 export const test = base.extend<PortalRepositoryFixtures>({
-  authenticatedTransferPage: async ({ page }, use, testInfo) => {
-    const loginPage = new LoginPage(page);
-    const dashboardPage = new DashboardPage(page);
+  loginPage: async ({ page }, use) => {
+    await use(new LoginPage(page));
+  },
 
+  dashboardPage: async ({ page }, use) => {
+    await use(new DashboardPage(page));
+  },
+
+  authenticatedTransferPage: async ({ loginPage, dashboardPage, page }, use, testInfo) => {
     await loginPage.goto();
-    await loginPage.login(process.env.PORTAL_USERNAME, process.env.PORTAL_PASSWORD, testInfo);
+    await loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
     await dashboardPage.expectLoaded(testInfo);
 
     const transferPage = new TransferRepositoryPage(page);

@@ -1097,9 +1097,9 @@ Recommended Page Objects:
 
 Artifacts:
   - locator-inventory.md
-  - ui-behavior-inventory.md
-  - workflow-observations.md
-  - automation-readiness-report.md
+  - ui-behavior-inventory.md (OPTIONAL — produce only when behavior notes exceed the system map)
+  - workflow-observations.md (OPTIONAL — produce only for multi-step business flows)
+  - automation-readiness-report.md (OPTIONAL — produce only when readiness risks were found)
 
 ────────────────────────────────────────────
 ```
@@ -1107,13 +1107,24 @@ Artifacts:
 ---
 
 ## Output file locations
-- `docs/analysis/system-map.md`
-- `docs/analysis/navigation-map.md`
-- `docs/analysis/screen-inventory.md`
-- `docs/analysis/locator-inventory.md`
-- `docs/analysis/blocker-inventory.md`
-- `docs/analysis/page-object-recommendations.md`
-- `reports/system-walkthrough/`
+
+All artifacts are module-prefixed kebab-case per the master workflow naming convention
+(e.g. `docs/analysis/accounts-management-system-map.md`).
+
+Mandatory:
+- `docs/analysis/<module>-system-map.md`
+- `docs/analysis/<module>-navigation-map.md`
+- `docs/analysis/<module>-screen-inventory.md`
+- `docs/analysis/<module>-locator-inventory.md`
+- `docs/analysis/<module>-blocker-inventory.md`
+- `docs/analysis/<module>-page-object-recommendations.md`
+- `reports/system-walkthrough/<module>/` (screenshots)
+- Locator entries merged into the shared `docs/analysis/locator-repository.json`
+
+Optional (produce only when their trigger condition above applies):
+- `docs/analysis/<module>-ui-behavior-inventory.md`
+- `docs/analysis/<module>-workflow-observations.md`
+- `docs/analysis/<module>-automation-readiness-report.md`
 
 ## Example prompt to use this skill
 “Use the System Walkthrough Agent to inspect the application, document navigation paths, discover stable Playwright locators, identify workflow dependencies, and generate the Playwright handoff package.”

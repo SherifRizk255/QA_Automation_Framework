@@ -104,7 +104,8 @@ Priority order (highest first):
 Additional rules:
 
 * Chain from a scoped root (`this.recordForm().getByLabel(...)`), never from bare `page` when a scope exists — prevents strict-mode collisions.
-* Every locator that exists in `docs/analysis/locator-repository.json` must be used from there conceptually — same primary, same fallbacks. Never invent a competing locator for a registered element.
+* Every locator that exists in `docs/analysis/locator-repository.json` must be resolved through `LocatorRepository` (CRM pages get it via `BaseCrmPage.repository`). Never invent a competing locator for a registered element — skill 24 is authoritative for the resource layers.
+* URLs, routes, env values, shared test data: ONLY from `config/resources.ts` (skill 24). `process.env` reads are forbidden in specs and page objects.
 * Repeated locators become private getters. Two usages = extract.
 
 ---

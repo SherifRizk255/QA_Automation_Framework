@@ -8,14 +8,33 @@
 
 ---
 
+# INSTALLATION STATE (verified 2026-07-07)
+
+`allure-playwright` v3 IS installed and registered in `playwright.config.ts`
+(`['allure-playwright', { resultsDir: 'allure-results' }]`). The v3 import is:
+
+```typescript
+import * as allure from 'allure-js-commons';
+```
+
+The metadata calls are async in v3 — always `await` them. `allure-results/` and
+`allure-report/` are gitignored. Report generation: `npm run report:allure`
+(requires the Allure CLI; bundle it for air-gapped environments).
+
+The Cubic HTML report (skill 25) is generated on every run independently of
+Allure — Allure is the machine-consumable layer for the Final Report Agent;
+the Cubic report is the stakeholder layer. Both consume the same TC-id title contract below.
+
+---
+
 # MANDATORY TEST METADATA
 
 Every generated test MUST declare, in this order, at the top of the test body:
 
 ```typescript
-allure.feature('<Business Feature>');      // e.g. 'Service Request', 'Between My Accounts Transfer'
-allure.story('<Sub-flow>');                // e.g. 'Service Request Grid'
-allure.severity('<severity>');             // blocker | critical | normal | minor | trivial
+await allure.feature('<Business Feature>');      // e.g. 'Service Request', 'Between My Accounts Transfer'
+await allure.story('<Sub-flow>');                // e.g. 'Service Request Grid'
+await allure.severity('<severity>');             // blocker | critical | normal | minor | trivial
 ```
 
 Severity mapping from QA Analyzer risk:

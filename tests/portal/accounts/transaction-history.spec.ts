@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { ENV } from '../../../config/resources';
 import { LoginPage } from '../../../pages/portal/LoginPage.js';
 import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
 import { AccountsSummaryPage } from '../../../pages/portal/accounts/AccountsSummaryPage.ts';
@@ -14,7 +15,7 @@ test.describe('Accounts Management - Transaction History', () => {
 
     try {
       await loginPage.goto();
-      await loginPage.login(process.env.PORTAL_USERNAME, process.env.PORTAL_PASSWORD, testInfo);
+      await loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
       await dashboardPage.expectLoaded(testInfo);
       await accountsSummaryPage.goto(testInfo);
       await transactionHistoryPage.expectRecentTransactionsExperienceVisible();

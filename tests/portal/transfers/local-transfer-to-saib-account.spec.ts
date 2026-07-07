@@ -1,4 +1,5 @@
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { ENV } from '../../../config/resources';
 import { LoginPage } from '../../../pages/portal/LoginPage.js';
 import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
 import { LocalTransferToSaibAccountPage } from '../../../pages/portal/LocalTransferToSaibAccountPage';
@@ -10,7 +11,7 @@ async function loginAndOpenLocalTransferToSaibAccount(page: Page, testInfo: Test
   const transferPage = new LocalTransferToSaibAccountPage(page);
 
   await loginPage.goto();
-  await loginPage.login(process.env.PORTAL_USERNAME, process.env.PORTAL_PASSWORD, testInfo);
+  await loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
   await dashboardPage.expectLoaded(testInfo);
   await transferPage.navigateToLocalTransferToSaibAccount(testInfo);
 

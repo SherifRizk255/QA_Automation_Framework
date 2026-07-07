@@ -4,10 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test:all": "playwright test",
     "test:portal": "playwright test --project=chromium",
     "test:bma": "playwright test tests/portal/transfers/transfer-between-my-accounts-validations.spec.ts --project=chromium --headed",
     "test:crm": "playwright test --project=crm",
-    "test:portal:report": "playwright test --project=chromium & node utils/reportGenerator.ts",
+    "test:portal:report": "playwright test --project=chromium && npm run report:summary || npm run report:summary",
+    "report:summary": "node --experimental-strip-types utils/reportGenerator.ts",
+    "report:allure": "allure generate allure-results --clean -o allure-report",
     "cleanup:drivers": "powershell -ExecutionPolicy Bypass -File scripts/cleanup-drivers.ps1",
     "diagnose:node": "powershell -ExecutionPolicy Bypass -File scripts/diagnose-node.ps1"
   },
@@ -18,6 +21,7 @@
   "devDependencies": {
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.9.2",
+    "allure-playwright": "^3.10.2",
     "httpntlm": "^1.8.13",
     "typescript": "^6.0.3"
   },

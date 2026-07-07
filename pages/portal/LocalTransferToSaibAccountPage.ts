@@ -1,4 +1,5 @@
 import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { ENV, ROUTES, portalHashRoute } from '../../config/resources';
 import path from 'node:path';
 import { LocatorRepository } from '../../utils/locatorRepository';
 
@@ -358,13 +359,12 @@ export class LocalTransferToSaibAccountPage {
   }
 
   private transferMoneyUrl() {
-    const loginUrl = process.env.PORTAL_LOGIN_URL ?? this.page.url();
-    return loginUrl.replace(/#\/login.*$/i, '#/transfers/transfer-money');
+    // Fall back to the current page URL when PORTAL_LOGIN_URL is not configured.
+    return portalHashRoute(ROUTES.portal.transferHub, ENV.portal.loginUrl || this.page.url());
   }
 
   private toAnotherSaibAccountUrl() {
-    const loginUrl = process.env.PORTAL_LOGIN_URL ?? this.page.url();
-    return loginUrl.replace(/#\/login.*$/i, '#/transfers/to-another-saib-account');
+    return portalHashRoute('#/transfers/to-another-saib-account', ENV.portal.loginUrl || this.page.url());
   }
 
   private reasonOptions() {

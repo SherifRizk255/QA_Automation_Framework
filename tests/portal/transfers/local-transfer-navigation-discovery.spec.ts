@@ -1,4 +1,5 @@
 import { test, type Page, type Locator } from '@playwright/test';
+import { ENV } from '../../../config/resources';
 import fs from 'node:fs';
 import path from 'node:path';
 import { LoginPage } from '../../../pages/portal/LoginPage.js';
@@ -87,7 +88,7 @@ test('system walkthrough - Transfers to Local Transfers to Another SAIB Account'
   const dashboardPage = new DashboardPage(page);
 
   await loginPage.goto();
-  await loginPage.login(process.env.PORTAL_USERNAME, process.env.PORTAL_PASSWORD, testInfo);
+  await loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
   await dashboardPage.expectLoaded(testInfo);
 
   await captureStep(page, '01-dashboard-after-login');

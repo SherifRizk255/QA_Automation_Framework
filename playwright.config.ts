@@ -19,7 +19,11 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { outputFolder: 'playwright-report', open: 'never' }],
-    ['json', { outputFile: 'test-results/results.json' }]
+    ['json', { outputFile: 'test-results/results.json' }],
+    // Skill 21 — machine-consumable results for the Final Report Agent.
+    ['allure-playwright', { resultsDir: 'allure-results' }],
+    // Skill 25 — Cubic-branded stakeholder HTML report, generated after every run.
+    ['./utils/cubicHtmlReporter.ts']
   ],
 
   use: {

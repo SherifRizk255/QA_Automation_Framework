@@ -1,27 +1,15 @@
 import { expect, type Page } from '@playwright/test';
-import { LocatorRepository } from '../../utils/locatorRepository';
+import { BaseCrmPage } from './BaseCrmPage';
 
-export class ServiceRequestsPage {
-  private readonly repository: LocatorRepository;
-
-  constructor(private readonly page: Page) {
-    this.repository = new LocatorRepository(page);
+export class ServiceRequestsPage extends BaseCrmPage {
+  constructor(page: Page) {
+    super(page);
   }
 
   // ─── Navigation ─────────────────────────────────────────────────────────────
 
   async switchToServiceRequests(): Promise<void> {
-    const switcher = this.page
-      .locator('#areaSwitcherId')
-      .or(this.page.getByRole('button', { name: /change area/i }))
-      .first();
-    await switcher.waitFor({ state: 'visible', timeout: 60_000 });
-    await switcher.click();
-
-    const target = this.repository.locator('CRM.SERVICE_REQUESTS.AREA_ITEM');
-    await target.waitFor({ state: 'visible', timeout: 10_000 });
-    await target.click();
-    await this.page.waitForLoadState('domcontentloaded');
+    await this.switchToArea('CRM.SERVICE_REQUESTS.AREA_ITEM');
   }
 
   async navigateToServiceRequests(): Promise<void> {
@@ -74,24 +62,7 @@ export class ServiceRequestsPage {
   }
 
   // ─── Private helpers ─────────────────────────────────────────────────────────
-
-  private async waitForDynamicsReady(): Promise<void> {
-    await this.page.waitForLoadState('domcontentloaded');
-    // D365 shows a spinner during navigation; ignore if it never appears.
-    await this.page
-      .locator('[data-id="LoadingSpinner"], .ms-Spinner')
-      .waitFor({ state: 'hidden', timeout: 30_000 })
-      .catch(() => { /* spinner may not appear on every navigation */ });
-  }
-
-  private async waitForGrid(): Promise<void> {
-    await this.waitForDynamicsReady();
-    // Row 2 is the first data row (row 1 is the header) — same aria-label
-    // pattern used by the D365 grid regardless of entity.
-    await this.page
-      .locator('[aria-label="Select row 2"]')
-      .waitFor({ state: 'visible', timeout: 120_000 });
-  }
+  // Readiness/grid waits live in BaseCrmPage — do not re-implement here.
 
   // D365 record forms render some field labels inside iframes. This helper
   // checks the main frame first; if the pattern is not found there it walks

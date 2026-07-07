@@ -1,26 +1,25 @@
 import 'dotenv/config';
 import { test } from '@playwright/test';
+import * as allure from 'allure-js-commons';
 import { LoginPage } from '../../../pages/portal/LoginPage';
 import { DashboardPage } from '../../../pages/portal/DashboardPage';
 import { TransferBetweenOwnAccountsPage } from '../../../pages/portal/TransferBetweenOwnAccountsPage';
 import { BetweenMyAccountsTransferLogPage } from '../../../pages/crm/BetweenMyAccountsTransferLogPage';
+import { ENV, ROUTES, TEST_DATA } from '../../../config/resources';
 
-const CRM_BETWEEN_MY_ACCOUNTS_LOG_URL =
-  'https://crm.cubicsystems.com/Saib/main.aspx' +
-  '?appid=c6546de1-f7f5-f011-a74c-000c290f08a3' +
-  '&pagetype=entitylist' +
-  '&etn=cis_betweenmyaccountstransferlog' +
-  '&viewid=bae3b8ea-4de3-4510-bfcb-687442f58866' +
-  '&viewType=1039';
-
-const TRANSFER_AMOUNT = '77';
-const PORTAL_IB_USERNAME = 'OSerry';
-
-// TODO(mrizk): add allure.feature/story/severity once allure-playwright is installed — skill 21
+// All URLs and correlation data come from the central resource file — skill 24.
+const CRM_BETWEEN_MY_ACCOUNTS_LOG_URL = ROUTES.crm.betweenMyAccountsTransferLog;
+const TRANSFER_AMOUNT = TEST_DATA.transferAmount;
+const PORTAL_IB_USERNAME = TEST_DATA.portalIbUsername;
 
 test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
 
   test('TC-CROSS-001 | Between My Accounts transfer reflects as Completed log in CRM', async ({ page, browser }) => {
+    // Skill 21 — mandatory Allure metadata (money movement → blocker severity).
+    await allure.feature('Between My Accounts Transfer');
+    await allure.story('Cross-System Validation — Portal → CRM Log');
+    await allure.severity('blocker');
+
     // Cross-system tests include two auth sessions plus propagation delay — skill 20.
     test.setTimeout(240_000);
 
@@ -31,8 +30,8 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
     // ── Portal: Login ─────────────────────────────────────────────────────
     await loginPage.goto();
     await loginPage.login(
-      process.env.PORTAL_USERNAME ?? '',
-      process.env.PORTAL_PASSWORD ?? ''
+      ENV.portal.username,
+      ENV.portal.password
     );
     await dashboardPage.expectLoaded();
 
@@ -65,9 +64,9 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
     // requests efficiently; the old httpntlm route-intercept caused ECONNRESET failures.
     const crmContext = await browser.newContext({
       httpCredentials: {
-        username: process.env.CRM_USERNAME!,
-        password: process.env.CRM_PASSWORD!,
-        origin: 'https://crm.cubicsystems.com',
+        username: ENV.crm.username,
+        password: ENV.crm.password,
+        origin: ENV.crm.origin,
       },
       ignoreHTTPSErrors: true,
     });

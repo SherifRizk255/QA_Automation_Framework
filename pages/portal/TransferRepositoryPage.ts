@@ -1,6 +1,7 @@
 import { expect, type Page, type TestInfo } from '@playwright/test';
 import path from 'node:path';
 import { LocatorRepository } from '../../utils/locatorRepository';
+import { ENV, ROUTES, portalHashRoute } from '../../config/resources';
 
 export class TransferRepositoryPage {
   private readonly repository: LocatorRepository;
@@ -10,9 +11,9 @@ export class TransferRepositoryPage {
   }
 
   async gotoTransferHub() {
-    const loginUrl = process.env.PORTAL_LOGIN_URL ?? this.page.url();
-    const transferUrl = loginUrl.replace(/#\/login.*$/i, '#/transfers/transfer-money');
-    await this.page.goto(transferUrl);
+    // Fall back to the current page URL when PORTAL_LOGIN_URL is not configured.
+    const baseUrl = ENV.portal.loginUrl || this.page.url();
+    await this.page.goto(portalHashRoute(ROUTES.portal.transferHub, baseUrl));
   }
 
   async expectTransferHubLoaded(testInfo?: TestInfo) {

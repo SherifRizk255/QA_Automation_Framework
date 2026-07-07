@@ -820,6 +820,8 @@ Stage numbers and skill file numbers are NOT identical. Use this table as the si
 | — | Allure Reporting Standard (support skill) | 21-allure-reporting-standard.md |
 | — | Multi-Project Configuration (support skill) | 22-multi-project-configuration.md |
 | — | Clean Code Standard (support skill) | 23-clean-code-standard.md |
+| — | Centralized Resource Standard (support skill) | 24-centralized-resource-standard.md |
+| — | Execution Report Standard — Cubic HTML (support skill) | 25-execution-report-standard.md |
 
 ---
 

@@ -1,5 +1,6 @@
 import { expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import path from 'node:path';
+import { ENV } from '../../config/resources';
 
 export class LoginPage {
   readonly page: Page;
@@ -47,9 +48,8 @@ export class LoginPage {
   }
 
   async goto(): Promise<void> {
-    const baseUrl = process.env.PORTAL_BASE_URL ?? '';
-    const loginPath = process.env.PORTAL_LOGIN_PATH ?? '';
-    const loginUrl = process.env.PORTAL_LOGIN_URL ?? `${baseUrl}${loginPath}`;
+    // Central resource file resolves PORTAL_LOGIN_URL or base + path — skill 24.
+    const loginUrl = ENV.portal.loginUrl;
 
     if (!loginUrl) {
       throw new Error('PORTAL_LOGIN_URL or PORTAL_BASE_URL/PORTAL_LOGIN_PATH must be configured in .env');

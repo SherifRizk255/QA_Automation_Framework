@@ -1,11 +1,9 @@
 import { expect, type Page } from '@playwright/test';
-import { LocatorRepository } from '../../utils/locatorRepository';
+import { BaseCrmPage } from './BaseCrmPage';
 
-export class BetweenMyAccountsTransferLogPage {
-  private readonly repository: LocatorRepository;
-
-  constructor(private readonly page: Page) {
-    this.repository = new LocatorRepository(page);
+export class BetweenMyAccountsTransferLogPage extends BaseCrmPage {
+  constructor(page: Page) {
+    super(page);
   }
 
   // ─── Navigation ────────────────────────────────────────────────────────────
@@ -15,14 +13,10 @@ export class BetweenMyAccountsTransferLogPage {
     // The CRM view sorts by Transaction Date descending so the latest record is always row 2.
     await expect(async () => {
       await this.page.reload({ waitUntil: 'domcontentloaded' });
-      await this.waitForDynamicsReady();
-      await this.page
-        .locator('[aria-label="Select row 2"]')
-        .waitFor({ state: 'visible', timeout: 30_000 });
+      await this.waitForGrid(30_000);
     }).toPass({ timeout: 120_000, intervals: [10_000] });
 
-    // Row 1 is the header; row 2 is the first data row (D365 grid standard).
-    await this.page.locator('[aria-label="Select row 2"]').dblclick();
+    await this.firstDataRow().dblclick();
     await this.waitForDynamicsReady();
   }
 
@@ -73,12 +67,5 @@ export class BetweenMyAccountsTransferLogPage {
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────
-
-  private async waitForDynamicsReady(): Promise<void> {
-    await this.page.waitForLoadState('domcontentloaded');
-    await this.page
-      .locator('[data-id="LoadingSpinner"], .ms-Spinner')
-      .waitFor({ state: 'hidden', timeout: 30_000 })
-      .catch(() => {});
-  }
+  // Readiness/grid waits live in BaseCrmPage — do not re-implement here.
 }

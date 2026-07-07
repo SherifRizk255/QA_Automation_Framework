@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { ENV } from '../../../config/resources';
 import { test, type Page } from '@playwright/test';
 import { LoginPage } from '../../../pages/portal/LoginPage';
 import { DashboardPage } from '../../../pages/portal/DashboardPage';
@@ -12,7 +13,7 @@ async function loginAndNavigateToBMA(page: Page): Promise<TransferBetweenOwnAcco
   const dashboardPage = new DashboardPage(page);
   const transferPage = new TransferBetweenOwnAccountsPage(page);
   await loginPage.goto();
-  await loginPage.login(process.env.PORTAL_USERNAME ?? '', process.env.PORTAL_PASSWORD ?? '');
+  await loginPage.login(ENV.portal.username, ENV.portal.password);
   await dashboardPage.expectLoaded();
   await transferPage.navigateToTransferBetweenOwnAccounts();
   return transferPage;
