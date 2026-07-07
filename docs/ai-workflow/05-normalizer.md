@@ -1,6 +1,6 @@
 # normalizer.md
 
-> Step 2 of the pipeline.
+> Pipeline Stage 05 — runs after Intent Preview approval.
 > Runs only after input-detector.md completes and receives approval.
 > Converts confirmed Intent Candidates into Intent Units (IUs).
 > Produces a normalized, traceable, testable behavior model.
@@ -402,7 +402,7 @@ Do not execute:
 - qa-analyzer.md
 - traceability-manager.md
 - tc-generator.md
-- playwright-generator.md
+- 13-automation-implementation-agent.md
 - reporter.md
 
 Next valid stage:

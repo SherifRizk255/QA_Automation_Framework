@@ -16,6 +16,9 @@ const NTLM_CREDS = {
   domain,
   workstation: '',
   rejectUnauthorized: false, // internal CA cert not in Node.js trust store
+  timeout: 20_000,           // socket inactivity limit per NTLM round-trip;
+                             // prevents open socket handles from keeping the
+                             // Node.js process alive after a test ends
 };
 
 function ntlmRequest(

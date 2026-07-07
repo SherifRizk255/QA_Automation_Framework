@@ -164,7 +164,19 @@ QA Review Agent
 
 # APPROVAL GATES
 
-Intent approval is mandatory.
+There are TWO mandatory approval gates.
+
+## Gate 1 — Detection Approval
+
+Required before Intent Preview may run.
+
+Accepted value:
+
+APPROVE_DETECTION
+
+## Gate 2 — Intent Approval
+
+Required before Normalizer may run.
 
 Accepted values:
 
@@ -775,3 +787,57 @@ Expected Output:
 ────────────────────────────────────────
 
 Only then may the selected skill execute.
+
+
+---
+
+# STAGE ↔ SKILL FILE MAPPING
+
+Stage numbers and skill file numbers are NOT identical. Use this table as the single source of truth when locating skill files:
+
+| Stage | Skill | File |
+|-------|-------|------|
+| 01 | Project Intake | 01-project-intake-agent.md |
+| 02 | System Walkthrough (Optional) | 02-system-walkthrough-agent.md |
+| 03 | Input Detection | 03-input-detector.md |
+| 04 | Intent Preview | 04-intent-preview.md |
+| 05 | Normalizer | 05-normalizer.md |
+| 06 | Requirements Quality Checker | 06-requirements-quality-checker.md |
+| 07 | Intent Unit Schema Validation | 07-intent-unit-schema.md |
+| 08 | Orchestrator | 08-orchestrator.md |
+| 09A | QA Analyzer | 09-qa-analyzer.md |
+| 09B | CR Analyzer (CR Delta Mode) | 10-cr-analyzer.md |
+| 10 | Traceability Manager | 11-traceability-manager.md |
+| 11 | TC Generator | 12-tc-generator.md |
+| 12 | Automation Implementation | 13-automation-implementation-agent.md |
+| 13 | Test Execution | 14-test-execution-agent.md |
+| 14 | Failure Analysis | 15-failure-analysis-agent.md |
+| 15 | Self-Healing | 16-self-healing-agent.md |
+| 16 | Final Report | 17-final-report-agent.md |
+| 17 | QA Review | 18-qa-review-agent.md |
+| — | Authentication & Session Manager (support skill) | 19-authentication-session-manager.md |
+| — | Cross-System Orchestration (support skill) | 20-cross-system-orchestration.md |
+| — | Allure Reporting Standard (support skill) | 21-allure-reporting-standard.md |
+| — | Multi-Project Configuration (support skill) | 22-multi-project-configuration.md |
+| — | Clean Code Standard (support skill) | 23-clean-code-standard.md |
+
+---
+
+# ARTIFACT NAMING CONVENTION
+
+All analysis and test-design artifacts MUST be prefixed with the module name in kebab-case:
+
+```
+docs/analysis/<module-name>-system-map.md
+docs/analysis/<module-name>-locator-inventory.md
+docs/test-design/<module-name>-manual-test-cases.md
+docs/test-design/<module-name>-automation-coverage.md
+```
+
+Example: accounts-management-system-map.md
+
+The shared cross-module locator repository remains unprefixed:
+
+```
+docs/analysis/locator-repository.json
+```

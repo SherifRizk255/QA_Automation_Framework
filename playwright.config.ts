@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -33,13 +33,38 @@ export default defineConfig({
     navigationTimeout: 60000,
 
     ignoreHTTPSErrors: true,
+
+    // viewport: null disables Playwright's forced 1280×720 clamp so the OS window size applies.
+    // Combined with --start-maximized this gives D365 forms the full desktop viewport,
+    // which renders more columns and reduces the scroll distance needed to reach bottom sections.
+    viewport: null,
+    launchOptions: {
+      timeout: 30_000,
+      args: ['--start-maximized'],
+    },
   },
 
   projects: [
     {
+      // Portal tests — headless, 60 s default timeout (from root config).
+      // Explicitly excludes CRM specs so the browser never switches
+      // headless mode mid-run, which would orphan the previous instance.
       name: 'chromium',
+      testIgnore: 'crm/**',
       use: {
-        ...devices['Desktop Chrome'],
+        browserName: 'chromium',
+      },
+    },
+    {
+      // CRM tests — non-headless (NTLM auth requires visible session),
+      // isolated into their own project so the browser is launched once
+      // in the correct mode and torn down cleanly after all CRM tests.
+      name: 'crm',
+      testMatch: 'crm/**',
+      timeout: 180_000,
+      use: {
+        browserName: 'chromium',
+        headless: false,
       },
     },
   ],

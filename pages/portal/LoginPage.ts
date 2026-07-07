@@ -21,14 +21,20 @@ export class LoginPage {
       .or(page.getByPlaceholder(/user\s*name|username|user id|customer id/i))
       .or(page.locator('input[type="text"], input[name*="user" i], input[id*="user" i]').first());
     this.passwordInput = page.locator('input[type="password"]').first();
-    this.loginButton = page.getByRole('button', { name: /login|sign in/i });
+    this.loginButton = page.getByRole('button', { name: 'Sign In', exact: true })
+      .or(page.locator('button.login-submit-button'))
+      .or(page.locator('button.ds-auth-confirm-button'));
     this.blockingOverlay = page.locator('.p-blockui, .p-overlay-mask');
 
     this.activeSessionDialog = page
       .getByRole('alertdialog')
+      .or(page.getByRole('dialog'))
       .filter({ hasText: /you have an active session/i })
       .last();
-    this.genericAlertDialog = page.getByRole('alertdialog').last();
+    this.genericAlertDialog = page
+      .getByRole('alertdialog')
+      .or(page.getByRole('dialog'))
+      .last();
     this.activeSessionMessage = this.activeSessionDialog.getByText(
       /you have an active session\.?\s*do you want to close it\?/i
     );

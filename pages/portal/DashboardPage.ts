@@ -22,7 +22,8 @@ export class DashboardPage {
 
     if (!knownElementVisible) {
       console.log('[DashboardPage] Dashboard-specific selector was not found; using safe temporary assertion.');
-      await expect(this.page).not.toHaveURL(/\/login(?:$|[/?#])/i, { timeout: 30000 });
+      // Allow up to 90 seconds — portal session switch can be slow after active-session dismissal.
+      await expect(this.page).not.toHaveURL(/\/login(?:$|[/?#])/i, { timeout: 90000 });
       await expect(this.body).toBeAttached();
     }
 

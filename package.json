@@ -4,8 +4,12 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:portal": "playwright test tests/portal --headed",
-    "test:portal:report": "playwright test tests/portal --headed & node utils/reportGenerator.ts"
+    "test:portal": "playwright test --project=chromium",
+    "test:bma": "playwright test tests/portal/transfers/transfer-between-my-accounts-validations.spec.ts --project=chromium --headed",
+    "test:crm": "playwright test --project=crm",
+    "test:portal:report": "playwright test --project=chromium & node utils/reportGenerator.ts",
+    "cleanup:drivers": "powershell -ExecutionPolicy Bypass -File scripts/cleanup-drivers.ps1",
+    "diagnose:node": "powershell -ExecutionPolicy Bypass -File scripts/diagnose-node.ps1"
   },
   "keywords": [],
   "author": "",

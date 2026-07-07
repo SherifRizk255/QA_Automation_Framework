@@ -51,7 +51,7 @@ function buildLocator(page: Page, definition: LocatorDefinition): Locator {
   }
 
   if (definition.type === 'label') {
-    return page.getByLabel(value);
+    return page.getByLabel(value, { exact: definition.exact });
   }
 
   if (definition.type === 'placeholder') {

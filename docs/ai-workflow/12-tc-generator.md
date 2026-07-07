@@ -571,4 +571,4 @@ Open Rule Conflicts:
   [N]
 
 Ready For:
-  playwright-generator.md
+  13-automation-implementation-agent.md

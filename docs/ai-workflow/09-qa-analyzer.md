@@ -1,6 +1,6 @@
 # qa-analyzer.md
 
-> Step 3 of the pipeline (after normalizer.md and requirements-quality-checker.md)
+> Pipeline Stage 09A — runs after Orchestrator (Standard Mode).
 >
 > Applies QA intelligence to Intent Units (IUs).
 >
@@ -30,7 +30,7 @@ Consumes:
 * Requirements Quality Report
 * Intent Unit List
 * Run Context (from orchestrator)
-* `docs\test-design\test-lifecycle.md`
+* `docs/test-design/test-lifecycle.md`
 
 Run Context Authority:
 

@@ -93,7 +93,7 @@ Do not execute:
 - qa-analyzer
 - traceability-manager
 - tc-generator
-- playwright-generator
+- 13-automation-implementation-agent.md
 - reporter
 
 ```
@@ -144,7 +144,7 @@ Stage ordering is controlled by master-workflow.md.
 - **Standard mode**: all IUs are in scope. Full coverage applies.
 - **CR mode**: only delta IUs (new, changed) are in scope for new TC generation. Regression IUs are flagged for re-run, not regenerated.
 - **Baseline present**: tc-generator.md must not regenerate TCs already covered in the baseline. Gap-fill only.
-- **Automation not requested**: stop after tc-generator.md. Do not run playwright-generator.md.
+- **Automation not requested**: stop after tc-generator.md. Do not run 13-automation-implementation-agent.md.
 
 ---
 
@@ -165,5 +165,5 @@ Recommend: confirm with stakeholder before retiring TC-[N].
 
 - Never skip cr-analyzer.md when a CR is detected — even if the CR seems small.
 - Never run tc-generator.md without a completed IU list from normalizer.md.
-- Never run playwright-generator.md without a completed TC set from tc-generator.md.
+- Never run 13-automation-implementation-agent.md without a completed TC set from tc-generator.md.
 - If domain context is not specified, pass "domain: unspecified" to all downstream skills — they will apply generic rules and flag domain-specific assumptions.
