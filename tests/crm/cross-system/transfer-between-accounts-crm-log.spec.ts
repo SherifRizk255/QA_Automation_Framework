@@ -77,7 +77,7 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
 
     // ── CRM: Open latest record, assert fields ───────────────────────────
     // The view sorts by Transaction Date descending — latest transfer is always row 2.
-    // Field assertions (Status, Transfer Type, Amount) confirm it is our record.
+    // Field assertions (Status, Transfer Type, Amount, User Name) confirm it is our record.
     await logPage.openLatestLogRecord();
     await logPage.assertStatusReasonCompleted();
     await logPage.assertTransferTypeBetweenMyAccounts();
