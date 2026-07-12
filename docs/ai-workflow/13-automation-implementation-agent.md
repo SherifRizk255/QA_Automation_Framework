@@ -260,6 +260,21 @@ Self-healing is NOT permitted for:
 
 ---
 
+## Maximize browser windows (mandatory for every test)
+
+Every test must start with a maximized browser window.
+
+* The base config (`playwright.config.ts`) uses `headless: false`, `viewport: null`, and `launchOptions.args: ['--start-maximized']`.
+* Any browser context/window a test opens (portal, CRM, or any secondary window) MUST be created with `viewport: null` so it fills the maximized window.
+* In cross-system tests that open both the portal and CRM, both windows must be maximized — apply `viewport: null` to each context.
+* For headless/CI runs where `--start-maximized` has no effect, use a large fixed viewport (`{ width: 1920, height: 1080 }`) as the fallback. In this repo that is supplied by `launchOptions.args: ['--window-size=1920,1080']`, so a headless page with `viewport: null` fills 1920×1080.
+* Remove any leftover fixed `viewport` in the config or in context creation that would override the maximize (keep only the headless fallback).
+* Reference implementation: `tests/crm/cross-system/transfer-between-accounts-crm-log.spec.ts` — the portal uses the default `page` fixture (maximized via config), and the CRM `browser.newContext({ viewport: null, httpCredentials, ... })` maximizes the second window.
+
+Repo note: the portal-only `chromium` project runs headless (fast CI) and relies on the 1920×1080 fallback; the `crm` project (which owns the cross-system reference spec) runs `headless: false` and truly maximizes. Whichever mode a project runs in, every context it opens still passes `viewport: null`.
+
+---
+
 ## Locator Strategy
 
 Use Locator Repository first.

@@ -62,7 +62,10 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
     // Portal uses form-login cookies; CRM uses NTLM — separate contexts per Skill 20.
     // Browser-native NTLM via httpCredentials handles D365's 40+ concurrent init
     // requests efficiently; the old httpntlm route-intercept caused ECONNRESET failures.
+    // viewport: null makes this second window fill the maximized frame — without it
+    // the context would clamp to Playwright's 1280×720 default (skill 13 maximize rule).
     const crmContext = await browser.newContext({
+      viewport: null,
       httpCredentials: {
         username: ENV.crm.username,
         password: ENV.crm.password,

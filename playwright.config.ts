@@ -45,11 +45,13 @@ export default defineConfig({
 
     ignoreHTTPSErrors: true,
 
-    // viewport: null disables Playwright's forced 1280×720 clamp so the OS window size applies.
-    // Combined with --start-maximized this gives D365 forms the full desktop viewport,
-    // which renders more columns and reduces the scroll distance needed to reach bottom sections.
-    // --window-size covers headless runs (where --start-maximized is a no-op and the 800×600
-    // default collapses the portal navbar into a hamburger menu, hiding the nav links).
+    // Maximize browser windows (skill 13, mandatory rule).
+    // viewport: null disables Playwright's forced 1280×720 clamp so the page fills
+    // the whole window. --start-maximized opens a maximized window in headed runs;
+    // --window-size=1920,1080 is the headless/CI fallback (where --start-maximized is a
+    // no-op) — it also stops the 800×600 default collapsing the portal navbar into a
+    // hamburger menu, which hides the nav links. Any context a test opens must repeat
+    // viewport: null so secondary windows (e.g. the CRM window) maximize too.
     viewport: null,
     launchOptions: {
       timeout: 30_000,
