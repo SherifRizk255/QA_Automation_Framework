@@ -128,6 +128,7 @@ export const ROUTES = {
     login: ENV.portal.loginUrl,
     accounts: '#/accounts',
     transferHub: '#/transfers/transfer-money',
+    toAnotherSaibAccount: '#/transfers/to-another-saib-account',
   },
   crm: {
     smsLogs: crmEntityListUrl({

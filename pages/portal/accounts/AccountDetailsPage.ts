@@ -3,22 +3,19 @@ import { expect, type Locator, type Page } from '@playwright/test';
 export class AccountDetailsPage {
   readonly page: Page;
   readonly viewDetailsButtons: Locator;
-  readonly candidateFullIdentifier: Locator;
   readonly recentTransactionsArea: Locator;
   readonly statementButton: Locator;
 
   constructor(page: Page) {
     this.page = page;
     this.viewDetailsButtons = page.getByRole('button', { name: /view details/i });
-    this.candidateFullIdentifier = page
-      .getByText(/account number|account identifier|iban/i)
-      .or(page.locator('[aria-label*="account" i], [data-testid*="account" i]'));
     this.recentTransactionsArea = page.getByText(/recent transactions|transaction history/i).first();
+    // Single .or kept intentionally: the statements flow has no active spec and the
+    // control was never live-verified as button vs link — resolve on the next
+    // unblocked walkthrough run and commit to one.
     this.statementButton = page
       .getByRole('button', { name: /statement/i })
-      .or(page.getByRole('link', { name: /statement/i }))
-      .or(page.getByRole('tab', { name: /statement/i }))
-      .or(page.getByText(/^statement$/i));
+      .or(page.getByRole('link', { name: /statement/i }));
   }
 
   async openFirstAccountDetailsCandidate() {
@@ -45,11 +42,11 @@ export class AccountDetailsPage {
     await expect(
       this.recentTransactionsArea,
       'Account details page should show a transactions area before opening statements.'
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible();
     await expect(
       this.statementButton.first(),
       'STATEMENT button/control was not found on the account details page. Account Statements must be opened from account details, not Accounts Overview.'
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible();
     await expect(this.statementButton.first(), 'STATEMENT button/control should be enabled.').toBeEnabled();
 
     await this.statementButton.first().click();

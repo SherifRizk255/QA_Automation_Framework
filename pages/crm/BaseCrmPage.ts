@@ -63,10 +63,7 @@ export abstract class BaseCrmPage {
    * inline `data-id` (skill 24).
    */
   protected async switchToArea(areaItemElementId: string): Promise<void> {
-    const switcher = this.page
-      .locator('#areaSwitcherId')
-      .or(this.page.getByRole('button', { name: /change area/i }))
-      .first();
+    const switcher = this.repository.locator('CRM.SERVICE_REQUESTS.AREA_SWITCHER');
     await switcher.waitFor({ state: 'visible', timeout: 60_000 });
     await switcher.click();
 

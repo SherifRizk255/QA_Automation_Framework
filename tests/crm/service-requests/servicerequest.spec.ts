@@ -2,12 +2,12 @@ import 'dotenv/config';
 import { test } from '@playwright/test';
 import { setupNtlmAuth } from '../../helpers/ntlm.js';
 import { ServiceRequestsPage } from '../../../pages/crm/ServiceRequestsPage';
-
+import { ROUTES } from '../../../config/resources';
 
 // npx playwright test servicerequest.spec.ts --project=crm
 
-const CRM_SERVICE_REQUESTS_URL =
-  'https://crm.cubicsystems.com/SaibUAT/main.aspx?appid=c6546de1-f7f5-f011-a74c-000c290f08a3&pagetype=entitylist&etn=cis_servicerequest&viewType=1039';
+// URL comes from the central resource file — skill 24. Never inline CRM URLs.
+const CRM_SERVICE_REQUESTS_URL = ROUTES.crm.serviceRequests;
 
 test.afterEach(async ({ page }) => {
   await page.unrouteAll({ behavior: 'ignoreErrors' });

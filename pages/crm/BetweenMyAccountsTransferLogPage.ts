@@ -26,14 +26,14 @@ export class BetweenMyAccountsTransferLogPage extends BaseCrmPage {
     const indicator = this.repository.locator(
       'CRM.BETWEEN_MY_ACCOUNTS_LOG.STATUS_COMPLETED'
     );
-    await expect(indicator).toBeVisible({ timeout: 30_000 });
+    await expect(indicator).toBeVisible();
   }
 
   async assertTransferTypeBetweenMyAccounts(): Promise<void> {
     const typeLabel = this.repository.locator(
       'CRM.BETWEEN_MY_ACCOUNTS_LOG.TRANSFER_TYPE_VALUE'
     );
-    await expect(typeLabel).toBeVisible({ timeout: 30_000 });
+    await expect(typeLabel).toBeVisible();
   }
 
   async assertLogAmount(expectedAmount: string): Promise<void> {
@@ -63,7 +63,7 @@ export class BetweenMyAccountsTransferLogPage extends BaseCrmPage {
     // Internet Banking User is a D365 lookup field rendered as a clickable link.
     await expect(
       this.page.getByRole('link', { name: expectedUser, exact: true })
-    ).toBeVisible({ timeout: 30_000 });
+    ).toBeVisible();
   }
 
   // ─── Helpers ───────────────────────────────────────────────────────────────

@@ -7,32 +7,29 @@ export class AccountStatementsPage {
   readonly statementDateControls: Locator;
   readonly downloadButtons: Locator;
   readonly statementsText: Locator;
-  readonly emptyState: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.statementDateControls = page
-      .getByLabel(/statement|from date|to date|date/i)
-      .or(page.getByRole('textbox', { name: /statement|from|to|date/i }))
-      .or(page.getByRole('combobox', { name: /statement|period|date/i }));
-    this.downloadButtons = page.getByRole('button', { name: /download/i }).or(page.getByRole('link', { name: /download/i }));
+    this.statementDateControls = page.getByLabel(/statement|from date|to date|date/i);
+    // Single .or kept intentionally: the statements flow has no active spec and the
+    // download control was never live-verified as button vs link — resolve on the
+    // next unblocked walkthrough run and commit to one.
+    this.downloadButtons = page
+      .getByRole('button', { name: /download/i })
+      .or(page.getByRole('link', { name: /download/i }));
     this.statementsText = page.getByText(/statement/i);
-    this.emptyState = page.getByText(/no statements|no statement|not found|no records|no data/i);
-  }
-
-  async isStatementExperienceDiscovered() {
-    return (await this.statementsText.isVisible().catch(() => false)) || (await this.downloadButtons.first().isVisible().catch(() => false));
   }
 
   async assertLoaded() {
     await expect(this.page.locator('body'), 'Account Statements screen body should be visible.').toBeVisible();
     await expect(
-      this.statementsText.first().or(this.statementDateControls.first()).or(this.downloadButtons.first()).or(this.emptyState.first()),
-      'Account Statements screen should show statement text, filters, downloads, or a statement empty state.'
-    ).toBeVisible({ timeout: 30000 });
+      this.statementsText.first(),
+      'Account Statements screen should show statement content.'
+    ).toBeVisible();
   }
 
   async validateFiltersIfAvailable(testInfo?: TestInfo) {
+    // Filters are tenant-dependent; their absence is documented, not failed.
     const filterCount = await this.statementDateControls.count();
 
     if (filterCount === 0) {
@@ -47,6 +44,7 @@ export class AccountStatementsPage {
   }
 
   async validateDownloadIfAvailable(testInfo?: TestInfo) {
+    // Downloads are tenant-dependent; their absence is documented, not failed.
     if (!(await this.downloadButtons.first().isVisible().catch(() => false))) {
       testInfo?.annotations.push({
         type: 'statement download',

@@ -4,41 +4,23 @@ import { ROUTES, portalHashRoute } from '../../../config/resources';
 
 export class AccountsSummaryPage {
   readonly page: Page;
-  readonly accountsNavLink: Locator;
-  readonly heading: Locator;
   readonly searchInput: Locator;
   readonly viewDetailsButtons: Locator;
   readonly loadMoreButton: Locator;
   readonly displayCurrencyDropdown: Locator;
   readonly availableBalanceLabels: Locator;
   readonly maskedAccountIdentifiers: Locator;
-  readonly recentTransactionsHeading: Locator;
-  readonly recentTransactionsTable: Locator;
   readonly loadingIndicator: Locator;
-  readonly themeErrorToast: Locator;
 
   constructor(page: Page) {
     this.page = page;
-    this.accountsNavLink = page
-      .getByRole('link', { name: /^accounts$/i })
-      .or(page.locator('a[href="#/accounts"]'))
-      .first();
-    this.heading = page.getByText(/^accounts$/i).first();
     this.searchInput = page.getByPlaceholder(/search accounts/i);
     this.viewDetailsButtons = page.getByRole('button', { name: /view details/i });
     this.loadMoreButton = page.getByRole('button', { name: /load more/i });
     this.displayCurrencyDropdown = page.getByRole('combobox').first();
     this.availableBalanceLabels = page.getByText(/available balance/i);
     this.maskedAccountIdentifiers = page.getByText(/\*{2,}\d{2,}/);
-    this.recentTransactionsHeading = page.getByRole('heading', { name: /recent transactions/i });
-    this.recentTransactionsTable = page
-      .getByRole('table')
-      .filter({ hasText: /Reference Number/i })
-      .filter({ hasText: /Transaction Date/i })
-      .filter({ hasText: /Amount/i })
-      .first();
     this.loadingIndicator = page.getByText(/loading|please wait/i);
-    this.themeErrorToast = page.getByText(/error fetching theme/i);
   }
 
   async goto(testInfo?: TestInfo) {
@@ -51,14 +33,15 @@ export class AccountsSummaryPage {
 
   async waitForAccountsScreen() {
     await expect(this.page, 'Accounts route should be active.').toHaveURL(/#\/accounts(?:$|[/?#])/);
-    await expect(this.searchInput, 'Accounts search input should be visible on the Accounts screen.').toBeVisible({
-      timeout: 30000,
-    });
+    await expect(this.searchInput, 'Accounts search input should be visible on the Accounts screen.').toBeVisible();
+    // Dual business outcome: the screen is ready with either account actions
+    // or the approved "no accounts" empty state.
     await expect(
       this.viewDetailsButtons.first().or(this.page.getByText(/no accounts found/i)),
       'Accounts screen should show account actions or an approved empty state.'
-    ).toBeVisible({ timeout: 30000 });
-    await expect(this.loadingIndicator).toBeHidden({ timeout: 20000 }).catch(() => {});
+    ).toBeVisible();
+    // Best-effort: the loading text may never appear on fast loads.
+    await this.loadingIndicator.first().waitFor({ state: 'hidden', timeout: 20_000 }).catch(() => {});
   }
 
   async expectSummaryControlsVisible() {
@@ -78,6 +61,7 @@ export class AccountsSummaryPage {
   }
 
   async expectLoadMoreIfPresent() {
+    // Load More only renders when the user has more accounts than one page.
     if (await this.loadMoreButton.isVisible().catch(() => false)) {
       await expect(this.loadMoreButton, 'Load More should be enabled when visible.').toBeEnabled();
     }
@@ -87,7 +71,7 @@ export class AccountsSummaryPage {
     await expect(
       this.viewDetailsButtons.first(),
       'Cannot open account details because no VIEW DETAILS button is visible on Accounts Overview.'
-    ).toBeVisible({ timeout: 30000 });
+    ).toBeVisible();
     await expect(this.viewDetailsButtons.first(), 'First account VIEW DETAILS button should be enabled.').toBeEnabled();
 
     await this.viewDetailsButtons.first().click();

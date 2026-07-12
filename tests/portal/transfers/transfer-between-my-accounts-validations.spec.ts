@@ -1,12 +1,17 @@
 import 'dotenv/config';
 import { ENV } from '../../../config/resources';
 import { test, type Page } from '@playwright/test';
+import * as allure from 'allure-js-commons';
 import { LoginPage } from '../../../pages/portal/LoginPage';
 import { DashboardPage } from '../../../pages/portal/DashboardPage';
 import { TransferBetweenOwnAccountsPage } from '../../../pages/portal/TransferBetweenOwnAccountsPage';
 
-// TODO(mrizk): add allure.feature/story/severity once allure-playwright is installed — skill 21
-// feature: 'Between My Accounts Transfer' | story: 'Transfer Validations' | severity: 'critical'
+// Skill 21 — mandatory Allure metadata for every test in this suite.
+test.beforeEach(async () => {
+  await allure.feature('Between My Accounts Transfer');
+  await allure.story('Transfer Validations');
+  await allure.severity('critical');
+});
 
 async function loginAndNavigateToBMA(page: Page): Promise<TransferBetweenOwnAccountsPage> {
   const loginPage = new LoginPage(page);

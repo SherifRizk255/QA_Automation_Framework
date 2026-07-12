@@ -1,92 +1,82 @@
 import { expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import path from 'node:path';
+import { LocatorRepository } from '../../utils/locatorRepository';
+import {
+  ACCOUNT_NUMBER_FILTER_PATTERN,
+  ACCOUNT_TYPE_PATTERN,
+  BALANCE_WITH_CURRENCY_PATTERN,
+  CURRENCY_CODE_PATTERN,
+  MASKED_OR_FULL_ACCOUNT_PATTERN,
+  UNMASKED_ACCOUNT_PATTERN,
+  escapeRegExp,
+  extractAccountNumber,
+  extractAmount,
+  extractCurrencyCode,
+  normalizeWhitespace,
+} from '../../utils/textParsers';
 
 export class TransferBetweenOwnAccountsPage {
   readonly page: Page;
+  private readonly repository: LocatorRepository;
 
   constructor(page: Page) {
     this.page = page;
+    this.repository = new LocatorRepository(page);
   }
 
-  // ─── Locators ──────────────────────────────────────────────────────────────
+  // ─── Locators (private getters) ──────────────────────────────────────────────
 
   private get transferMenuLink(): Locator {
-    return this.page
-      .getByRole('link', { name: 'Transfers', exact: true })
-      .or(this.page.locator('[href="#/transfers"]'))
-      .first();
+    return this.repository.locator('TRANSFER.SIDEBAR_TRANSFERS_LINK');
   }
 
   private get betweenMyAccountsTab(): Locator {
-    return this.page.getByRole('button', { name: /between my accounts/i });
+    return this.repository.locator('TRANSFER.BETWEEN_OWN_ACCOUNTS_CARD');
   }
 
   private get toAccountPickerTrigger(): Locator {
-    return this.page
-      .getByText('Select Account', { exact: true })
-      .first()
-      .or(this.dropdownByLabel(/to account/i))
-      .or(this.page.getByText(/select destination account/i));
+    // From is always pre-selected, so only the To selector shows this placeholder.
+    return this.repository.locator('TRANSFER.BMA_TO_ACCOUNT_PLACEHOLDER').first();
   }
 
-  private get fromAccountDropdown(): Locator {
-    return this.dropdownByLabel(/from account/i).or(
-      this.page.getByText(/select source account/i)
-    );
+  private get fromAccountCardNumber(): Locator {
+    return this.repository.locator('TRANSFER.BMA_FROM_ACCOUNT_CARD_NUMBER');
   }
 
-  private get dropdownOptions(): Locator {
-    return this.page
-      .getByRole('option')
-      .or(
-        this.page.locator(
-          '.p-select-option, .p-dropdown-item, [role="listbox"] li, .dialog-account-item'
-        )
-      )
-      .or(
-        this.page.locator(
-          '[role="dialog"] [class*="account"], .account-list-item, .account-option'
-        )
-      );
+  private get pickerCardNumbers(): Locator {
+    return this.repository.locator('TRANSFER.BMA_PICKER_CARD_NUMBER');
+  }
+
+  private get pickerAccountCards(): Locator {
+    // Picker rows are li.account-card elements exposed with role="option".
+    return this.page.getByRole('option');
+  }
+
+  private get fromAccountInfoCard(): Locator {
+    // Both To and From fields render a bma-account-info card; only cards with a
+    // selected account carry a full account number.
+    return this.repository
+      .locator('TRANSFER.BMA_FROM_ACCOUNT_INFO')
+      .filter({ hasText: ACCOUNT_NUMBER_FILTER_PATTERN })
+      .first();
   }
 
   private get amountInput(): Locator {
-    return this.page
-      .locator('input.transfer-amount-input')
-      .or(this.page.locator('input[placeholder="0.00"]'))
-      .first();
+    return this.repository.locator('TRANSFER.BMA_AMOUNT_INPUT');
   }
 
   private get confirmButton(): Locator {
-    return this.page
-      .locator('.transfer-main-confirm-btn')
-      .or(this.page.locator('.continue-btn, .transfer-btn'))
-      .or(
-        this.page.getByRole('button', {
-          name: /^(confirm|continue|transfer|proceed|next)$/i,
-        })
-      )
-      .first();
+    return this.repository.locator('TRANSFER.BMA_CONFIRM_BUTTON');
   }
 
   private get summaryConfirmButton(): Locator {
-    return this.page
-      .getByRole('button', { name: /^confirm$/i })
-      .or(this.page.getByRole('button', { name: /confirm transfer/i }))
-      .first();
+    // The hidden main form stays in the DOM behind the summary overlay, so take
+    // the first CONFIRM in DOM order — the same element every green run clicked.
+    return this.page.getByRole('button', { name: /^confirm$/i }).first();
   }
 
   private get successBanner(): Locator {
-    // span.success-badge is the confirmed success indicator on this portal.
-    // The broad [class*="success"] fallback was removed — it matched the entire
-    // p-dialog.transfer-success-dialog container, causing a strict-mode violation.
-    return this.page
-      .locator('span.success-badge')
-      .or(
-        this.page.getByText(
-          /transfer successful|transaction successful|successfully submitted|successfully completed/i
-        )
-      );
+    return this.repository.locator('TRANSFER.BMA_SUCCESS_BADGE');
   }
 
   private get loadingSpinner(): Locator {
@@ -103,9 +93,7 @@ export class TransferBetweenOwnAccountsPage {
 
   private get scheduleExtraFields(): Locator {
     // Date/frequency inputs that only appear when SCHEDULE or RECURRING is selected.
-    return this.page
-      .getByLabel(/scheduled date|start date|end date|frequency|repeat/i)
-      .or(this.page.locator('[placeholder*="date" i], [formcontrolname*="frequency" i]').first());
+    return this.page.getByLabel(/scheduled date|start date|end date|frequency|repeat/i);
   }
 
   private get transferErrorMessage(): Locator {
@@ -114,43 +102,31 @@ export class TransferBetweenOwnAccountsPage {
     );
   }
 
-  private get toAccountResetPlaceholder(): Locator {
-    return this.page.getByText('Select Account', { exact: true }).first();
-  }
-
-  // ─── Navigation ────────────────────────────────────────────────────────────
+  // ─── Navigation ──────────────────────────────────────────────────────────────
 
   async navigateToTransferBetweenOwnAccounts(testInfo?: TestInfo): Promise<void> {
     await this.transferMenuLink.click();
     // The BetweenMyAccounts tab is the stable page-load indicator: the breadcrumb
     // heading "Transfer" has a back-arrow icon that disrupts a direct text match.
-    await expect(this.betweenMyAccountsTab).toBeVisible({ timeout: 20_000 });
+    await expect(this.betweenMyAccountsTab).toBeVisible();
     await this.captureTransferScreenScreenshot('transfer-screen-opened', testInfo);
     // Tab is auto-selected on load, but an explicit click guarantees the form renders.
     await this.betweenMyAccountsTab.click();
     await expect(
       this.toAccountPickerTrigger,
       'Between My Accounts form did not display the To Account selector.'
-    ).toBeVisible({ timeout: 15_000 });
+    ).toBeVisible();
   }
 
-  // ─── Actions ───────────────────────────────────────────────────────────────
+  // ─── Actions ─────────────────────────────────────────────────────────────────
 
   async openFromAccountDropdown(testInfo?: TestInfo): Promise<void> {
     // "From" is a pre-selected account card, not a label-based combobox.
-    // Clicking span.bma-account-number (inside the card) opens the From picker dialog.
-    // Use waitForFunction (DOM-presence, not viewport-visibility) — picker slides in from the top
-    // so entries may be at the viewport edge during animation, failing Playwright's visibility check.
+    // Clicking the card's account-number span opens the From picker dialog.
     await this.waitForLoadingToFinish();
-    await expect(this.page.locator('span.bma-account-number').first()).toBeVisible({ timeout: 10_000 });
-    await this.page.locator('span.bma-account-number').first().click();
-    await this.page.waitForFunction(
-      () =>
-        document.querySelectorAll('span.account-card-number').length >= 1 ||
-        document.querySelectorAll('span.bma-account-number').length >= 2,
-      null,
-      { timeout: 15_000 }
-    );
+    await expect(this.fromAccountCardNumber.first()).toBeVisible();
+    await this.fromAccountCardNumber.first().click();
+    await this.waitForPickerCards();
     await this.captureTransferScreenScreenshot('from-account-dropdown-opened', testInfo);
   }
 
@@ -159,25 +135,18 @@ export class TransferBetweenOwnAccountsPage {
   }
 
   async selectFirstFromAccount(): Promise<string> {
-    const firstOption = this.dropdownOptions.first();
+    const firstOption = this.pickerAccountCards.first();
     await expect(firstOption).toBeVisible();
-    const selectedText = this.normalizeText(await firstOption.innerText());
+    const selectedText = normalizeWhitespace(await firstOption.innerText());
     await firstOption.click();
     return selectedText;
   }
 
   async openToAccountDropdown(testInfo?: TestInfo): Promise<void> {
-    // The To picker opens a dialog whose entries use span.account-card-number.
-    // Use waitForFunction (DOM-presence) — picker slides in from the top and entries may
-    // be at the viewport edge during animation, failing Playwright's toBeVisible check.
     await this.waitForLoadingToFinish();
     await expect(this.toAccountPickerTrigger).toBeVisible();
     await this.toAccountPickerTrigger.click();
-    await this.page.waitForFunction(
-      () => document.querySelectorAll('span.account-card-number').length >= 1,
-      null,
-      { timeout: 15_000 }
-    );
+    await this.waitForPickerCards();
     await this.captureTransferScreenScreenshot('to-account-dropdown-opened', testInfo);
   }
 
@@ -186,97 +155,35 @@ export class TransferBetweenOwnAccountsPage {
   }
 
   async getSelectedFromAccountText(): Promise<string> {
-    // Walk from span.bma-account-number up to the nearest ancestor whose innerText
-    // contains both the account number and a currency code — that element is the
-    // pre-populated From account card in the main form.
-    const fromCardText = await this.page.evaluate(() => {
-      const bmaSpan = document.querySelector('span.bma-account-number') as HTMLElement | null;
-      if (!bmaSpan) return '';
-      let el = bmaSpan.parentElement;
-      while (el && el !== document.body) {
-        const text = el.innerText.trim();
-        if (/\b0\d{9,}\b/.test(text) && /\b(EGP|USD|EUR|GBP)\b/i.test(text)) return text;
-        el = el.parentElement;
-      }
-      return bmaSpan.textContent?.trim() ?? '';
-    });
-    if (fromCardText && /EGP|USD|EUR|GBP/i.test(fromCardText)) return fromCardText;
-    // Fallback: the Min/Max hint always carries the From account's currency.
+    const fromCardText = await this.readFromAccountCardText();
+    if (fromCardText && CURRENCY_CODE_PATTERN.test(fromCardText)) return fromCardText;
+    // Recovery: the Min/Max hint always carries the From account's currency
+    // when the card itself has not finished rendering.
     return this.page.getByText(/Min:/i).first().innerText().catch(() => '');
   }
 
   async selectToAccount(fromAccountText: string): Promise<string> {
-    const fromCurrency =
-      fromAccountText.match(/\b(EGP|USD|EUR|GBP)\b/i)?.[1]?.toUpperCase() ?? '';
-    // Read the From account number directly from the rendered form before the picker opens.
-    const formText = await this.page
-      .locator('main, [role="main"], body')
-      .first()
-      .innerText()
-      .catch(() => '');
-    const fromAccountNumber = formText.match(/\b0\d{9,}\b/)?.[0] ?? '';
+    const fromCurrency = extractCurrencyCode(fromAccountText) ?? '';
+    const fromAccountNumber = extractAccountNumber(await this.readFromAccountCardText()) ?? '';
 
     await this.waitForLoadingToFinish();
     await this.toAccountPickerTrigger.click();
+    await this.waitForPickerCards();
 
-    // Wait until the picker is open: at least one account number different from the
-    // From account must appear (picker cards are not pre-rendered in the DOM).
-    await this.page.waitForFunction(
-      (fromNum: string) => {
-        const unique = new Set(document.body.innerText.match(/\b0\d{9,}\b/g) ?? []);
-        unique.delete(fromNum);
-        return unique.size >= 1;
-      },
-      fromAccountNumber,
-      { timeout: 15_000 }
-    );
+    const targetAccountNumber = await this.findPickerAccountWithCurrency(fromCurrency, fromAccountNumber);
 
-    // Walk up from each picker span.account-card-number using innerText (not textContent)
-    // so element boundaries become newlines — this creates word boundaries for currency
-    // matching. textContent concatenates "0220123456910700EGP" with no boundary.
-    const targetAccNum = await this.page.evaluate(
-      (params: { fromCurrency: string; fromAccountNumber: string }) => {
-        const { fromCurrency, fromAccountNumber } = params;
-        const numberSpans = Array.from(
-          document.querySelectorAll('span.account-card-number')
-        );
-        for (const span of numberSpans) {
-          const accNum = (span.textContent ?? '').trim();
-          if (accNum === fromAccountNumber) continue;
-          let ancestor: Element | null = span.parentElement;
-          let cardCurrency = '';
-          while (ancestor && ancestor !== document.body) {
-            const text = (
-              (ancestor as HTMLElement).innerText ?? ancestor.textContent ?? ''
-            ).trim();
-            const match = text.match(/\b(EGP|USD|EUR|GBP)\b/i);
-            if (match) {
-              cardCurrency = match[1].toUpperCase();
-              break;
-            }
-            ancestor = ancestor.parentElement;
-          }
-          if (cardCurrency === fromCurrency) return accNum;
-        }
-        return null;
-      },
-      { fromCurrency, fromAccountNumber }
-    );
-
-    if (!targetAccNum) {
+    if (!targetAccountNumber) {
       throw new Error(
         `selectToAccount: No To Account found with currency "${fromCurrency}" ` +
           `different from From account "${fromAccountNumber}". ` +
-          `OSerry may have only one ${fromCurrency} account, or the picker was empty.`
+          `The user may have only one ${fromCurrency} account, or the picker was empty.`
       );
     }
 
     // Clicking the number span bubbles to the parent clickable card container.
-    await this.page
-      .locator('span.account-card-number', { hasText: targetAccNum })
-      .click();
+    await this.pickerCardNumbers.filter({ hasText: targetAccountNumber }).click();
     await this.waitForLoadingToFinish();
-    return targetAccNum;
+    return targetAccountNumber;
   }
 
   async enterAmount(amount: string | number): Promise<void> {
@@ -286,41 +193,34 @@ export class TransferBetweenOwnAccountsPage {
 
   async clickConfirm(): Promise<void> {
     await this.waitForLoadingToFinish();
-    await expect(this.confirmButton).toBeEnabled({ timeout: 30_000 });
+    await expect(this.confirmButton).toBeEnabled();
     await this.confirmButton.click();
     await this.waitForLoadingToFinish();
   }
 
   async clickConfirmOnSummary(): Promise<void> {
     await this.waitForLoadingToFinish();
-    await expect(this.summaryConfirmButton).toBeEnabled({ timeout: 30_000 });
+    await expect(this.summaryConfirmButton).toBeEnabled();
     await this.summaryConfirmButton.click();
     await this.waitForLoadingToFinish();
   }
 
   async getFromAccountBalance(): Promise<number> {
     const cardText = await this.getSelectedFromAccountText();
-    const match = cardText.match(/[\d,]+\.\d{2}/);
-    if (!match) throw new Error(`Cannot parse balance from From account card: "${cardText}"`);
-    return parseFloat(match[0].replace(/,/g, ''));
+    const balance = extractAmount(cardText);
+    if (balance === null) throw new Error(`Cannot parse balance from From account card: "${cardText}"`);
+    return balance;
   }
 
   async getSelectedFromAccountNumber(): Promise<string> {
-    const cardText = await this.getSelectedFromAccountText();
-    return cardText.match(/\b0\d{9,}\b/)?.[0] ?? '';
+    return extractAccountNumber(await this.getSelectedFromAccountText()) ?? '';
   }
 
   async changeFromAccount(accountNumber: string): Promise<void> {
     await this.waitForLoadingToFinish();
-    await this.page.locator('span.bma-account-number').first().click();
-    await this.page.waitForFunction(
-      () =>
-        document.querySelectorAll('span.account-card-number').length >= 1 ||
-        document.querySelectorAll('span.bma-account-number').length >= 2,
-      null,
-      { timeout: 15_000 }
-    );
-    await this.page.locator('span.account-card-number', { hasText: accountNumber }).first().click();
+    await this.fromAccountCardNumber.first().click();
+    await this.waitForPickerCards();
+    await this.pickerCardNumbers.filter({ hasText: accountNumber }).first().click();
     await this.waitForLoadingToFinish();
   }
 
@@ -330,8 +230,8 @@ export class TransferBetweenOwnAccountsPage {
   }
 
   async clickCancelTransfer(): Promise<void> {
-    // Try the CANCEL button first (visible when Transfer Summary panel is rendered).
-    // Fall back to browser back-navigation (the "< Transfer" arrow always present in SPA).
+    // Recovery path: CANCEL is only rendered with the Transfer Summary panel;
+    // otherwise browser back-navigation (the "< Transfer" arrow) leaves the form.
     const hasCancel = await this.cancelTransferButton.isVisible({ timeout: 3_000 }).catch(() => false);
     if (hasCancel) {
       await this.cancelTransferButton.click();
@@ -351,17 +251,9 @@ export class TransferBetweenOwnAccountsPage {
     }
   }
 
-  // ─── Assertions ────────────────────────────────────────────────────────────
+  // ─── Assertions ──────────────────────────────────────────────────────────────
 
   async verifyFromAccountEntriesHaveRequiredDetails(options: string[]): Promise<void> {
-    // Account number: masked (****1234 or 1234****) OR full unmasked (10+ digit sequence).
-    const accountNumberPattern =
-      /(?:\*{2,}|•{2,}|x{2,})\s*\d{2,}|(?:\d{2,}\s*(?:\*{2,}|•{2,}|x{2,}))|\b\d{8,}\b/i;
-    const accountTypePattern =
-      /\b(current|saving|savings|investment|account|overdraft|deposit|trst|adv|intr)\b/i;
-    const balancePattern =
-      /\b[A-Z]{3}\s*[+-]?\d{1,3}(?:,\d{3})*(?:\.\d{2})?\b|\b[+-]?\d{1,3}(?:,\d{3})*(?:\.\d{2})?\s*[A-Z]{3}\b/i;
-
     expect(
       options.length,
       'From Account dropdown should contain at least one account entry.'
@@ -372,62 +264,52 @@ export class TransferBetweenOwnAccountsPage {
       expect(
         optionText,
         `Account option should include an account number (masked or full): ${optionText}`
-      ).toMatch(accountNumberPattern);
+      ).toMatch(MASKED_OR_FULL_ACCOUNT_PATTERN);
       expect(
         optionText,
         `Account option should include account type text: ${optionText}`
-      ).toMatch(accountTypePattern);
+      ).toMatch(ACCOUNT_TYPE_PATTERN);
       expect(
         optionText,
         `Account option should include available balance/amount: ${optionText}`
-      ).toMatch(balancePattern);
+      ).toMatch(BALANCE_WITH_CURRENCY_PATTERN);
     }
   }
 
   async assertSummaryFromAccount(fromAccountText: string): Promise<void> {
-    const accountNumber = fromAccountText.match(/\b0\d{9,}\b/)?.[0] ?? fromAccountText;
-    // Scope to span.review-account-number to avoid a strict-mode collision: the hidden
-    // form's span.bma-account-number stays in the DOM while the summary overlay renders.
+    const accountNumber = extractAccountNumber(fromAccountText) ?? fromAccountText;
+    // Scoped to the review span — the hidden form's account-number span stays in
+    // the DOM while the summary overlay renders, so a page-wide text match collides.
     await expect(
-      this.page
-        .locator('span.review-account-number')
+      this.repository
+        .locator('TRANSFER.BMA_REVIEW_ACCOUNT_NUMBER')
         .filter({ hasText: accountNumber })
-        .or(
-          this.page
-            .locator('cubic-transfer-review')
-            .getByText(accountNumber, { exact: false })
-        )
-    ).toBeVisible({ timeout: 30_000 });
+    ).toBeVisible();
   }
 
   async assertSummaryAmount(expectedAmount: string): Promise<void> {
-    const escaped = String(expectedAmount).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    await expect(this.page.getByText(new RegExp(escaped))).toBeVisible({
-      timeout: 30_000,
-    });
+    await expect(this.page.getByText(new RegExp(escapeRegExp(String(expectedAmount))))).toBeVisible();
   }
 
   async assertTransferSuccessful(): Promise<void> {
+    // Posting can take up to a minute on UAT — deliberately above the default.
     await expect(this.successBanner).toBeVisible({ timeout: 60_000 });
   }
 
   async assertToAccountExcludesSourceAccount(fromAccountNumber: string): Promise<void> {
     const toOptions = await this.getToAccountOptions();
     expect(
-      toOptions.some(opt => opt.includes(fromAccountNumber)),
+      toOptions.some(option => option.includes(fromAccountNumber)),
       `To Account picker must not include source account "${fromAccountNumber}".\nOptions: ${JSON.stringify(toOptions)}`
     ).toBe(false);
   }
 
   async verifyToAccountEntriesHaveRequiredDetails(options: string[]): Promise<void> {
-    const accountNumberPattern = /\b0\d{9,}\b/;
-    const accountTypePattern = /\b(current|saving|savings|investment|account|overdraft|deposit|trst|adv|intr)\b/i;
-    const currencyPattern = /\b(EGP|USD|EUR|GBP)\b/i;
     expect(options.length, 'To Account picker must list at least one account.').toBeGreaterThan(0);
     for (const option of options) {
-      expect(option, `To entry must show an account number: "${option}"`).toMatch(accountNumberPattern);
-      expect(option, `To entry must show an account type: "${option}"`).toMatch(accountTypePattern);
-      expect(option, `To entry must show a currency: "${option}"`).toMatch(currencyPattern);
+      expect(option, `To entry must show an account number: "${option}"`).toMatch(UNMASKED_ACCOUNT_PATTERN);
+      expect(option, `To entry must show an account type: "${option}"`).toMatch(ACCOUNT_TYPE_PATTERN);
+      expect(option, `To entry must show a currency: "${option}"`).toMatch(CURRENCY_CODE_PATTERN);
     }
   }
 
@@ -438,15 +320,15 @@ export class TransferBetweenOwnAccountsPage {
       expect(
         option,
         `Every From Account entry must carry a currency code: "${option}"`
-      ).toMatch(/\b(EGP|USD|EUR|GBP)\b/i);
-      const match = option.match(/\b(EGP|USD|EUR|GBP)\b/i);
-      if (match) foundCurrencies.add(match[1].toUpperCase());
+      ).toMatch(CURRENCY_CODE_PATTERN);
+      const currency = extractCurrencyCode(option);
+      if (currency) foundCurrencies.add(currency);
     }
     return [...foundCurrencies];
   }
 
   async assertToAccountIsReset(): Promise<void> {
-    await expect(this.toAccountResetPlaceholder).toBeVisible({ timeout: 10_000 });
+    await expect(this.toAccountPickerTrigger).toBeVisible();
   }
 
   async assertFromAccountRequiredError(): Promise<void> {
@@ -476,6 +358,7 @@ export class TransferBetweenOwnAccountsPage {
   }
 
   async assertConfirmBlockedByMinimumAmount(): Promise<void> {
+    // Deliberately short: inline validation reacts immediately to the typed amount.
     await expect(
       this.confirmButton,
       'Confirm button must be disabled when amount is below the minimum.'
@@ -507,7 +390,7 @@ export class TransferBetweenOwnAccountsPage {
     }).toPass({ timeout: 15_000, intervals: [1_000] });
   }
 
-// ─── Helpers ───────────────────────────────────────────────────────────────
+  // ─── Helpers (private) ───────────────────────────────────────────────────────
 
   private async captureTransferScreenScreenshot(
     name: string,
@@ -520,65 +403,59 @@ export class TransferBetweenOwnAccountsPage {
     }
   }
 
+  /**
+   * Waits for the open picker dialog to render its account cards.
+   * Waits for DOM-attachment (not visibility): the picker slides in from the
+   * top, so cards sit at the viewport edge during the animation and would fail
+   * Playwright's visibility check.
+   */
+  private async waitForPickerCards(): Promise<void> {
+    await this.pickerCardNumbers.first().waitFor({ state: 'attached', timeout: 15_000 });
+  }
+
+  /**
+   * Returns the full text ("TYPE 0220… EGP 1,234.56") of the pre-populated From
+   * account card, or '' when the card has not populated yet — callers recover
+   * via the Min/Max hint, which carries the currency as soon as the form loads.
+   */
+  private async readFromAccountCardText(): Promise<string> {
+    const cardPopulated = await this.fromAccountInfoCard
+      .waitFor({ state: 'visible', timeout: 20_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!cardPopulated) return '';
+    return normalizeWhitespace(await this.fromAccountInfoCard.innerText());
+  }
+
+  /**
+   * Returns the account number of the first open-picker card that shows the
+   * given currency and differs from the excluded (From) account, or null when
+   * no such account exists.
+   */
+  private async findPickerAccountWithCurrency(
+    currency: string,
+    excludedAccountNumber: string
+  ): Promise<string | null> {
+    for (const cardText of await this.getPickerCardTexts()) {
+      const accountNumber = extractAccountNumber(cardText);
+      if (!accountNumber || accountNumber === excludedAccountNumber) continue;
+      if (extractCurrencyCode(cardText) === currency) return accountNumber;
+    }
+    return null;
+  }
+
+  /** Returns the normalized text of every account card in the open picker dialog. */
   private async getPickerCardTexts(): Promise<string[]> {
-    // To picker entries use span.account-card-number; From picker may use span.bma-account-number
-    // (multiple when open). Walk up from each number span to the nearest full-card ancestor.
-    return this.page.evaluate(() => {
-      const cardSpans: HTMLElement[] =
-        document.querySelectorAll('span.account-card-number').length >= 1
-          ? Array.from(document.querySelectorAll<HTMLElement>('span.account-card-number'))
-          : Array.from(document.querySelectorAll<HTMLElement>('span.bma-account-number'));
-      return Array.from(cardSpans)
-        .map((span) => {
-          let el: HTMLElement | null = span as HTMLElement;
-          for (let depth = 0; depth < 6 && el; depth++) {
-            const { width, height } = el.getBoundingClientRect();
-            if (width > 100 && height > 40) return el.innerText.trim();
-            el = el.parentElement;
-          }
-          return (span as HTMLElement).innerText.trim();
-        })
-        .filter((t) => t.length > 0);
-    });
-  }
-
-  private async getVisibleDropdownOptionTexts(): Promise<string[]> {
-    const texts = await this.dropdownOptions.evaluateAll((options) =>
-      options
-        .filter((option) => {
-          const style = window.getComputedStyle(option);
-          const box = option.getBoundingClientRect();
-          return (
-            style.visibility !== 'hidden' &&
-            style.display !== 'none' &&
-            box.width > 0 &&
-            box.height > 0
-          );
-        })
-        .map((option) => option.textContent ?? '')
-    );
-    return texts.map((text) => this.normalizeText(text)).filter(Boolean);
-  }
-
-  private dropdownByLabel(labelPattern: RegExp): Locator {
-    return this.page
-      .getByLabel(labelPattern)
-      .or(this.page.getByRole('combobox', { name: labelPattern }))
-      .or(
-        this.page
-          .locator('label')
-          .filter({ hasText: labelPattern })
-          .locator(
-            'xpath=following::*[@role="combobox" or contains(@class, "p-select") or contains(@class, "p-dropdown")][1]'
-          )
-      );
+    const cardTexts = await this.pickerAccountCards.allInnerTexts();
+    return cardTexts.map(normalizeWhitespace).filter((text) => text.length > 0);
   }
 
   private async waitForLoadingToFinish(): Promise<void> {
-    await expect(this.loadingSpinner).toBeHidden({ timeout: 20_000 }).catch(() => {});
-  }
-
-  private normalizeText(value: string): string {
-    return value.replace(/\s+/g, ' ').trim();
+    // Best-effort: the loading text may legitimately never appear, and a
+    // persistent background widget must not fail the calling action.
+    await this.loadingSpinner
+      .first()
+      .waitFor({ state: 'hidden', timeout: 20_000 })
+      .catch(() => {});
   }
 }

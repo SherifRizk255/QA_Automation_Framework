@@ -19,7 +19,8 @@ export class TransactionHistoryPage {
       .filter({ hasText: /Transaction Date/i })
       .filter({ hasText: /Amount/i })
       .first();
-    this.transactionRows = this.recentTransactionsTable.locator('tbody tr, [role="row"]').filter({ hasText: /\d|[+-]/ });
+    // Real <table> markup — getAmountTexts reads tbody cells, proven by passing runs.
+    this.transactionRows = this.recentTransactionsTable.locator('tbody tr').filter({ hasText: /\d|[+-]/ });
     this.referenceHeader = page.getByRole('columnheader', { name: /reference number/i });
     this.transactionDateHeader = page.getByRole('columnheader', { name: /transaction date/i });
     this.amountHeader = page.getByRole('columnheader', { name: /^amount$/i });

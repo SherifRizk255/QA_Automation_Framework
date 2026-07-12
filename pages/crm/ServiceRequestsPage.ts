@@ -26,6 +26,7 @@ export class ServiceRequestsPage extends BaseCrmPage {
     await requestCode.click();
     await this.waitForDynamicsReady();
     await this.page.keyboard.press('Enter');
+    // Opening a D365 record form takes up to a minute on-prem — above the default.
     await expect(
       this.repository.locator('CRM.SERVICE_REQUESTS.RECORD_REQUEST_FIELD')
     ).toBeVisible({ timeout: 60_000 });
@@ -40,19 +41,20 @@ export class ServiceRequestsPage extends BaseCrmPage {
   async assertRequestFieldVisible(): Promise<void> {
     await expect(
       this.repository.locator('CRM.SERVICE_REQUESTS.RECORD_REQUEST_FIELD')
-    ).toBeVisible({ timeout: 30_000 });
+    ).toBeVisible();
   }
 
   async assertStatusReasonIsSubmitted(): Promise<void> {
     await expect(
       this.repository.locator('CRM.SERVICE_REQUESTS.STATUS_REASON_LABEL')
-    ).toBeVisible({ timeout: 30_000 });
+    ).toBeVisible();
     await expect(
       this.repository.locator('CRM.SERVICE_REQUESTS.SUBMITTED_STATUS')
-    ).toBeVisible({ timeout: 30_000 });
+    ).toBeVisible();
   }
 
   async assertFirstRecordFields(): Promise<void> {
+    // Record form can still be hydrating right after openFirstRecord — D365 budget.
     await expect(
       this.repository.locator('CRM.SERVICE_REQUESTS.RECORD_REQUEST_FIELD')
     ).toBeVisible({ timeout: 60_000 });
@@ -70,7 +72,7 @@ export class ServiceRequestsPage extends BaseCrmPage {
   private async assertTextAcrossFrames(pattern: RegExp): Promise<void> {
     const inMain = await this.page.getByText(pattern).count().catch(() => 0);
     if (inMain > 0) {
-      await expect(this.page.getByText(pattern).first()).toBeVisible({ timeout: 30_000 });
+      await expect(this.page.getByText(pattern).first()).toBeVisible();
       return;
     }
     for (const frame of this.page.frames()) {

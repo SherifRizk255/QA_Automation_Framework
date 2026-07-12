@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { LoginPage } from '../../../pages/portal/LoginPage.js';
 import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
+import { LocatorRepository } from '../../../utils/locatorRepository';
 
 const evidenceDir = path.resolve('reports', 'system-walkthrough', 'transfers-local-transfer');
 
@@ -69,23 +70,26 @@ async function clickIfVisible(page: Page, locator: Locator, label: string) {
 }
 
 async function waitForTransferDetailOrStableSelector(page: Page) {
+  // Discovery flow: either signal (route change or a known form label) means the
+  // detail screen rendered — race them and continue with whichever fires first.
   await Promise.race([
-    page.waitForURL(/local-transfers\/.+|another-saib|saib-account/i, { timeout: 15000 }).catch(() => undefined),
+    page.waitForURL(/local-transfers\/.+|another-saib|saib-account/i, { timeout: 15_000 }).catch(() => undefined),
     page
       .getByText(/from account|source account|beneficiary|transfer amount|reason for transfer|add new/i)
       .first()
-      .waitFor({ state: 'visible', timeout: 15000 })
+      .waitFor({ state: 'visible', timeout: 15_000 })
       .catch(() => undefined),
   ]);
 
-  await page.locator('body').waitFor({ state: 'visible', timeout: 15000 });
+  await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
 }
 
 test('system walkthrough - Transfers to Local Transfers to Another SAIB Account', async ({ page }, testInfo) => {
-  test.setTimeout(180000);
+  test.setTimeout(180_000);
 
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
+  const repository = new LocatorRepository(page);
 
   await loginPage.goto();
   await loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
@@ -93,48 +97,25 @@ test('system walkthrough - Transfers to Local Transfers to Another SAIB Account'
 
   await captureStep(page, '01-dashboard-after-login');
 
-  await clickIfVisible(
-    page,
-    page
-      .getByRole('button', { name: /^transfers$/i })
-      .or(page.getByRole('link', { name: /transfers/i }))
-      .or(page.locator('.p-panelmenu-header-link[href="#/transfers"]')),
-    'Transfers'
-  );
+  await clickIfVisible(page, repository.locator('TRANSFER.SIDEBAR_TRANSFERS_LINK'), 'Transfers');
   await captureStep(page, '02-after-transfers-click');
 
-  await page
-    .getByRole('button', { name: /local transfers/i })
-    .or(page.locator('.transfer-card').filter({ hasText: /local transfers/i }))
-    .first()
-    .waitFor({ state: 'visible', timeout: 30000 });
+  await repository
+    .locator('TRANSFER.LOCAL_TRANSFERS_CARD')
+    .waitFor({ state: 'visible', timeout: 30_000 });
 
-  await clickIfVisible(
-    page,
-    page
-      .getByRole('button', { name: /local transfers/i })
-      .or(page.getByRole('link', { name: /local transfers/i }))
-      .or(page.getByText(/local transfers/i)),
-    'Local Transfers'
-  );
+  await clickIfVisible(page, repository.locator('TRANSFER.LOCAL_TRANSFERS_CARD'), 'Local Transfers');
   await captureStep(page, '03-after-local-transfers-click');
 
-  await clickIfVisible(
-    page,
-    page
-      .getByRole('button', { name: /to another saib account/i })
-      .or(page.getByRole('link', { name: /to another saib account/i }))
-      .or(page.getByText(/to another saib account/i)),
-    'To Another SAIB Account'
-  );
+  await clickIfVisible(page, repository.locator('TRANSFER.TO_ANOTHER_SAIB_ACCOUNT_CARD'), 'To Another SAIB Account');
   await waitForTransferDetailOrStableSelector(page);
   await captureStep(page, '04-after-to-another-saib-account-click');
 
-  await clickIfVisible(page, page.locator('.account-selector').filter({ hasText: /select source account/i }), 'From Account selector');
+  await clickIfVisible(page, repository.locator('TRANSFER.SAIB_FROM_ACCOUNT_SELECTOR'), 'From Account selector');
   await captureStep(page, '05-from-account-selector-opened');
   await page.keyboard.press('Escape').catch(() => {});
 
-  await clickIfVisible(page, page.locator('.add-new-link').or(page.getByText(/^add new$/i)), 'Add New beneficiary');
+  await clickIfVisible(page, repository.locator('TRANSFER.SAIB_ADD_NEW_BENEFICIARY_LINK'), 'Add New beneficiary');
   await captureStep(page, '06-add-new-beneficiary-opened');
   await page.keyboard.press('Escape').catch(() => {});
 

@@ -1,11 +1,11 @@
 {
   "repositoryVersion": "1.0.0",
   "module": "Portal Transfer & CRM",
-  "lastUpdated": "2026-06-30",
+  "lastUpdated": "2026-07-09",
   "statistics": {
-    "totalEntries": 40,
-    "activeEntries": 40,
-    "healedEntries": 1,
+    "totalEntries": 54,
+    "activeEntries": 54,
+    "healedEntries": 4,
     "blockedSubflows": 1,
     "repositoryReuseCount": 8
   },
@@ -16,9 +16,19 @@
       "elementName": "Transfer Money Heading",
       "locatorType": "TEXT",
       "primaryLocator": "getByText(/^Transfer Money$/i)",
-      "primary": { "type": "text", "value": "/^Transfer Money$/i" },
-      "fallbackLocatorChain": [".header-title-row"],
-      "fallbackChain": [{ "type": "css", "value": ".header-title-row" }],
+      "primary": {
+        "type": "text",
+        "value": "/^Transfer Money$/i"
+      },
+      "fallbackLocatorChain": [
+        ".header-title-row"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".header-title-row"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 82,
       "volatility": "MEDIUM",
@@ -34,7 +44,9 @@
           "date": "2026-06-22",
           "reason": "Forced locator failure validation",
           "primaryLocator": "getByText(/^__BROKEN_TRANSFER_HEADING__$/i)",
-          "fallbackLocatorChain": [".__broken-transfer-heading__"],
+          "fallbackLocatorChain": [
+            ".__broken-transfer-heading__"
+          ],
           "classification": "AUT_LOCATOR"
         }
       ],
@@ -54,24 +66,43 @@
     {
       "elementId": "TRANSFER.SIDEBAR_TRANSFERS_LINK",
       "screenName": "Portal Shell",
-      "elementName": "Transfers Sidebar Link",
+      "elementName": "Transfers Navbar Link",
       "locatorType": "CSS",
-      "primaryLocator": ".p-panelmenu-header-link[href=\"#/transfers\"]",
-      "primary": { "type": "css", "value": ".p-panelmenu-header-link[href=\"#/transfers\"]" },
-      "fallbackLocatorChain": ["getByRole('button', { name: /transfers/i })"],
-      "fallbackChain": [{ "type": "role", "value": "button", "name": "/transfers/i" }],
-      "confidence": "MEDIUM",
-      "confidenceScore": 80,
-      "volatility": "MEDIUM",
-      "discoverySource": "Live DOM",
+      "primaryLocator": "a[href=\"#/transfers\"]",
+      "primary": {
+        "type": "css",
+        "value": "a[href=\"#/transfers\"]"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 94,
+      "volatility": "LOW",
+      "discoverySource": "Live DOM probe 2026-07-09: navbar theme replaced the p-panelmenu sidebar — anchors are .ds-navbar-item with explicit role='menuitem' (so getByRole('link') cannot match); a[href='#/transfers'] matched exactly 1.",
       "uniqueness": "UNIQUE",
-      "lastVerifiedDate": "2026-06-22",
-      "verificationCount": 1,
-      "successCount": 1,
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 2,
+      "successCount": 2,
       "failureCount": 0,
       "repositoryStatus": "ACTIVE",
-      "originalLocatorHistory": [],
-      "healingMetadata": []
+      "originalLocatorHistory": [
+        {
+          "locator": ".p-panelmenu-header-link[href=\"#/transfers\"]",
+          "removedOn": "2026-07-09",
+          "reason": "ZERO_MATCHES — portal shell switched from sidebar panel menu to ds-navbar top navigation"
+        }
+      ],
+      "healingMetadata": [
+        {
+          "healedOn": "2026-07-09",
+          "failureType": "AUT_LOCATOR_NOT_FOUND",
+          "oldLocator": ".p-panelmenu-header-link[href=\"#/transfers\"]",
+          "newLocator": "a[href=\"#/transfers\"]",
+          "rootCause": "Shell theme change: navigation moved from PrimeNG panel menu to ds-navbar; href attribute is the stable hook",
+          "recoveryStrategy": "REDISCOVER_LOCATOR",
+          "healingConfidence": "HIGH"
+        }
+      ]
     },
     {
       "elementId": "TRANSFER.LANGUAGE_TOGGLE",
@@ -79,9 +110,19 @@
       "elementName": "Language Toggle",
       "locatorType": "CSS",
       "primaryLocator": ".lang-toggle-btn",
-      "primary": { "type": "css", "value": ".lang-toggle-btn" },
-      "fallbackLocatorChain": ["getByText(/العربية/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/العربية/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".lang-toggle-btn"
+      },
+      "fallbackLocatorChain": [
+        "getByText(/العربية/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/العربية/i"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 78,
       "volatility": "MEDIUM",
@@ -101,9 +142,20 @@
       "elementName": "Active Session Proceed Button",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('button', { name: /^(proceed|ok|yes|continue)$/i })",
-      "primary": { "type": "role", "value": "button", "name": "/^(proceed|ok|yes|continue)$/i" },
-      "fallbackLocatorChain": ["alertdialog context + visible text"],
-      "fallbackChain": [{ "type": "text", "value": "/^(proceed|ok|yes|continue)$/i" }],
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/^(proceed|ok|yes|continue)$/i"
+      },
+      "fallbackLocatorChain": [
+        "alertdialog context + visible text"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/^(proceed|ok|yes|continue)$/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 95,
       "volatility": "LOW",
@@ -123,9 +175,20 @@
       "elementName": "Between My Accounts Card",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('button', { name: /between my accounts/i })",
-      "primary": { "type": "role", "value": "button", "name": "/between my accounts/i" },
-      "fallbackLocatorChain": ["getByText(/between my accounts/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/between my accounts/i" }],
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/between my accounts/i"
+      },
+      "fallbackLocatorChain": [
+        "getByText(/between my accounts/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/between my accounts/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 95,
       "volatility": "LOW",
@@ -145,11 +208,24 @@
       "elementName": "From Account Selector",
       "locatorType": "TEXT",
       "primaryLocator": "getByText(/select source account/i)",
-      "primary": { "type": "text", "value": "/select source account/i" },
-      "fallbackLocatorChain": ["getByLabel(/from account/i)", "getByRole('combobox', { name: /from account/i })"],
+      "primary": {
+        "type": "text",
+        "value": "/select source account/i"
+      },
+      "fallbackLocatorChain": [
+        "getByLabel(/from account/i)",
+        "getByRole('combobox', { name: /from account/i })"
+      ],
       "fallbackChain": [
-        { "type": "label", "value": "/from account/i" },
-        { "type": "role", "value": "combobox", "name": "/from account/i" }
+        {
+          "type": "label",
+          "value": "/from account/i"
+        },
+        {
+          "type": "role",
+          "value": "combobox",
+          "name": "/from account/i"
+        }
       ],
       "confidence": "MEDIUM",
       "confidenceScore": 82,
@@ -170,11 +246,24 @@
       "elementName": "To Account Selector",
       "locatorType": "TEXT",
       "primaryLocator": "getByText(/select destination account/i)",
-      "primary": { "type": "text", "value": "/select destination account/i" },
-      "fallbackLocatorChain": ["getByLabel(/to account/i)", "getByRole('combobox', { name: /to account/i })"],
+      "primary": {
+        "type": "text",
+        "value": "/select destination account/i"
+      },
+      "fallbackLocatorChain": [
+        "getByLabel(/to account/i)",
+        "getByRole('combobox', { name: /to account/i })"
+      ],
       "fallbackChain": [
-        { "type": "label", "value": "/to account/i" },
-        { "type": "role", "value": "combobox", "name": "/to account/i" }
+        {
+          "type": "label",
+          "value": "/to account/i"
+        },
+        {
+          "type": "role",
+          "value": "combobox",
+          "name": "/to account/i"
+        }
       ],
       "confidence": "MEDIUM",
       "confidenceScore": 82,
@@ -195,9 +284,19 @@
       "elementName": "Account Dialog Row",
       "locatorType": "CSS",
       "primaryLocator": ".dialog-account-item",
-      "primary": { "type": "css", "value": ".dialog-account-item" },
-      "fallbackLocatorChain": ["getByText(/Available:/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/Available:/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".dialog-account-item"
+      },
+      "fallbackLocatorChain": [
+        "getByText(/Available:/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/Available:/i"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 80,
       "volatility": "MEDIUM",
@@ -217,9 +316,20 @@
       "elementName": "Local Transfers Card",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('button', { name: /local transfers/i })",
-      "primary": { "type": "role", "value": "button", "name": "/local transfers/i" },
-      "fallbackLocatorChain": [".transfer-card:has-text(\"Local Transfers\")"],
-      "fallbackChain": [{ "type": "css", "value": ".transfer-card:has-text(\"Local Transfers\")" }],
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/local transfers/i"
+      },
+      "fallbackLocatorChain": [
+        ".transfer-card:has-text(\"Local Transfers\")"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".transfer-card:has-text(\"Local Transfers\")"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 94,
       "volatility": "LOW",
@@ -239,9 +349,20 @@
       "elementName": "To Another SAIB Account Card",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('button', { name: /to another saib account/i })",
-      "primary": { "type": "role", "value": "button", "name": "/to another saib account/i" },
-      "fallbackLocatorChain": [".lt-type-card:has-text(\"To Another SAIB Account\")"],
-      "fallbackChain": [{ "type": "css", "value": ".lt-type-card:has-text(\"To Another SAIB Account\")" }],
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/to another saib account/i"
+      },
+      "fallbackLocatorChain": [
+        ".lt-type-card:has-text(\"To Another SAIB Account\")"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".lt-type-card:has-text(\"To Another SAIB Account\")"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 96,
       "volatility": "LOW",
@@ -261,9 +382,19 @@
       "elementName": "Transfer to SAIB Account Form",
       "locatorType": "CSS",
       "primaryLocator": ".page-wrapper:has-text(\"Transfer to SAIB Account\")",
-      "primary": { "type": "css", "value": ".page-wrapper:has-text(\"Transfer to SAIB Account\")" },
-      "fallbackLocatorChain": [".page-body:has-text(\"From Account\")"],
-      "fallbackChain": [{ "type": "css", "value": ".page-body:has-text(\"From Account\")" }],
+      "primary": {
+        "type": "css",
+        "value": ".page-wrapper:has-text(\"Transfer to SAIB Account\")"
+      },
+      "fallbackLocatorChain": [
+        ".page-body:has-text(\"From Account\")"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".page-body:has-text(\"From Account\")"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "MEDIUM",
@@ -283,9 +414,19 @@
       "elementName": "From Account Selector",
       "locatorType": "CSS",
       "primaryLocator": ".card-group:has-text(\"From Account\") .account-selector",
-      "primary": { "type": "css", "value": ".card-group:has-text(\"From Account\") .account-selector" },
-      "fallbackLocatorChain": ["getByText(/select source account/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/select source account/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".card-group:has-text(\"From Account\") .account-selector"
+      },
+      "fallbackLocatorChain": [
+        "getByText(/select source account/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/select source account/i"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 84,
       "volatility": "MEDIUM",
@@ -305,9 +446,19 @@
       "elementName": "Beneficiary Selector",
       "locatorType": "CSS",
       "primaryLocator": ".beneficiary-selection-list .account-selector",
-      "primary": { "type": "css", "value": ".beneficiary-selection-list .account-selector" },
-      "fallbackLocatorChain": [".card-group:has-text(\"Choose Beneficiary\") .account-selector"],
-      "fallbackChain": [{ "type": "css", "value": ".card-group:has-text(\"Choose Beneficiary\") .account-selector" }],
+      "primary": {
+        "type": "css",
+        "value": ".beneficiary-selection-list .account-selector"
+      },
+      "fallbackLocatorChain": [
+        ".card-group:has-text(\"Choose Beneficiary\") .account-selector"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".card-group:has-text(\"Choose Beneficiary\") .account-selector"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 84,
       "volatility": "MEDIUM",
@@ -327,9 +478,19 @@
       "elementName": "Add New Beneficiary Link",
       "locatorType": "CSS",
       "primaryLocator": ".add-new-link",
-      "primary": { "type": "css", "value": ".add-new-link" },
-      "fallbackLocatorChain": ["getByText(/^Add New$/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/^Add New$/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".add-new-link"
+      },
+      "fallbackLocatorChain": [
+        "getByText(/^Add New$/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/^Add New$/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 88,
       "volatility": "MEDIUM",
@@ -349,9 +510,20 @@
       "elementName": "Active Send Currency",
       "locatorType": "CSS",
       "primaryLocator": ".currency-btn--active",
-      "primary": { "type": "css", "value": ".currency-btn--active" },
-      "fallbackLocatorChain": ["getByRole('button', { name: /^EGP$/i })"],
-      "fallbackChain": [{ "type": "role", "value": "button", "name": "/^EGP$/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".currency-btn--active"
+      },
+      "fallbackLocatorChain": [
+        "getByRole('button', { name: /^EGP$/i })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "button",
+          "name": "/^EGP$/i"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 82,
       "volatility": "MEDIUM",
@@ -371,9 +543,19 @@
       "elementName": "Transfer Amount Input",
       "locatorType": "CSS",
       "primaryLocator": "input[formcontrolname=\"amount\"]",
-      "primary": { "type": "css", "value": "input[formcontrolname=\"amount\"]" },
-      "fallbackLocatorChain": [".amount-input"],
-      "fallbackChain": [{ "type": "css", "value": ".amount-input" }],
+      "primary": {
+        "type": "css",
+        "value": "input[formcontrolname=\"amount\"]"
+      },
+      "fallbackLocatorChain": [
+        ".amount-input"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".amount-input"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 92,
       "volatility": "LOW",
@@ -393,9 +575,20 @@
       "elementName": "Quick Amount Buttons",
       "locatorType": "CSS",
       "primaryLocator": ".quick-amount-btn",
-      "primary": { "type": "css", "value": ".quick-amount-btn" },
-      "fallbackLocatorChain": ["getByRole('button', { name: /\\+EGP/i })"],
-      "fallbackChain": [{ "type": "role", "value": "button", "name": "/\\+EGP/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".quick-amount-btn"
+      },
+      "fallbackLocatorChain": [
+        "getByRole('button', { name: /\\+EGP/i })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "button",
+          "name": "/\\+EGP/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -415,9 +608,20 @@
       "elementName": "Reason of Transfer Selector",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('combobox', { name: /select a reason/i })",
-      "primary": { "type": "role", "value": "combobox", "name": "/select a reason/i" },
-      "fallbackLocatorChain": [".field-group:has-text(\"Reason of Transfer\") [role=\"combobox\"]"],
-      "fallbackChain": [{ "type": "css", "value": ".field-group:has-text(\"Reason of Transfer\") [role=\"combobox\"]" }],
+      "primary": {
+        "type": "role",
+        "value": "combobox",
+        "name": "/select a reason/i"
+      },
+      "fallbackLocatorChain": [
+        ".field-group:has-text(\"Reason of Transfer\") [role=\"combobox\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".field-group:has-text(\"Reason of Transfer\") [role=\"combobox\"]"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 93,
       "volatility": "LOW",
@@ -437,9 +641,20 @@
       "elementName": "Instant Schedule Button",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('button', { name: /^instant$/i })",
-      "primary": { "type": "role", "value": "button", "name": "/^instant$/i" },
-      "fallbackLocatorChain": [".schedule-toggle__btn:has-text(\"INSTANT\")"],
-      "fallbackChain": [{ "type": "css", "value": ".schedule-toggle__btn:has-text(\"INSTANT\")" }],
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/^instant$/i"
+      },
+      "fallbackLocatorChain": [
+        ".schedule-toggle__btn:has-text(\"INSTANT\")"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".schedule-toggle__btn:has-text(\"INSTANT\")"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -459,9 +674,20 @@
       "elementName": "Schedule Transfer Button",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('button', { name: /^schedule$/i })",
-      "primary": { "type": "role", "value": "button", "name": "/^schedule$/i" },
-      "fallbackLocatorChain": [".schedule-toggle__btn:has-text(\"SCHEDULE\")"],
-      "fallbackChain": [{ "type": "css", "value": ".schedule-toggle__btn:has-text(\"SCHEDULE\")" }],
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/^schedule$/i"
+      },
+      "fallbackLocatorChain": [
+        ".schedule-toggle__btn:has-text(\"SCHEDULE\")"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".schedule-toggle__btn:has-text(\"SCHEDULE\")"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -481,9 +707,20 @@
       "elementName": "Recurring Transfer Button",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByRole('button', { name: /^recurring$/i })",
-      "primary": { "type": "role", "value": "button", "name": "/^recurring$/i" },
-      "fallbackLocatorChain": [".schedule-toggle__btn:has-text(\"RECURRING\")"],
-      "fallbackChain": [{ "type": "css", "value": ".schedule-toggle__btn:has-text(\"RECURRING\")" }],
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/^recurring$/i"
+      },
+      "fallbackLocatorChain": [
+        ".schedule-toggle__btn:has-text(\"RECURRING\")"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".schedule-toggle__btn:has-text(\"RECURRING\")"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -503,9 +740,19 @@
       "elementName": "Transfer Summary Card",
       "locatorType": "CSS",
       "primaryLocator": ".summary-card",
-      "primary": { "type": "css", "value": ".summary-card" },
-      "fallbackLocatorChain": [".summary-column"],
-      "fallbackChain": [{ "type": "css", "value": ".summary-column" }],
+      "primary": {
+        "type": "css",
+        "value": ".summary-card"
+      },
+      "fallbackLocatorChain": [
+        ".summary-column"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".summary-column"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 84,
       "volatility": "MEDIUM",
@@ -525,9 +772,19 @@
       "elementName": "Terms and Conditions Checkbox",
       "locatorType": "CSS",
       "primaryLocator": "#anotherSaibTerms",
-      "primary": { "type": "css", "value": "#anotherSaibTerms" },
-      "fallbackLocatorChain": [".p-checkbox-input"],
-      "fallbackChain": [{ "type": "css", "value": ".p-checkbox-input" }],
+      "primary": {
+        "type": "css",
+        "value": "#anotherSaibTerms"
+      },
+      "fallbackLocatorChain": [
+        ".p-checkbox-input"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".p-checkbox-input"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 95,
       "volatility": "LOW",
@@ -547,9 +804,20 @@
       "elementName": "Continue Button",
       "locatorType": "CSS",
       "primaryLocator": ".continue-btn",
-      "primary": { "type": "css", "value": ".continue-btn" },
-      "fallbackLocatorChain": ["getByRole('button', { name: /^continue$/i })"],
-      "fallbackChain": [{ "type": "role", "value": "button", "name": "/^continue$/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".continue-btn"
+      },
+      "fallbackLocatorChain": [
+        "getByRole('button', { name: /^continue$/i })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "button",
+          "name": "/^continue$/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "MEDIUM",
@@ -569,9 +837,20 @@
       "elementName": "Cancel Transfer Button",
       "locatorType": "CSS",
       "primaryLocator": ".cancel-btn",
-      "primary": { "type": "css", "value": ".cancel-btn" },
-      "fallbackLocatorChain": ["getByRole('button', { name: /cancel transfer/i })"],
-      "fallbackChain": [{ "type": "role", "value": "button", "name": "/cancel transfer/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".cancel-btn"
+      },
+      "fallbackLocatorChain": [
+        "getByRole('button', { name: /cancel transfer/i })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "button",
+          "name": "/cancel transfer/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "MEDIUM",
@@ -591,9 +870,19 @@
       "elementName": "Add New Beneficiary Dialog",
       "locatorType": "CSS",
       "primaryLocator": ".p-dialog:has-text(\"Add New Beneficiary\")",
-      "primary": { "type": "css", "value": ".p-dialog:has-text(\"Add New Beneficiary\")" },
-      "fallbackLocatorChain": ["getByText(/Add New Beneficiary/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/Add New Beneficiary/i" }],
+      "primary": {
+        "type": "css",
+        "value": ".p-dialog:has-text(\"Add New Beneficiary\")"
+      },
+      "fallbackLocatorChain": [
+        "getByText(/Add New Beneficiary/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/Add New Beneficiary/i"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 86,
       "volatility": "MEDIUM",
@@ -613,9 +902,20 @@
       "elementName": "Active SMS Logs Page Heading",
       "locatorType": "TEXT",
       "primaryLocator": "getByText('Active SMS Logs', { exact: true })",
-      "primary": { "type": "text", "value": "Active SMS Logs", "exact": true },
-      "fallbackLocatorChain": ["getByText(/Active SMS Logs/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/Active SMS Logs/i" }],
+      "primary": {
+        "type": "text",
+        "value": "Active SMS Logs",
+        "exact": true
+      },
+      "fallbackLocatorChain": [
+        "getByText(/Active SMS Logs/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/Active SMS Logs/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -635,9 +935,19 @@
       "elementName": "First Record Row Checkbox",
       "locatorType": "ARIA",
       "primaryLocator": "[aria-label=\"Select row 2\"]",
-      "primary": { "type": "css", "value": "[aria-label=\"Select row 2\"]" },
-      "fallbackLocatorChain": ["[aria-label^=\"Select row 2\"]"],
-      "fallbackChain": [{ "type": "css", "value": "[aria-label^=\"Select row 2\"]" }],
+      "primary": {
+        "type": "css",
+        "value": "[aria-label=\"Select row 2\"]"
+      },
+      "fallbackLocatorChain": [
+        "[aria-label^=\"Select row 2\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "[aria-label^=\"Select row 2\"]"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 88,
       "volatility": "LOW",
@@ -657,9 +967,20 @@
       "elementName": "Area Switcher Button",
       "locatorType": "CSS",
       "primaryLocator": "#areaSwitcherId",
-      "primary": { "type": "css", "value": "#areaSwitcherId" },
-      "fallbackLocatorChain": ["getByRole('button', { name: /change area/i })"],
-      "fallbackChain": [{ "type": "role", "value": "button", "name": "/change area/i" }],
+      "primary": {
+        "type": "css",
+        "value": "#areaSwitcherId"
+      },
+      "fallbackLocatorChain": [
+        "getByRole('button', { name: /change area/i })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "button",
+          "name": "/change area/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 88,
       "volatility": "LOW",
@@ -679,9 +1000,20 @@
       "elementName": "Service Request Area Menu Item",
       "locatorType": "ARIA",
       "primaryLocator": "[aria-label=\"Service Request (change area)\"]",
-      "primary": { "type": "css", "value": "[aria-label=\"Service Request (change area)\"]" },
-      "fallbackLocatorChain": ["getByRole('menuitem', { name: /service request/i })"],
-      "fallbackChain": [{ "type": "role", "value": "menuitem", "name": "/service request/i" }],
+      "primary": {
+        "type": "css",
+        "value": "[aria-label=\"Service Request (change area)\"]"
+      },
+      "fallbackLocatorChain": [
+        "getByRole('menuitem', { name: /service request/i })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "menuitem",
+          "name": "/service request/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 92,
       "volatility": "LOW",
@@ -701,9 +1033,19 @@
       "elementName": "Service Requests Sitemap Entity Link",
       "locatorType": "CSS",
       "primaryLocator": "[data-id=\"sitemap-entity-NewSubArea_4cbab3938\"]",
-      "primary": { "type": "css", "value": "[data-id=\"sitemap-entity-NewSubArea_4cbab3938\"]" },
-      "fallbackLocatorChain": ["[data-id*=\"NewSubArea_4cbab3938\"]"],
-      "fallbackChain": [{ "type": "css", "value": "[data-id*=\"NewSubArea_4cbab3938\"]" }],
+      "primary": {
+        "type": "css",
+        "value": "[data-id=\"sitemap-entity-NewSubArea_4cbab3938\"]"
+      },
+      "fallbackLocatorChain": [
+        "[data-id*=\"NewSubArea_4cbab3938\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "[data-id*=\"NewSubArea_4cbab3938\"]"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -723,9 +1065,20 @@
       "elementName": "Request Field Label",
       "locatorType": "ACCESSIBILITY",
       "primaryLocator": "getByLabel('Request', { exact: true })",
-      "primary": { "type": "label", "value": "Request", "exact": true },
-      "fallbackLocatorChain": ["[aria-label=\"Request\"]"],
-      "fallbackChain": [{ "type": "css", "value": "[aria-label=\"Request\"]" }],
+      "primary": {
+        "type": "label",
+        "value": "Request",
+        "exact": true
+      },
+      "fallbackLocatorChain": [
+        "[aria-label=\"Request\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "[aria-label=\"Request\"]"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -745,9 +1098,20 @@
       "elementName": "Status Reason Field Label",
       "locatorType": "TEXT",
       "primaryLocator": "getByText('Status Reason', { exact: true })",
-      "primary": { "type": "text", "value": "Status Reason", "exact": true },
-      "fallbackLocatorChain": ["getByText(/Status Reason/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/Status Reason/i" }],
+      "primary": {
+        "type": "text",
+        "value": "Status Reason",
+        "exact": true
+      },
+      "fallbackLocatorChain": [
+        "getByText(/Status Reason/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/Status Reason/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 88,
       "volatility": "LOW",
@@ -767,9 +1131,20 @@
       "elementName": "Submitted Status Value",
       "locatorType": "ARIA",
       "primaryLocator": "[aria-label=\"Submitted\"]",
-      "primary": { "type": "css", "value": "[aria-label=\"Submitted\"]" },
-      "fallbackLocatorChain": ["getByText('Submitted', { exact: true })"],
-      "fallbackChain": [{ "type": "text", "value": "Submitted", "exact": true }],
+      "primary": {
+        "type": "css",
+        "value": "[aria-label=\"Submitted\"]"
+      },
+      "fallbackLocatorChain": [
+        "getByText('Submitted', { exact: true })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "Submitted",
+          "exact": true
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 88,
       "volatility": "LOW",
@@ -789,9 +1164,19 @@
       "elementName": "CIF Field Label",
       "locatorType": "TEXT",
       "primaryLocator": "getByText(/^CIF$/)",
-      "primary": { "type": "text", "value": "/^CIF$/" },
-      "fallbackLocatorChain": ["getByText(/CIF/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/CIF/i" }],
+      "primary": {
+        "type": "text",
+        "value": "/^CIF$/"
+      },
+      "fallbackLocatorChain": [
+        "getByText(/CIF/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/CIF/i"
+        }
+      ],
       "confidence": "MEDIUM",
       "confidenceScore": 82,
       "volatility": "LOW",
@@ -811,9 +1196,20 @@
       "elementName": "Message Details Section Heading",
       "locatorType": "TEXT",
       "primaryLocator": "getByText('Message Details', { exact: true })",
-      "primary": { "type": "text", "value": "Message Details", "exact": true },
-      "fallbackLocatorChain": ["getByText(/Message Details/i)"],
-      "fallbackChain": [{ "type": "text", "value": "/Message Details/i" }],
+      "primary": {
+        "type": "text",
+        "value": "Message Details",
+        "exact": true
+      },
+      "fallbackLocatorChain": [
+        "getByText(/Message Details/i)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "/Message Details/i"
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 90,
       "volatility": "LOW",
@@ -832,22 +1228,21 @@
       "screenName": "Portal Login Page — Active Session Dialog",
       "elementName": "Active Session Confirmation Dialog",
       "locatorType": "ACCESSIBILITY",
-      "primaryLocator": "getByRole('dialog').filter({ hasText: /you have an active session/i }).last()",
-      "primary": { "type": "role", "value": "dialog" },
-      "fallbackLocatorChain": [
-        "getByRole('alertdialog').filter({ hasText: /you have an active session/i }).last()"
-      ],
-      "fallbackChain": [
-        { "type": "role", "value": "alertdialog" }
-      ],
+      "primaryLocator": "getByRole('alertdialog').filter({ hasText: /you have an active session/i }).last()",
+      "primary": {
+        "type": "role",
+        "value": "alertdialog"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
       "confidence": "HIGH",
-      "confidenceScore": 92,
+      "confidenceScore": 95,
       "volatility": "LOW",
-      "discoverySource": "Self-Healing Agent — screenshot from TC-CROSS-001 FAILURE-002. Portal renders this as role='dialog' (PrimeNG p-confirmDialog), not alertdialog. Handler was missing the dialog for 30s before timeout.",
+      "discoverySource": "ARIA snapshot from live probe 2026-07-09: dialog renders as role='alertdialog' named 'Confirmation' with Cancel/Proceed buttons; an empty sibling alertdialog also exists, so the text filter + .last() are required. The 2026-07-05 heal to role='dialog' was incorrect.",
       "uniqueness": "CONTEXTUAL",
-      "lastVerifiedDate": "2026-07-05",
-      "verificationCount": 0,
-      "successCount": 0,
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 1,
+      "successCount": 1,
       "failureCount": 1,
       "repositoryStatus": "ACTIVE",
       "healingMetadata": [
@@ -859,35 +1254,57 @@
           "rootCause": "PrimeNG p-confirmDialog renders as role='dialog', not role='alertdialog'",
           "recoveryStrategy": "REDISCOVER_LOCATOR",
           "healingConfidence": "HIGH"
+        },
+        {
+          "healedOn": "2026-07-09",
+          "failureType": "AUT_LOCATOR_NOT_FOUND",
+          "oldLocator": "getByRole('dialog').filter({ hasText: /you have an active session/i }).last()",
+          "newLocator": "getByRole('alertdialog').filter({ hasText: /you have an active session/i }).last()",
+          "rootCause": "Live ARIA snapshot shows role='alertdialog' — the 2026-07-05 rediscovery picked the wrong role and the old .or() chain masked it",
+          "recoveryStrategy": "REDISCOVER_LOCATOR",
+          "healingConfidence": "HIGH"
         }
       ],
       "originalLocatorHistory": [
-        { "locator": "getByRole('alertdialog').filter({ hasText: /you have an active session/i })", "removedOn": "2026-07-05", "reason": "WRONG_ARIA_ROLE" }
+        {
+          "locator": "getByRole('alertdialog').filter({ hasText: /you have an active session/i })",
+          "removedOn": "2026-07-05",
+          "reason": "WRONG_ARIA_ROLE (incorrect diagnosis, reverted 2026-07-09)"
+        },
+        {
+          "locator": "getByRole('dialog').filter({ hasText: /you have an active session/i }).last()",
+          "removedOn": "2026-07-09",
+          "reason": "ZERO_MATCHES — dialog is role='alertdialog' per ARIA snapshot"
+        }
       ]
     },
     {
       "elementId": "PORTAL.LOGIN.SIGN_IN_BUTTON",
       "screenName": "Portal Login Page",
       "elementName": "Sign In Submit Button",
-      "locatorType": "ACCESSIBILITY",
-      "primaryLocator": "getByRole('button', { name: 'Sign In', exact: true })",
-      "primary": { "type": "role", "value": "button", "name": "Sign In", "exact": true },
+      "locatorType": "CSS",
+      "primaryLocator": "locator('button.login-submit-button')",
+      "primary": {
+        "type": "css",
+        "value": "button.login-submit-button"
+      },
       "fallbackLocatorChain": [
-        "locator('button.login-submit-button')",
         "locator('button.ds-auth-confirm-button')"
       ],
       "fallbackChain": [
-        { "type": "css", "value": "button.login-submit-button" },
-        { "type": "css", "value": "button.ds-auth-confirm-button" }
+        {
+          "type": "css",
+          "value": "button.ds-auth-confirm-button"
+        }
       ],
       "confidence": "HIGH",
       "confidenceScore": 96,
       "volatility": "LOW",
-      "discoverySource": "Self-Healing Agent — DOM snapshot from TC-CROSS-001 failure. Previous /login|sign in/i regex matched password-toggle aria-label='loginPage.showPassword'. Exact 'Sign In' text is unique and stable.",
+      "discoverySource": "Live DOM probe 2026-07-09: getByRole('button', { name: 'Sign In', exact: true }) matched 0 elements — the portal exposes i18n keys as accessible names. button.login-submit-button matched exactly 1.",
       "uniqueness": "UNIQUE",
-      "lastVerifiedDate": "2026-07-05",
-      "verificationCount": 0,
-      "successCount": 0,
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 1,
+      "successCount": 1,
       "failureCount": 1,
       "repositoryStatus": "ACTIVE",
       "healingMetadata": [
@@ -899,10 +1316,28 @@
           "rootCause": "Regex /login|sign in/i matched password-toggle button aria-label containing 'login'",
           "recoveryStrategy": "USE_CONTEXTUAL_LOCATOR",
           "healingConfidence": "HIGH"
+        },
+        {
+          "healedOn": "2026-07-09",
+          "failureType": "AUT_LOCATOR_NOT_FOUND",
+          "oldLocator": "getByRole('button', { name: 'Sign In', exact: true })",
+          "newLocator": "locator('button.login-submit-button')",
+          "rootCause": "Live probe counted 0 matches for the role locator — button's accessible name is an i18n key, not the rendered 'Sign In' text",
+          "recoveryStrategy": "REDISCOVER_LOCATOR",
+          "healingConfidence": "HIGH"
         }
       ],
       "originalLocatorHistory": [
-        { "locator": "getByRole('button', { name: /login|sign in/i })", "removedOn": "2026-07-05", "reason": "MULTIPLE_MATCHES" }
+        {
+          "locator": "getByRole('button', { name: /login|sign in/i })",
+          "removedOn": "2026-07-05",
+          "reason": "MULTIPLE_MATCHES"
+        },
+        {
+          "locator": "getByRole('button', { name: 'Sign In', exact: true })",
+          "removedOn": "2026-07-09",
+          "reason": "ZERO_MATCHES — accessible name is an i18n key"
+        }
       ]
     },
     {
@@ -911,9 +1346,20 @@
       "elementName": "Completed Status Reason Value",
       "locatorType": "ARIA",
       "primaryLocator": "[aria-label=\"Completed\"]",
-      "primary": { "type": "css", "value": "[aria-label=\"Completed\"]" },
-      "fallbackLocatorChain": ["getByText('Completed', { exact: true })"],
-      "fallbackChain": [{ "type": "text", "value": "Completed", "exact": true }],
+      "primary": {
+        "type": "css",
+        "value": "[aria-label=\"Completed\"]"
+      },
+      "fallbackLocatorChain": [
+        "getByText('Completed', { exact: true })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "Completed",
+          "exact": true
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 88,
       "volatility": "LOW",
@@ -933,9 +1379,20 @@
       "elementName": "Transfer Type Between My Accounts Value",
       "locatorType": "CSS",
       "primaryLocator": "[data-id*=\"cis_transfertype\"][title=\"Between My Accounts\"]",
-      "primary": { "type": "css", "value": "[data-id*=\"cis_transfertype\"][title=\"Between My Accounts\"]" },
-      "fallbackLocatorChain": ["getByText('Between My Accounts', { exact: true })"],
-      "fallbackChain": [{ "type": "text", "value": "Between My Accounts", "exact": true }],
+      "primary": {
+        "type": "css",
+        "value": "[data-id*=\"cis_transfertype\"][title=\"Between My Accounts\"]"
+      },
+      "fallbackLocatorChain": [
+        "getByText('Between My Accounts', { exact: true })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "text",
+          "value": "Between My Accounts",
+          "exact": true
+        }
+      ],
       "confidence": "HIGH",
       "confidenceScore": 95,
       "volatility": "LOW",
@@ -947,11 +1404,393 @@
       "failureCount": 0,
       "repositoryStatus": "ACTIVE",
       "originalLocatorHistory": [
-        { "locator": "getByText('Between My Accounts', { exact: true })", "removedOn": "2026-07-06", "reason": "STRICT_MODE_VIOLATION — matches both cis_transferfamily and cis_transfertype lookup tags on the same form" }
+        {
+          "locator": "getByText('Between My Accounts', { exact: true })",
+          "removedOn": "2026-07-06",
+          "reason": "STRICT_MODE_VIOLATION — matches both cis_transferfamily and cis_transfertype lookup tags on the same form"
+        }
       ],
       "healingMetadata": [
-        { "healedOn": "2026-07-06", "previousLocator": "getByText('Between My Accounts', { exact: true })", "newLocator": "[data-id*=\"cis_transfertype\"][title=\"Between My Accounts\"]", "reason": "Strict mode violation: two elements matched the text — Transfer Family and Transfer Type both show 'Between My Accounts'. Scoped to cis_transfertype data-id." }
+        {
+          "healedOn": "2026-07-06",
+          "previousLocator": "getByText('Between My Accounts', { exact: true })",
+          "newLocator": "[data-id*=\"cis_transfertype\"][title=\"Between My Accounts\"]",
+          "reason": "Strict mode violation: two elements matched the text — Transfer Family and Transfer Type both show 'Between My Accounts'. Scoped to cis_transfertype data-id."
+        }
       ]
+    },
+    {
+      "elementId": "PORTAL.LOGIN.USERNAME_INPUT",
+      "screenName": "Portal Login Page",
+      "elementName": "Username Input",
+      "locatorType": "ACCESSIBILITY",
+      "primaryLocator": "getByLabel(/username/i)",
+      "primary": {
+        "type": "label",
+        "value": "/username/i"
+      },
+      "fallbackLocatorChain": [
+        "input.ds-auth-input[type=\"text\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "input.ds-auth-input[type=\"text\"]"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 95,
+      "volatility": "LOW",
+      "discoverySource": "Live DOM probe 2026-07-09: getByLabel matched exactly 1 (label element 'Username').",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.LOGIN.PASSWORD_INPUT",
+      "screenName": "Portal Login Page",
+      "elementName": "Password Input",
+      "locatorType": "CSS",
+      "primaryLocator": "input[type=\"password\"]",
+      "primary": {
+        "type": "css",
+        "value": "input[type=\"password\"]"
+      },
+      "fallbackLocatorChain": [
+        "getByLabel('Password', { exact: true })"
+      ],
+      "fallbackChain": [
+        {
+          "type": "label",
+          "value": "Password",
+          "exact": true
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 96,
+      "volatility": "LOW",
+      "discoverySource": "Live DOM probe 2026-07-09: input[type=password] matched exactly 1; element carries aria-label='Password'.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.LOGIN.BLOCKING_OVERLAY",
+      "screenName": "Portal Login Page",
+      "elementName": "Blocking UI Overlay",
+      "locatorType": "CSS",
+      "primaryLocator": ".p-blockui, .p-overlay-mask",
+      "primary": {
+        "type": "css",
+        "value": ".p-blockui, .p-overlay-mask"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "PrimeNG block-UI classes; exercised by every passing login run.",
+      "uniqueness": "COLLECTION",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.SAIB_SELECTED_BENEFICIARY",
+      "screenName": "Transfer to SAIB Account",
+      "elementName": "Selected Beneficiary Card",
+      "locatorType": "CSS",
+      "primaryLocator": ".beneficiary-selection-list .account-selector.selected",
+      "primary": {
+        "type": "css",
+        "value": ".beneficiary-selection-list .account-selector.selected"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "MEDIUM",
+      "discoverySource": "Exercised by SAIB-181x beneficiary selection passing runs.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-08",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.COMMON.DIALOG_MASK",
+      "screenName": "Portal Shell",
+      "elementName": "PrimeNG Dialog Mask",
+      "locatorType": "CSS",
+      "primaryLocator": ".p-dialog-mask",
+      "primary": {
+        "type": "css",
+        "value": ".p-dialog-mask"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 94,
+      "volatility": "LOW",
+      "discoverySource": "PrimeNG dialog mask class; exercised by every dialog-dismissal wait in passing runs.",
+      "uniqueness": "COLLECTION",
+      "lastVerifiedDate": "2026-07-08",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.COMMON.BLOCK_UI",
+      "screenName": "Portal Shell",
+      "elementName": "PrimeNG Block-UI Overlay",
+      "locatorType": "CSS",
+      "primaryLocator": ".p-blockui",
+      "primary": {
+        "type": "css",
+        "value": ".p-blockui"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 94,
+      "volatility": "LOW",
+      "discoverySource": "PrimeNG block-UI class; exercised by transfer-page loading waits in passing runs.",
+      "uniqueness": "COLLECTION",
+      "lastVerifiedDate": "2026-07-08",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_TO_ACCOUNT_PLACEHOLDER",
+      "screenName": "Transfer Between My Accounts",
+      "elementName": "To Account 'Select Account' Placeholder",
+      "locatorType": "TEXT",
+      "primaryLocator": "getByText('Select Account', { exact: true })",
+      "primary": {
+        "type": "text",
+        "value": "Select Account",
+        "exact": true
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 92,
+      "volatility": "LOW",
+      "discoverySource": "Exercised by TC-CROSS-001 and TC-BMA suite passing runs (last green 2026-07-08). From account is pre-selected, so only the To selector shows this placeholder. Re-verified by live DOM probe 2026-07-09 (exactly 1 match; picker spans = one per account).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 2,
+      "successCount": 2,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_FROM_ACCOUNT_CARD_NUMBER",
+      "screenName": "Transfer Between My Accounts",
+      "elementName": "From Account Card Number Span",
+      "locatorType": "CSS",
+      "primaryLocator": "span.bma-account-number",
+      "primary": {
+        "type": "css",
+        "value": "span.bma-account-number"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 92,
+      "volatility": "LOW",
+      "discoverySource": "Live-DOM discovery documented in TransferBetweenOwnAccountsPage; exercised by TC-CROSS-001 passing run 2026-07-08. Clicking it opens the From picker dialog. Re-verified by live DOM probe 2026-07-09 (exactly 1 match; picker spans = one per account).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 2,
+      "successCount": 2,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_PICKER_CARD_NUMBER",
+      "screenName": "Transfer Between My Accounts — Account Picker Dialog",
+      "elementName": "Picker Account Card Number Span",
+      "locatorType": "CSS",
+      "primaryLocator": "span.account-card-number",
+      "primary": {
+        "type": "css",
+        "value": "span.account-card-number"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 92,
+      "volatility": "LOW",
+      "discoverySource": "Live-DOM discovery documented in TransferBetweenOwnAccountsPage; exercised by TC-CROSS-001 passing run 2026-07-08. Re-verified by live DOM probe 2026-07-09 (exactly 1 match; picker spans = one per account).",
+      "uniqueness": "COLLECTION",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 2,
+      "successCount": 2,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_FROM_ACCOUNT_INFO",
+      "screenName": "Transfer Between My Accounts",
+      "elementName": "Account Info Card (holds type + number + currency + balance)",
+      "locatorType": "CSS",
+      "primaryLocator": "div.bma-account-info",
+      "primary": {
+        "type": "css",
+        "value": "div.bma-account-info"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 94,
+      "volatility": "LOW",
+      "discoverySource": "Live DOM probe 2026-07-09: div.bma-account-info innerText = 'SAVING ACCOUNTS 3M INTR 0220123456910500 EGP 184,750.62'. To-field renders a sibling info card with placeholder text, so consumers filter by account-number pattern.",
+      "uniqueness": "COLLECTION",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_AMOUNT_INPUT",
+      "screenName": "Transfer Between My Accounts",
+      "elementName": "Transfer Amount Input",
+      "locatorType": "CSS",
+      "primaryLocator": "input.transfer-amount-input",
+      "primary": {
+        "type": "css",
+        "value": "input.transfer-amount-input"
+      },
+      "fallbackLocatorChain": [
+        "input[placeholder=\"0.00\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "input[placeholder=\"0.00\"]"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 92,
+      "volatility": "LOW",
+      "discoverySource": "Class discovered on live DOM (former primary in page object); exercised by TC-CROSS-001 passing run 2026-07-08. Re-verified by live DOM probe 2026-07-09 (exactly 1 match; picker spans = one per account).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 2,
+      "successCount": 2,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_CONFIRM_BUTTON",
+      "screenName": "Transfer Between My Accounts",
+      "elementName": "Main Form Confirm Button",
+      "locatorType": "CSS",
+      "primaryLocator": ".transfer-main-confirm-btn",
+      "primary": {
+        "type": "css",
+        "value": ".transfer-main-confirm-btn"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 92,
+      "volatility": "LOW",
+      "discoverySource": "Class discovered on live DOM (former primary in page object); exercised by TC-CROSS-001 passing run 2026-07-08. Re-verified by live DOM probe 2026-07-09 (exactly 1 match; picker spans = one per account).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 2,
+      "successCount": 2,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_SUCCESS_BADGE",
+      "screenName": "Transfer Between My Accounts — Success Dialog",
+      "elementName": "Transfer Success Badge",
+      "locatorType": "CSS",
+      "primaryLocator": "span.success-badge",
+      "primary": {
+        "type": "css",
+        "value": "span.success-badge"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 94,
+      "volatility": "LOW",
+      "discoverySource": "Confirmed success indicator (strict-mode analysis in page object removed the broad [class*=success] fallback); exercised by TC-CROSS-001 passing run 2026-07-08.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-08",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_REVIEW_ACCOUNT_NUMBER",
+      "screenName": "Transfer Between My Accounts — Summary",
+      "elementName": "Review From-Account Number Span",
+      "locatorType": "CSS",
+      "primaryLocator": "span.review-account-number",
+      "primary": {
+        "type": "css",
+        "value": "span.review-account-number"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 92,
+      "volatility": "LOW",
+      "discoverySource": "Strict-mode-safe summary scope documented in page object; exercised by TC-CROSS-001 passing run 2026-07-08.",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-07-08",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     }
   ],
   "blockedDiscovery": [
