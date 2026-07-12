@@ -47,15 +47,16 @@ export default defineConfig({
 
     // Maximize browser windows (skill 13, mandatory rule).
     // viewport: null disables Playwright's forced 1280×720 clamp so the page fills
-    // the whole window. --start-maximized opens a maximized window in headed runs;
-    // --window-size=1920,1080 is the headless/CI fallback (where --start-maximized is a
-    // no-op) — it also stops the 800×600 default collapsing the portal navbar into a
-    // hamburger menu, which hides the nav links. Any context a test opens must repeat
-    // viewport: null so secondary windows (e.g. the CRM window) maximize too.
+    // the whole window. --start-maximized requests a maximized headed window, but it
+    // is unreliable and does NOT reach windows opened by browser.newContext(), so tests
+    // additionally call maximizeWindow() (CDP Browser.setWindowBounds) per window.
+    // NOTE: --window-size must NOT live here — Chromium honours it over --start-maximized
+    // and the window opens at that fixed size instead of maximizing. It belongs only on
+    // the headless portal project below, as the CI fallback.
     viewport: null,
     launchOptions: {
       timeout: 30_000,
-      args: ['--start-maximized', '--window-size=1920,1080'],
+      args: ['--start-maximized'],
     },
   },
 
@@ -64,10 +65,17 @@ export default defineConfig({
       // Portal tests — headless, 60 s default timeout (from root config).
       // Explicitly excludes CRM specs so the browser never switches
       // headless mode mid-run, which would orphan the previous instance.
+      // Headless has no window manager, so --start-maximized is a no-op; the
+      // 1920×1080 fixed size is the CI fallback (also stops the 800×600 default
+      // collapsing the portal navbar into a hamburger, which hides nav links).
       name: 'chromium',
       testIgnore: 'crm/**',
       use: {
         browserName: 'chromium',
+        launchOptions: {
+          timeout: 30_000,
+          args: ['--window-size=1920,1080'],
+        },
       },
     },
     {

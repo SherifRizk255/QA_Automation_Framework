@@ -6,6 +6,7 @@ import { DashboardPage } from '../../../pages/portal/DashboardPage';
 import { TransferBetweenOwnAccountsPage } from '../../../pages/portal/TransferBetweenOwnAccountsPage';
 import { BetweenMyAccountsTransferLogPage } from '../../../pages/crm/BetweenMyAccountsTransferLogPage';
 import { ENV, ROUTES, TEST_DATA } from '../../../config/resources';
+import { maximizeWindow, logWindowSize } from '../../../utils/browserWindow';
 
 // All URLs and correlation data come from the central resource file — skill 24.
 const CRM_BETWEEN_MY_ACCOUNTS_LOG_URL = ROUTES.crm.betweenMyAccountsTransferLog;
@@ -29,6 +30,9 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
 
     // ── Portal: Login ─────────────────────────────────────────────────────
     await loginPage.goto();
+    // Maximize the portal window (skill 13 maximize rule — CDP is the reliable path).
+    await maximizeWindow(page);
+    await logWindowSize('portal', page);
     await loginPage.login(
       ENV.portal.username,
       ENV.portal.password
@@ -74,6 +78,12 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
       ignoreHTTPSErrors: true,
     });
     const crmTab = await crmContext.newPage();
+    // Maximize the second (CRM) window — newContext windows never receive
+    // --start-maximized, so CDP is required here (skill 13 maximize rule).
+    // Log before goto: window dimensions are already valid on the blank page,
+    // so the maximize is proven even if the CRM host is transiently unreachable.
+    await maximizeWindow(crmTab);
+    await logWindowSize('crm', crmTab);
     await crmTab.goto(CRM_BETWEEN_MY_ACCOUNTS_LOG_URL, { waitUntil: 'domcontentloaded' });
 
     const logPage = new BetweenMyAccountsTransferLogPage(crmTab);

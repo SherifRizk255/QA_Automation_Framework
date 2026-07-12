@@ -262,16 +262,38 @@ Self-healing is NOT permitted for:
 
 ## Maximize browser windows (mandatory for every test)
 
-Every test must start with a maximized browser window.
+Every test must start with a maximized browser window. Two mechanisms are needed,
+because config settings alone do NOT reliably maximize:
 
-* The base config (`playwright.config.ts`) uses `headless: false`, `viewport: null`, and `launchOptions.args: ['--start-maximized']`.
-* Any browser context/window a test opens (portal, CRM, or any secondary window) MUST be created with `viewport: null` so it fills the maximized window.
-* In cross-system tests that open both the portal and CRM, both windows must be maximized — apply `viewport: null` to each context.
-* For headless/CI runs where `--start-maximized` has no effect, use a large fixed viewport (`{ width: 1920, height: 1080 }`) as the fallback. In this repo that is supplied by `launchOptions.args: ['--window-size=1920,1080']`, so a headless page with `viewport: null` fills 1920×1080.
-* Remove any leftover fixed `viewport` in the config or in context creation that would override the maximize (keep only the headless fallback).
-* Reference implementation: `tests/crm/cross-system/transfer-between-accounts-crm-log.spec.ts` — the portal uses the default `page` fixture (maximized via config), and the CRM `browser.newContext({ viewport: null, httpCredentials, ... })` maximizes the second window.
+1. **`viewport: null` on EVERY context — config viewport does not reach manual contexts.**
+   `use.viewport: null` in `playwright.config.ts` only affects the auto-created `page`
+   fixture. Any `browser.newContext(...)` a test creates itself gets Playwright's default
+   1280×720 viewport unless you pass `{ viewport: null }` to that call directly. In
+   cross-system tests the CRM (second) context is hand-made — it MUST pass `viewport: null`,
+   or its page stays clamped to 1280×720 even inside a maximized window.
 
-Repo note: the portal-only `chromium` project runs headless (fast CI) and relies on the 1920×1080 fallback; the `crm` project (which owns the cross-system reference spec) runs `headless: false` and truly maximizes. Whichever mode a project runs in, every context it opens still passes `viewport: null`.
+2. **CDP `Browser.setWindowBounds` per window — `--start-maximized` is unreliable.**
+   `--start-maximized` only affects the FIRST window (never a `newContext` window) and is
+   silently defeated when `--window-size` is also present (Chromium honours the fixed size).
+   Call a `maximizeWindow(page)` helper (`utils/browserWindow.ts`) right after each window
+   opens; it uses CDP `Browser.getWindowForTarget` + `Browser.setWindowBounds({ windowState:
+   'maximized' })` and is a safe no-op in headless. Apply it to the portal window AND the
+   CRM window.
+
+Rules:
+
+* The `crm` project runs `headless: false` (CDP maximize needs a real window manager).
+* Do NOT put `--window-size` on any headed project — it overrides `--start-maximized`.
+  `--window-size=1920,1080` belongs ONLY on the headless portal project as the CI fallback
+  (headless has no window manager, so CDP maximize is a no-op there and the fixed size also
+  stops the 800×600 default collapsing the portal navbar into a hamburger).
+* Remove any leftover fixed `viewport` / `devices[...]` spread that would override the maximize.
+* Prove it when in doubt: `logWindowSize()` (gated by `LOG_WINDOW_SIZE`) logs
+  `outerW/outerH` vs `screen.availWidth/availHeight`; a window is maximized when they match.
+* Reference implementation: `tests/crm/cross-system/transfer-between-accounts-crm-log.spec.ts`
+  — portal uses the default `page` fixture + `maximizeWindow(page)`; CRM uses
+  `browser.newContext({ viewport: null, httpCredentials, ... })` + `maximizeWindow(crmTab)`.
+  Verified 2026-07-12: both windows logged 1536×816 == screen 1536×816.
 
 ---
 
