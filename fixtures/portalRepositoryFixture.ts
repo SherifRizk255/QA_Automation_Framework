@@ -2,7 +2,7 @@ import { test as base } from '@playwright/test';
 import { ENV } from '../config/resources';
 import { LoginPage } from '../pages/portal/LoginPage.js';
 import { DashboardPage } from '../pages/portal/DashboardPage.js';
-import { TransferRepositoryPage } from '../pages/portal/TransferRepositoryPage';
+import { TransferRepositoryPage } from '../pages/transfers/portal/TransferRepositoryPage';
 
 type PortalRepositoryFixtures = {
   loginPage: LoginPage;

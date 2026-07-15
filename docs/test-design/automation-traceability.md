@@ -19,7 +19,7 @@ Credentials Login
 ↓
 SAIB-0209
 ↓
-tests/portal/credentials-login.spec.ts
+tests/authentication/portal/credentials-login.spec.ts
 ↓
 pages/portal/LoginPage.js
 
@@ -34,7 +34,7 @@ Credentials Login
 ↓
 SAIB-0217 / SAIB-0218
 ↓
-tests/portal/credentials-login.spec.ts
+tests/authentication/portal/credentials-login.spec.ts
 ↓
 pages/portal/LoginPage.js
 
@@ -56,7 +56,7 @@ Account Summary coverage
 ↓
 AM-TC-001 / AM-TC-002 / AM-TC-003
 ↓
-tests/portal/accounts/accounts-summary.spec.ts
+tests/accounts/portal/accounts-summary.spec.ts
 ↓
 pages/portal/accounts/AccountsSummaryPage.ts
 
@@ -71,7 +71,7 @@ Recent Transactions coverage
 ↓
 AM-TC-009 / AM-TC-010
 ↓
-tests/portal/accounts/transaction-history.spec.ts
+tests/accounts/portal/transaction-history.spec.ts
 ↓
 pages/portal/accounts/TransactionHistoryPage.ts
 
@@ -116,7 +116,7 @@ To another SAIB account
 â†“
 SAIB-1803 ... SAIB-1820
 â†“
-tests/portal/transfers/local-transfer-to-saib-account.spec.ts
+tests/transfers/portal/local-transfer-to-saib-account.spec.ts
 â†“
 pages/portal/LocalTransferToSaibAccountPage.ts
 

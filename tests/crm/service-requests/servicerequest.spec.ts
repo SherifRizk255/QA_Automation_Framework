@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { test } from '@playwright/test';
 import { setupNtlmAuth } from '../../helpers/ntlm.js';
-import { ServiceRequestsPage } from '../../../pages/crm/ServiceRequestsPage';
+import { ServiceRequestsPage } from '../../../pages/crm/entities/service-requests/ServiceRequestsPage';
 
 
 // npx playwright test servicerequest.spec.ts --project=crm

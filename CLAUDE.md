@@ -44,6 +44,7 @@ All skills live in `docs/ai-workflow/`. Match the request to the row(s) below:
 | Adding a URL/route/test-data value, or anything about `config/resources.ts` / the locator repository | 24-centralized-resource-standard |
 | The Cubic HTML report, execution reporting, failure classification (F1–F5) | 25-execution-report-standard |
 | ANY code creation or modification (always, in addition to above) | 23-clean-code-standard, 24-centralized-resource-standard |
+| Building, refactoring, or validating cross-system workflows (Portal → CRM, Portal → ERP, ESS → CRM, Mobile → CRM, etc.), implementing or extending `CrossSystemCrmValidator`, designing cross-system validation architecture, or validating business data across multiple enterprise systems | 27-cross-system-validation-framework-standard |
 
 Pipeline order, approval gates, and the stage↔file mapping are authoritative in `00-master-workflow.md`.
 

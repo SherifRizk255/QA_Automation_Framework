@@ -6,7 +6,7 @@
   "scripts": {
     "test:all": "playwright test",
     "test:portal": "playwright test --project=chromium",
-    "test:bma": "playwright test tests/portal/transfers/transfer-between-my-accounts-validations.spec.ts --project=chromium --headed",
+    "test:bma": "playwright test tests\\transfers\\between-my-accounts\\smoke\\transfer-between-my-accounts-validations.spec.ts --project=chromium --headed",
     "test:crm": "playwright test --project=crm",
     "test:portal:report": "playwright test --project=chromium && npm run report:summary || npm run report:summary",
     "report:summary": "node --experimental-strip-types utils/reportGenerator.ts",

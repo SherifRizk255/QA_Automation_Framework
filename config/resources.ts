@@ -20,7 +20,16 @@ import 'dotenv/config';
 /** Read an optional variable, falling back to the committed default. */
 function env(name: string, fallback: string): string {
   const value = process.env[name];
-  return value !== undefined && value !== '' ? value : fallback;
+  if (value !== undefined && value !== '') {
+  return value;
+} else {
+  return fallback;
+}
+}
+
+/** Read an optional boolean-like variable ("true"/"false", any casing). */
+function envBool(name: string, fallback: 'true' | 'false'): boolean {
+  return env(name, fallback).toLowerCase() === 'true';
 }
 
 /**
@@ -64,6 +73,9 @@ const CRM_APP_ID = env('CRM_APP_ID', 'c6546de1-f7f5-f011-a74c-000c290f08a3');
 /** Saved-view ids per entity list. */
 const CRM_VIEW_ID_SMS_LOGS = env('CRM_VIEW_ID_SMS_LOGS', '4111affe-b728-482e-b44f-540508c30c3b');
 const CRM_VIEW_ID_BMA_TRANSFER_LOG = env('CRM_VIEW_ID_BMA_TRANSFER_LOG', 'bae3b8ea-4de3-4510-bfcb-687442f58866');
+const CRM_VIEW_ID_LOCALTRANSFER_LOG = env('CRM_VIEW_ID_LOCALTRANSFER_LOG', '9434451f-4390-462f-95c6-6a01e66721d9');
+const CRM_VIEW_ID_PAY_MY_CARD_LOG = env('CRM_VIEW_ID_PAY_MY_CARD_LOG', '6a3e26c6-ee02-4966-8e03-a4f35baa20d5');
+
 
 // ─── ENV: runtime environment values ─────────────────────────────────────────
 
@@ -108,9 +120,13 @@ export function crmEntityListUrl(options: {
     appid: options.appId ?? CRM_APP_ID,
     pagetype: 'entitylist',
     etn: options.entityName,
-    ...(options.viewId ? { viewid: options.viewId } : {}),
     viewType: '1039',
   });
+
+  if (options.viewId) {
+    params.set('viewid', options.viewId);
+  }
+
   return `${CRM_BASE_URL}${options.orgPath}/main.aspx?${params.toString()}`;
 }
 
@@ -120,7 +136,10 @@ export function crmEntityListUrl(options: {
  * fallback base when the login URL is not configured.
  */
 export function portalHashRoute(hashRoute: string, fromUrl: string = ENV.portal.loginUrl): string {
-  return fromUrl.includes('#') ? fromUrl.replace(/#.*$/, hashRoute) : `${fromUrl}${hashRoute}`;
+  const hashIndex = fromUrl.indexOf('#');
+  const baseUrl = hashIndex === -1 ? fromUrl : fromUrl.substring(0, hashIndex);
+
+  return baseUrl + hashRoute;
 }
 
 export const ROUTES = {
@@ -131,18 +150,28 @@ export const ROUTES = {
   },
   crm: {
     smsLogs: crmEntityListUrl({
-      orgPath: CRM_ORG_PATH_UAT,
+      orgPath: CRM_ORG_PATH_MAIN,
       entityName: 'cis_smslog',
       viewId: CRM_VIEW_ID_SMS_LOGS,
     }),
     serviceRequests: crmEntityListUrl({
-      orgPath: CRM_ORG_PATH_UAT,
+      orgPath: CRM_ORG_PATH_MAIN,
       entityName: 'cis_servicerequest',
     }),
     betweenMyAccountsTransferLog: crmEntityListUrl({
       orgPath: CRM_ORG_PATH_MAIN,
       entityName: 'cis_betweenmyaccountstransferlog',
       viewId: CRM_VIEW_ID_BMA_TRANSFER_LOG,
+    }),
+    localTransferLog: crmEntityListUrl({
+      orgPath: CRM_ORG_PATH_MAIN,
+      entityName: 'cis_localtransferlog',
+      viewId: CRM_VIEW_ID_LOCALTRANSFER_LOG,
+    }),
+    payMyCardLog: crmEntityListUrl({
+      orgPath: CRM_ORG_PATH_MAIN,
+      entityName: 'cis_paymycreditcardtransferlog',
+      viewId: CRM_VIEW_ID_PAY_MY_CARD_LOG,
     }),
   },
 } as const;

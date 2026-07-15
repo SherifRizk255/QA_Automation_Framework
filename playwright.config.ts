@@ -18,7 +18,7 @@ export default defineConfig({
 
   reporter: [
     ['list'],
-    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['html', { outputFolder: 'playwright-report', open: 'on-failure' }],
     ['json', { outputFile: 'test-results/results.json' }],
     // Skill 21 — machine-consumable results for the Final Report Agent.
     ['allure-playwright', { resultsDir: 'allure-results' }],
@@ -45,6 +45,7 @@ export default defineConfig({
     launchOptions: {
       timeout: 30_000,
       args: ['--start-maximized'],
+      slowMo: 1000,
     },
   },
 
@@ -53,10 +54,11 @@ export default defineConfig({
       // Portal tests — headless, 60 s default timeout (from root config).
       // Explicitly excludes CRM specs so the browser never switches
       // headless mode mid-run, which would orphan the previous instance.
-      name: 'chromium',
-      testIgnore: 'crm/**',
+      name: 'Portal',
+      testIgnore: ['crm/**', 'transfers/cross-system/**'],
       use: {
         browserName: 'chromium',
+        headless: false,
       },
     },
     {
@@ -64,7 +66,7 @@ export default defineConfig({
       // isolated into their own project so the browser is launched once
       // in the correct mode and torn down cleanly after all CRM tests.
       name: 'crm',
-      testMatch: 'crm/**',
+      testMatch: ['crm/**', 'transfers/cross-system/**'],
       timeout: 180_000,
       use: {
         browserName: 'chromium',
