@@ -1,9 +1,9 @@
 import { test, type Page, type Locator } from '@playwright/test';
-import { ENV } from '../../config/resources';
+import { ENV } from '../../config/resources.js';
 import fs from 'node:fs';
 import path from 'node:path';
-import { LoginPage } from '../../pages/portal/LoginPage.js';
-import { DashboardPage } from '../../pages/portal/DashboardPage.js';
+import { LoginPage } from '../../pages/portal-pages/LoginPage.js';
+import { DashboardPage } from '../../pages/portal-pages/DashboardPage.js';
 
 const evidenceDir = path.resolve('reports', 'system-walkthrough', 'transfers-local-transfer');
 

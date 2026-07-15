@@ -1,9 +1,9 @@
 import 'dotenv/config';
 import { test } from '@playwright/test';
 import * as allure from 'allure-js-commons';
-import { LoginPage } from '../../../../pages/portal/LoginPage';
-import { DashboardPage } from '../../../../pages/portal/DashboardPage';
-import { TransferBetweenOwnAccountsPage } from '../../../../pages/transfers/portal/TransferBetweenOwnAccountsPage';
+import { LoginPage } from '../../../../pages/portal-pages/LoginPage';
+import { DashboardPage } from '../../../../pages/portal-pages/DashboardPage';
+import { TransferBetweenOwnAccountsPage } from '../../../../pages/portal-pages/transfers/TransferBetweenOwnAccountsPage';
 import { CrossSystemCrmValidator } from '../../../../utils/crm';
 import { ENV, TEST_DATA } from '../../../../config/resources';
 

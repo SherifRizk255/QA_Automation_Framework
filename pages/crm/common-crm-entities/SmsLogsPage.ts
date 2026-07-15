@@ -1,7 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import { ROUTES } from '../../../../config/resources';
-import { extractBusinessValue } from '../../../../utils/businessValueExtractor';
-import { BaseCrmPage } from '../../BaseCrmPage';
+import { ROUTES } from '../../../config/resources';
+import { extractBusinessValue } from '../../../utils/businessValueExtractor';
+import { BaseCrmPage } from '../BaseCrmPage';
 import * as allure from 'allure-js-commons';
 
 const OTP_PATTERN = /\b\d{6}\b/;

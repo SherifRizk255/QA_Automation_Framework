@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { ENV } from '../../../config/resources';
-import { LoginPage } from '../../../pages/portal/LoginPage.js';
-import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
+import { LoginPage } from '../../../pages/portal-pages/LoginPage.js';
+import { DashboardPage } from '../../../pages/portal-pages/DashboardPage.js';
 import { handleFailureEvidence } from '../../../utils/failureHandler.js';
 
 test.describe('Internet Banking Portal - Session Blocker Tests', () => {

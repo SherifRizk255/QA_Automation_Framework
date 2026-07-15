@@ -1,9 +1,9 @@
 import 'dotenv/config';
-import { ENV } from '../../../../config/resources';
+import { ENV } from '../../../config/resources';
 import { test, type Page } from '@playwright/test';
-import { LoginPage } from '../../../../pages/portal/LoginPage';
-import { DashboardPage } from '../../../../pages/portal/DashboardPage';
-import { TransferBetweenOwnAccountsPage } from '../../../../pages/transfers/portal/TransferBetweenOwnAccountsPage';
+import { LoginPage } from '../../../pages/portal-pages/LoginPage';
+import { DashboardPage } from '../../../pages/portal-pages/DashboardPage';
+import { TransferBetweenOwnAccountsPage } from '../../../pages/portal-pages/transfers/TransferBetweenOwnAccountsPage';
 
 // TODO(mrizk): add allure.feature/story/severity once allure-playwright is installed — skill 21
 // feature: 'Between My Accounts Transfer' | story: 'Transfer Validations' | severity: 'critical'

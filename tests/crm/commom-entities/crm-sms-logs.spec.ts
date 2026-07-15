@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { test } from '@playwright/test';
 import { setupNtlmAuth } from '../../helpers/ntlm.js';
-import { SmsLogsPage } from '../../../pages/crm/entities/sms-logs/SmsLogsPage';
+import { SmsLogsPage } from '../../../pages/crm/common-crm-entities/entities/sms-logs/SmsLogsPage.js';
 import * as allure from 'allure-js-commons';
 
 // Browser mode (headless: false) and timeout (180_000) are set in the
