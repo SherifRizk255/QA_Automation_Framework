@@ -19,6 +19,16 @@ export class CrossSystemCrmValidator {
     return this.transferLogValidator;
   }
 
+  async validateBetweenMyAccountsTransfer(validation: {
+    amount: string;
+    internetBankingUser: string;
+  }): Promise<void> {
+    const transferLogs = this.transferLogs();
+
+    await transferLogs.openLatest();
+    await transferLogs.validateTransferLog(validation);
+  }
+
   async close(): Promise<void> {
     await this.crmContext?.close();
     this.crmContext = undefined;

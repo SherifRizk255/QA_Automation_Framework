@@ -4,6 +4,8 @@ Discovery Date: 2026-06-23
 
 Scope: Transfers -> Local Transfers -> To Another SAIB Account
 
+Discovery Tool: `scripts/discovery/transfers/local-transfer-navigation.ts`
+
 Evidence Directory: `reports/system-walkthrough/transfers-local-transfer/`
 
 ## Navigation Path

@@ -1,10 +1,10 @@
 {
   "repositoryVersion": "1.0.0",
   "module": "Portal Transfer & CRM",
-  "lastUpdated": "2026-07-13",
+  "lastUpdated": "2026-07-18",
   "statistics": {
-    "totalEntries": 41,
-    "activeEntries": 41,
+    "totalEntries": 43,
+    "activeEntries": 42,
     "healedEntries": 1,
     "blockedSubflows": 1,
     "repositoryReuseCount": 8
@@ -184,6 +184,28 @@
       "lastVerifiedDate": "2026-06-17",
       "verificationCount": 1,
       "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "elementId": "TRANSFER.BMA_CONFIRM_BUTTON",
+      "screenName": "Transfer Between My Accounts",
+      "elementName": "Main Form Confirm Button",
+      "locatorType": "CSS",
+      "primaryLocator": ".transfer-main-confirm-btn",
+      "primary": { "type": "css", "value": ".transfer-main-confirm-btn" },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 92,
+      "volatility": "LOW",
+      "discoverySource": "Class discovered on live DOM; exercised by TC-CROSS-001 passing run 2026-07-08 and re-verified by live DOM probe 2026-07-09 with exactly one match.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-07-09",
+      "verificationCount": 2,
+      "successCount": 2,
       "failureCount": 0,
       "repositoryStatus": "ACTIVE",
       "originalLocatorHistory": [],
@@ -974,6 +996,27 @@
       "healingMetadata": [
         { "healedOn": "2026-07-06", "previousLocator": "getByText('Between My Accounts', { exact: true })", "newLocator": "[data-id*=\"cis_transfertype\"][title=\"Between My Accounts\"]", "reason": "Strict mode violation: two elements matched the text — Transfer Family and Transfer Type both show 'Between My Accounts'. Scoped to cis_transfertype data-id." }
       ]
+    },
+    {
+      "elementId": "CRM_TRANSFER_RECORD.AMOUNT_FIELD",
+      "screenName": "CRM Between My Accounts Transfer Log Record",
+      "elementName": "Amount Field",
+      "locatorType": "CSS",
+      "primaryLocator": "section[aria-label=\"Amount & Currency\"] [data-id=\"cis_amount\"]",
+      "primary": { "type": "css", "value": "section[aria-label=\"Amount & Currency\"] [data-id=\"cis_amount\"]" },
+      "fallbackLocatorChain": [
+        "[data-id=\"cis_amount\"]",
+        "[data-id=\"cis_amount\"], [data-control-name=\"cis_amount\"]"
+      ],
+      "fallbackChain": [
+        { "type": "css", "value": "[data-id=\"cis_amount\"]" },
+        { "type": "css", "value": "[data-id=\"cis_amount\"], [data-control-name=\"cis_amount\"]" }
+      ],
+      "confidence": "HIGH",
+      "volatility": "LOW",
+      "discoverySource": "TC-CRM-003 live locator discovery",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-06-30"
     }
   ],
   "blockedDiscovery": [

@@ -35,4 +35,4 @@ Automation file:
 | Transfer Between My Accounts - From Account ownership | Automated | `tests/portal/transfer-between-own-accounts.spec.ts` |
 | Transfer Between My Accounts - To Account exclusion | Automated | `tests/portal/transfer-between-own-accounts.spec.ts` |
 | Transfer Between My Accounts - Account entry details | Existing APP_UI failure from prior execution | `tests/portal/transfer-between-own-accounts.spec.ts` |
-| Locator Repository Validation | Automated | `tests/transfers/portal/transfer-locator-repository.spec.ts` |
+| Locator Repository Validation | Automated | `tests/framework/locator-repository/transfer-locator-repository-validation.spec.ts` |

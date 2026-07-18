@@ -1,6 +1,6 @@
 import { expect, type Page, type Locator, type TestInfo } from '@playwright/test';
 import path from 'node:path';
-import { ENV } from '../../config/resources';
+import { ENV } from '../../config/resources.ts';
 
 export class LoginPage {
   readonly page: Page;

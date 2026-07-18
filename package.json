@@ -12,7 +12,8 @@
     "report:summary": "node --experimental-strip-types utils/reportGenerator.ts",
     "report:allure": "allure generate allure-results --clean -o allure-report",
     "cleanup:drivers": "powershell -ExecutionPolicy Bypass -File scripts/cleanup-drivers.ps1",
-    "diagnose:node": "powershell -ExecutionPolicy Bypass -File scripts/diagnose-node.ps1"
+    "diagnose:node": "powershell -ExecutionPolicy Bypass -File scripts/diagnose-node.ps1",
+    "discover:local-transfer": "node --experimental-strip-types scripts/discovery/transfers/local-transfer-navigation.ts"
   },
   "keywords": [],
   "author": "",

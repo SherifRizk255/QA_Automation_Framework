@@ -6,6 +6,7 @@ Discovery Scope: Transfer module, Local Transfers, To Another SAIB Account.
 
 Discovery Sources:
 
+- Discovery tool: `scripts/discovery/transfers/local-transfer-navigation.ts`
 - Live Playwright DOM walkthrough from Dashboard to `#/transfers/to-another-saib-account`
 - Screenshots and DOM captures under `reports/system-walkthrough/transfers-local-transfer/`
 - Existing Transfer Between My Accounts automation evidence
