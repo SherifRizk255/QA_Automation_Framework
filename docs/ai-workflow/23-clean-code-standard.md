@@ -194,6 +194,17 @@ When the Self-Healing Agent edits code it must ALSO obey this skill:
 
 ---
 
+# LOAD-BEARING INFRASTRUCTURE — EXEMPT FROM CLEAN-CODE REFACTORING
+
+The CRM NTLM authentication setup is **load-bearing infrastructure, not complexity to simplify** (skill 26 is authoritative). During any refactor, enhancement, or clean-code pass, never remove, inline, collapse, or "clean up":
+
+* The CRM context creation block — `httpCredentials` (username/password/origin), `viewport: null`, `ignoreHTTPSErrors: true` — in any CRM spec. Chrome's native connection-level NTLM via `httpCredentials` is the only mechanism that works against D365.
+* `tests/helpers/ntlm.ts` and every `setupNtlmAuth(page)` call site, including its `page.route()` interception, `rejectUnauthorized: false`, retry loop, and `DEBUG_NTLM` logging — the fallback for non-D365 IIS endpoints.
+
+These have repeatedly been broken by enhancement passes because they *look like* removable complexity. Changing the CRM auth mechanism is out of scope for any clean-code task; if it seems wrong, read skill 26 before touching it.
+
+---
+
 # REVIEW CHECKLIST (gate for every generated/edited file)
 
 1. Spec reads as a business scenario — zero raw locators, zero waits, zero try/catch.
@@ -205,5 +216,6 @@ When the Self-Healing Agent edits code it must ALSO obey this skill:
 7. No magic numbers, no abbreviations, no dead code, no commented-out code, no workaround-apology comments.
 8. `npx tsc --noEmit` passes.
 9. A colleague could tell what the file does from names alone.
+10. CRM NTLM auth mechanics untouched — no change to `httpCredentials` context blocks or `tests/helpers/ntlm.ts` (load-bearing section above; skill 26).
 
 Fail any item → fix before handing off. Code that works but fails this checklist is NOT done.

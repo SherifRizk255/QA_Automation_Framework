@@ -13,7 +13,7 @@ A reusable, AI-assisted QA automation framework built on Playwright + TypeScript
 * **Internet Banking Portals** (Angular-style web apps, form login)
 * **Microsoft Dynamics 365 CRM** (on-prem, NTLM auth, heavy iframes, `data-id` attributes)
 
-The full QA lifecycle is driven by the skill files in `docs/ai-workflow/` (stages 00–18 plus support skills 19–25). The stage↔file mapping table in `00-master-workflow.md` is the source of truth for which file implements which stage.
+The full QA lifecycle is driven by the skill files in `docs/ai-workflow/` (stages 00–18 plus support skills 19–26). The stage↔file mapping table in `00-master-workflow.md` is the source of truth for which file implements which stage.
 
 ---
 
@@ -40,7 +40,7 @@ fixtures/         Playwright test.extend fixtures — one entry per page object
 tests/            spec files, grouped per system/module
 utils/            shared helpers only (locatorRepository, cubicHtmlReporter,
                   failureClassification, reportGenerator — no page-specific logic)
-docs/ai-workflow/ the skill files (00–25) — the QA pipeline definition
+docs/ai-workflow/ the skill files (00–26) — the QA pipeline definition
 docs/analysis/    walkthrough artifacts (module-prefixed) + locator-repository.json
 docs/test-design/ test cases, scenarios, coverage, test-lifecycle.md
 docs/projects/    per-client artifact roots (multi-project layout)
@@ -67,7 +67,7 @@ Artifact naming: module-prefixed kebab-case, e.g. `accounts-management-locator-i
 ## 5. CRM (Dynamics 365) patterns — do not reinvent
 
 * **Base class**: every CRM page object extends `pages/crm/BaseCrmPage.ts`, which owns `waitForDynamicsReady()`, `waitForGrid()`, `waitForRecordReady()`, `firstDataRow()`, `switchToArea()`, and the `repository` (LocatorRepository) instance. Never re-implement these privately.
-* **Auth**: NTLM via `httpCredentials` at context level, or the `setupNtlmAuth()` route-intercept helper in `tests/helpers/ntlm.ts` (skill 19). Never fill an NTLM dialog with locators.
+* **Auth**: NTLM via `httpCredentials` at context level — the ONLY viable mechanism for D365 (skill 26 is MANDATORY reading before writing or refactoring any CRM test). The `setupNtlmAuth()` route-intercept helper in `tests/helpers/ntlm.ts` is a guarded fallback for non-D365 IIS endpoints only — it crashes (0xC0000409) under D365's request concurrency. Never fill an NTLM dialog with locators.
 * **URLs**: CRM entity-list URLs come ONLY from `ROUTES.crm.*` / `crmEntityListUrl()` in `config/resources.ts` (skill 24) — never inline an org path, app id, or view id.
 * **Area switching**: `switchToArea('<SCREEN>.<AREA_ITEM_ID>')` from `BaseCrmPage` — the target locator lives in `docs/analysis/locator-repository.json`; never hardcode a `data-id` inline.
 * **Grid readiness**: `waitForGrid()` — internally: `domcontentloaded` → spinner hidden → `[aria-label="Select row 2"]` visible (row 2 is the first data row; row 1 is the header).

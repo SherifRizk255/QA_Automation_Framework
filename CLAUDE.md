@@ -34,8 +34,9 @@ All skills live in `docs/ai-workflow/`. Match the request to the row(s) below:
 | Traceability, RTM, coverage plans | 11-traceability-manager |
 | Writing/generating manual test cases | 12-tc-generator, 11-traceability-manager |
 | Writing/editing ANY Playwright code (page objects, specs, fixtures) | 13-automation-implementation-agent, 23-clean-code-standard, 21-allure-reporting-standard, 24-centralized-resource-standard |
-| Anything touching login, credentials, sessions, NTLM, storage state | 19-authentication-session-manager |
-| Tests spanning Portal AND CRM (or any two systems) | 20-cross-system-orchestration, 19-authentication-session-manager |
+| Anything touching login, credentials, sessions, NTLM, storage state | 19-authentication-session-manager, 26-crm-test-automation |
+| A test that opens, acts on, or validates ANYTHING in the CRM (D365) — writing OR refactoring | 26-crm-test-automation, 19-authentication-session-manager |
+| Tests spanning Portal AND CRM (or any two systems) | 20-cross-system-orchestration, 19-authentication-session-manager, 26-crm-test-automation |
 | Running tests, collecting results | 14-test-execution-agent, 21-allure-reporting-standard, 25-execution-report-standard |
 | Investigating failures, flaky tests, root cause | 15-failure-analysis-agent, 25-execution-report-standard |
 | Fixing broken locators / self-healing | 16-self-healing-agent, 23-clean-code-standard, 24-centralized-resource-standard |

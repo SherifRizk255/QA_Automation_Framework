@@ -822,6 +822,7 @@ Stage numbers and skill file numbers are NOT identical. Use this table as the si
 | — | Clean Code Standard (support skill) | 23-clean-code-standard.md |
 | — | Centralized Resource Standard (support skill) | 24-centralized-resource-standard.md |
 | — | Execution Report Standard — Cubic HTML (support skill) | 25-execution-report-standard.md |
+| — | CRM Test Automation — NTLM Auth (support skill) | 26-crm-test-automation.md |
 
 ---
 
