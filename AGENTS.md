@@ -315,9 +315,12 @@ Screenshots are not locator discovery mechanisms.
 # Automation Rules
 
 - Use TypeScript only.
-- Use Page Object Model.
-- Keep locators inside Page Objects.
-- Reuse existing Page Objects whenever possible.
+- Use the Page Object Model with reusable UI components where equivalent DOM and behavior have been proven.
+- Prefer Playwright locators, web-first assertions, actionability, and auto-waiting before custom TypeScript waiting, polling, or retry logic.
+- Keep TypeScript control flow explicit and readable; exceptional use of polling, locator unions, regex, or exception handling must be justified and must preserve behavior.
+- Tests must consume feature page-object facades and must not import, instantiate, or directly operate reusable UI components.
+- Keep each locator in its narrowest correct owner: reusable widget internals belong to components, feature-specific elements belong to feature page objects, and registered definitions remain authoritative in the locator repository.
+- Reuse existing Page Objects and cataloged components whenever possible.
 - Keep tests independent.
 - No hardcoded credentials.
 - No hardcoded waits.

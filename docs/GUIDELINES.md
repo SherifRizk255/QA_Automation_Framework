@@ -36,6 +36,8 @@ Files copied in from other projects will reference infrastructure by name (e.g.,
 config/           config/resources.ts — THE central resource file: URLs, routes,
                   env access, shared test data, reporting identity (skill 24)
 pages/            page objects (POM) — one class per screen/area; CRM pages extend BaseCrmPage
+pages/components/ reusable UI components, catalog metadata, and component governance;
+                  tests never consume these components directly
 fixtures/         Playwright test.extend fixtures — one entry per page object
 tests/            spec files, grouped per system/module
 utils/            shared helpers only (locatorRepository, cubicHtmlReporter,
@@ -105,6 +107,26 @@ Follow skill 20 exactly: same-context new tab when auth allows, second context w
 1. Create the class in `pages/`, extending the correct base.
 2. Register it in the EXISTING fixtures file with the same `test.extend` pattern as its neighbors. Never create a second fixtures file.
 3. Import in specs from the fixtures file, never instantiate page objects with `new` inside a spec.
+
+---
+
+## 8a. Reusable UI component boundary
+
+The supported dependency direction is:
+
+```text
+Tests
+  ↓
+Feature Page Objects
+  ↓
+Reusable UI Components
+  ↓
+Playwright Locators / Locator Repository
+```
+
+Tests call feature page-object methods and never import or instantiate components. Feature pages retain business rules and workflow orchestration; components own only proven reusable widget mechanics beneath a scoped root.
+
+Before creating or reusing a component, search `pages/components/catalog/component-catalog.ts` and follow `pages/components/catalog/README.md`. Do not infer shared behavior from visual similarity alone.
 
 ---
 

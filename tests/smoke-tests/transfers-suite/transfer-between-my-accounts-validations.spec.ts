@@ -25,11 +25,7 @@ test.describe('Portal — Between My Accounts Transfer Validations', () => {
     'TC-BMA-002 | From Account entries display masked number, account type, and balance',
     async ({ transferBetweenOwnAccountsPage: transferPage }) => {
       await transferPage.openFromAccountDropdown();
-      const fromOptions = await transferPage.getFromAccountOptions();
-
-      await transferPage.verifyFromAccountEntriesHaveRequiredDetails(
-        fromOptions
-      );
+      await transferPage.verifyFromAccountEntriesHaveRequiredDetails();
     }
   );
 
@@ -39,9 +35,7 @@ test.describe('Portal — Between My Accounts Transfer Validations', () => {
     'TC-BMA-003 | To Account entries display account number, account type, and currency',
     async ({ transferBetweenOwnAccountsPage: transferPage }) => {
       await transferPage.openToAccountDropdown();
-      const toOptions = await transferPage.getToAccountOptions();
-
-      await transferPage.verifyToAccountEntriesHaveRequiredDetails(toOptions);
+      await transferPage.verifyToAccountEntriesHaveRequiredDetails();
     }
   );
 

@@ -21,7 +21,21 @@ Rules:
 
 * `config/resources.ts` is the ONLY file in the codebase allowed to contain a literal URL or tenant-specific value — and each literal there is a committed default, overridable by an `.env` variable (skill 22).
 * Credentials are NEVER literals anywhere — `.env` only. `ENV.portal.username` / `ENV.crm.password` read them lazily and STOP with `🚫 AUTH BLOCKED — Missing environment variable: <name>` when absent (skill 19).
-* Locator definitions in page objects are allowed ONLY for elements not yet registered in the repository; once an element is registered, the repository entry is authoritative and competing inline locators are forbidden (skill 23).
+* Locator definitions in page objects or reusable components are allowed ONLY for elements not yet registered in the repository; once an element is registered, the repository entry is authoritative and competing inline locators are forbidden (skill 23).
+
+---
+
+# LOCATOR CONSUMER OWNERSHIP
+
+The Locator Repository owns registered locator definitions, fallback metadata, confidence, and healing history. The consuming automation class owns the scope in which a locator is resolved.
+
+Use the narrowest correct consumer:
+
+* Unregistered reusable widget locator → reusable component.
+* Unregistered feature-specific or selected-display locator → feature page object.
+* Test specification → never owns a locator.
+
+Healing updates the registered repository entry or the current narrowest owner. It must not create a duplicate locator at another layer.
 
 ---
 
@@ -35,7 +49,7 @@ A new or edited spec file, page object, fixture, or helper.
 1. **Is it a URL, route, org path, app id, view id?** → Use `ROUTES.*` or the builders `crmEntityListUrl()` / `portalHashRoute()`. If the route doesn't exist yet, ADD it to `config/resources.ts` (new constant + env override), then consume it.
 2. **Is it a credential or environment value?** → Use `ENV.*`. Never `process.env.X` directly in specs or page objects — the resource file is the single accessor.
 3. **Is it shared test data (amounts, expected users, seeded values)?** → Use `TEST_DATA.*`, adding an env-overridable entry if missing. Purely local one-test data may stay a spec-level `UPPER_SNAKE_CASE` constant (skill 23).
-4. **Is it an element locator?** → Check `docs/analysis/locator-repository.json` for an existing `SCREEN.ELEMENT_NAME` entry first. Exists → resolve through `LocatorRepository`. Doesn't exist → either register it (preferred for stable, reused elements) or define it once as a private page-object locator per the skill 23 priority order.
+4. **Is it an element locator?** → Check `docs/analysis/locator-repository.json` for an existing `SCREEN.ELEMENT_NAME` entry first. Exists → resolve through `LocatorRepository` from the owning page or component. Doesn't exist → either register it (preferred for stable, reused elements) or define it once in the narrowest correct private owner per the skill 23 priority order.
 
 ## Output
 Code in which:
@@ -77,6 +91,7 @@ myEntity: crmEntityListUrl({
 # SELF-HEALING INTERACTION (skill 16)
 
 * Healing a registered locator updates the repository entry (primary/fallbacks/history) — never the consuming page object.
+* Healing an unregistered locator updates its current narrowest Page Object or Component owner.
 * Healing must NEVER "fix" a failure by inlining a URL or bypassing the resource file.
 
 ---

@@ -124,7 +124,7 @@ Every automated test must be traceable back to its originating TC.
 4. Read System Map and Navigation Map.
 5. Read Locator Inventory, Locator Confidence, Locator Volatility, Locator Uniqueness, and Locator Metadata.
 6. Read existing Playwright framework structure.
-7. Read existing Page Objects, Fixtures, Utilities, and Shared Components.
+7. Read existing Page Objects, Fixtures, Utilities, Shared Components, `pages/components/catalog/component-catalog.ts`, and `pages/components/catalog/README.md`.
 8. Determine automation scope and impacted business flows.
 
     8.1 Read Test Lifecycle definitions.
@@ -146,14 +146,14 @@ Every automated test must be traceable back to its originating TC.
 
    8.7 Determine evidence collection obligations.
 
-9. Reuse existing Page Objects where possible.
-10. Create new Page Objects only when required.
-11. Define Page Object responsibilities and reusable methods.
+9. Reuse existing Page Objects and cataloged Components where proven equivalent.
+10. Classify new behavior as feature-page responsibility or reusable widget mechanics.
+11. Create a new Page Object or Component only when no existing owner satisfies the requirement.
 12. Select Primary Locators and Fallback Locator Chains from Locator Inventory.
 13. Apply contextual locator strategy for non-unique elements.
-14. Store all locators exclusively inside Page Objects.
+14. Store locators in their narrowest correct Page Object or Component owner. Registered definitions remain authoritative in the Locator Repository.
 15. Create or update Fixtures, Utilities, Test Data, and Supporting Helpers.
-16. Implement Playwright TypeScript tests using Page Object methods only.
+16. Implement Playwright TypeScript tests using feature Page Object methods only.
 17. Add business assertions based on approved expected results.
 18. Implement waits using business-state validation rules.
 19. Capture evidence only when required by the TC, audit requirements, or business process.
@@ -245,8 +245,9 @@ Self-healing is NOT permitted for:
 
 ## Automation Architecture Rules
 
- - Page Object Model Required
- - All UI interactions must reside in Page Objects.
+ - Page Object Model Required.
+ - Tests consume feature Page Object facades and never reusable UI Components directly.
+ - Reusable widget mechanics may reside in cataloged Components behind the feature facade.
  - Tests must not contain:
     page.locator(...)
     page.getByRole(...)
@@ -257,6 +258,37 @@ Self-healing is NOT permitted for:
     loginPage.login()
     transferPage.submitTransfer()
    instead.
+
+---
+
+## Component-Aware Implementation Workflow
+
+1. Search `pages/components/catalog/component-catalog.ts`.
+2. Classify the responsibility as feature behavior or reusable widget mechanics.
+3. Reuse or extend a Component only when current DOM and behavior evidence proves equivalence.
+4. Keep business rules and item-selection decisions in the feature Page Object.
+5. Preserve the feature Page Object's public facade.
+6. Register a new Component before using it.
+7. Validate the Component, consuming Page Object, fixtures, and affected test discovery.
+
+Implementation boundaries follow skill 23. Locator ownership follows skill 24. Detailed component eligibility, lifecycle, and evidence rules are defined in `pages/components/catalog/README.md`.
+
+---
+
+## Playwright-First Implementation Check
+
+Before adding custom TypeScript control logic:
+
+1. Check whether a direct Playwright locator, action, or web-first assertion already provides the required behavior.
+2. Use Playwright auto-waiting, actionability, and web-first assertions before custom waiting or retry logic.
+3. Model optional states through explicit optional APIs and readable conditions.
+4. Use readable bounded loops for asynchronous, ordering-dependent, multi-decision workflows.
+5. Poll only state that cannot be directly observed through a Playwright locator.
+6. Keep Locator Repository fallback metadata separate from runtime `locator.or()` behavior.
+7. Justify exceptional `try/catch`, polling, `.or()`, or complex regex usage.
+8. Preserve functionality, sequencing, diagnostics, return values, and public APIs.
+
+Detailed implementation rules follow skill 23. Cross-system propagation polling follows skill 20.
 
 ---
 
@@ -407,6 +439,8 @@ Confidence:
 ---
 
 ## Locator Fallback Chain Generation
+
+Locator Repository fallback chains are metadata for validation and governed recovery. They must not be converted automatically into permanent Playwright `locator.or()` chains. Runtime alternatives require documented valid product outcomes and strictness analysis.
 
 Every interactive element must contain:
 
@@ -909,6 +943,15 @@ Updated Automation
 - No fake locators are introduced.
 - No hard-coded waits are used.
 - Application defects are not hidden.
+- Tests consume feature Page Object facades and do not import Components directly.
+- New or reused Components are cataloged and supported by equivalent DOM and behavior evidence.
+- Locators remain in their narrowest correct owner.
+- Playwright-native actions and web-first assertions were considered before custom waiting or polling.
+- No exception-based normal UI control flow was introduced.
+- No permanent runtime `.or()` fallback chain was introduced.
+- Asynchronous multi-decision workflows remain readable and bounded.
+- TypeScript abstractions improve safety or reuse without hiding Playwright intent.
+- Functionality, sequencing, diagnostics, return values, and public APIs remain preserved.
 
 ---
 

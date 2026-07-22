@@ -224,7 +224,7 @@ Possible fixes:
  - Locator rediscovery
  - Locator replacement
  - Fallback locator activation
- - Page Object locator update
+ - Owning Page Object or Component locator update
 
 ---
 
@@ -320,7 +320,7 @@ AUT_ASYNC_RENDER
 7. Identify recovery strategy.
 8. Collect locator metadata and DOM evidence.
 9. Identify affected automation asset.
-10. Identify affected Page Object.
+10. Identify the owning Page Object or Component.
 11. Generate recovery candidates.
 12. Validate recovery candidates.
 13. Select safest valid repair.
@@ -333,6 +333,39 @@ AUT_ASYNC_RENDER
 10. Generate self-healing report.
 11. Update automation coverage if required.
 12. Record remaining risks.
+
+---
+
+## Component Ownership Protection Rules
+
+Before healing a locator or widget interaction:
+
+1. Trace the failure through the feature Page Object facade to the owning Page Object or Component.
+2. Heal at the narrowest existing owner.
+3. Do not bypass a Component by adding a competing locator to a Page Object or specification.
+4. Do not duplicate locators across layers.
+5. Preserve optional `find*()` behavior and required `get*()` validation behavior.
+6. Preserve the feature Page Object's public facade and business sequencing.
+
+Registered locator healing updates the Locator Repository. Unregistered locator healing updates its current narrowest owner according to skill 24.
+
+---
+
+## Playwright-First Healing Protections
+
+A healing change must not:
+
+* Append permanent `locator.or()` chains to hide an obsolete locator.
+* Catch and swallow locator, actionability, or assertion failures.
+* Add `expect.poll()`, `toPass()`, or custom polling for state directly observable through a locator assertion.
+* Replace dedicated structured DOM access with complex regex parsing.
+* Compress separate business, rejection, or recovery reasons into unreadable compound logic.
+* Change optional `find*()` behavior into required failure.
+* Change required `get*()` behavior into optional skipping.
+* Weaken assertions or diagnostics.
+* Bypass the feature Page Object facade.
+
+When a locator fails, replace it in its narrowest owner after evidence-backed validation. Repository fallbacks are evaluated independently; they are not accumulated into an unbounded runtime union. Exceptional handling must remain justified and preserve the original behavior.
 
 ---
 
@@ -380,7 +413,7 @@ Repository recovery must be attempted before full rediscovery.
 8. Validate candidates.
 9. Select highest-scoring valid candidate.
 10. Rebuild fallback locator chain.
-11. Update Page Object.
+11. Update the owning Page Object or Component.
 12. Re-run affected tests.
 
 ---
@@ -628,7 +661,7 @@ When Primary Locator fails:
 2. Validate fallback candidates.
 3. Select highest-confidence valid fallback.
 4. Rebuild locator chain if necessary.
-5. Update Page Object.
+5. Update the owning Page Object or Component.
 
 Document all locator chain modifications.
 
@@ -708,9 +741,9 @@ Not allowed:
 
 ---
 
-## Page Object Recovery Framework
+## Page Object and Component Recovery Framework
 
-### Page Object Repair Rules
+### Page Object and Component Repair Rules
 
 Allowed:
  - Locator updates
@@ -894,6 +927,16 @@ Before completion verify:
  - Setup behavior unchanged unless explicitly approved.
  - Teardown behavior unchanged unless explicitly approved.
  - No lifecycle violations introduced.
+ - Owning Page Object or Component identified.
+ - No existing Component was bypassed.
+ - No duplicate locator was introduced at another layer.
+ - Optional and required reader behavior preserved.
+ - Feature Page Object facade preserved.
+ - No permanent runtime `.or()` fallback chain introduced.
+ - No swallowed Playwright failure introduced.
+ - No unnecessary polling introduced for locator-observable state.
+ - Structured DOM access remains preferred over complex regex parsing.
+ - Control flow remains explicit and readable.
 ---
 
 ## Do-not rules
