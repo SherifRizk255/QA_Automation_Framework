@@ -35,9 +35,14 @@ Files copied in from other projects will reference infrastructure by name (e.g.,
 ```
 config/           config/resources.ts — THE central resource file: URLs, routes,
                   env access, shared test data, reporting identity (skill 24)
-pages/            page objects (POM) — one class per screen/area; CRM pages extend BaseCrmPage
-fixtures/         Playwright test.extend fixtures — one entry per page object
-tests/            spec files, grouped per system/module
+pages/            page objects (POM) — one class per screen/area; CRM pages extend BaseCrmPage.
+                  PageObjectManager.ts is the single access point that lazily exposes every page object.
+fixtures/         frameworkFixtures.ts — the ONE test.extend file. Exposes `pom` (a PageObjectManager),
+                  `authenticatedPom` (logged-in portal session), and workflow fixtures. Never a second fixtures file.
+tests/            spec files in a hybrid feature layout: tests/<system>/<business-feature>/<business-operation>/
+                  (e.g. tests/portal/transfers/transfer-between-accounts/). The system root (portal/crm)
+                  is retained ONLY because the Playwright projects key the headed-CRM / headless-portal
+                  split off it; inside it, organize by business capability, not by screen.
 utils/            shared helpers only (locatorRepository, cubicHtmlReporter,
                   failureClassification, reportGenerator — no page-specific logic)
 docs/ai-workflow/ the skill files (00–26) — the QA pipeline definition
@@ -57,9 +62,9 @@ Artifact naming: module-prefixed kebab-case, e.g. `accounts-management-locator-i
 ## 4. Naming conventions
 
 * Page objects: `PascalCase` classes in files named `<Entity>Page.ts` (e.g., `ServiceRequestsPage.ts`), extending `BaseCrmPage` (CRM) or the portal base page.
-* Spec files: `kebab-case.spec.ts`. Cross-system: `<action>-<source>-<target>.spec.ts`.
+* Spec files: each business operation has ONE `smoke-<operation>.spec.ts` (the primary valid end-to-end reference) plus `<operation>-suite-NN.spec.ts` files (two-digit, sequential) for the remaining cases. **Max 10 test cases per suite file.** Never dump a feature into one large spec; never name a spec `test1`/`new-suite`/`remaining-tests`.
 * Test titles: `TC-<AREA>-<NNN> | <business description>` — the TC id is mandatory (Allure/traceability join key).
-* Fixtures: `camelCase` matching the page-object name (`serviceRequestsPage`).
+* Page-object accessors on the manager: `camelCase` matching the page-object name (`serviceRequestsPage`).
 * Locator element IDs in the repository: `SCREEN.ELEMENT_NAME` uppercase.
 
 ---
@@ -103,8 +108,10 @@ Follow skill 20 exactly: same-context new tab when auth allows, second context w
 ## 8. Wiring a new page object
 
 1. Create the class in `pages/`, extending the correct base.
-2. Register it in the EXISTING fixtures file with the same `test.extend` pattern as its neighbors. Never create a second fixtures file.
-3. Import in specs from the fixtures file, never instantiate page objects with `new` inside a spec.
+2. Add a lazy getter for it in `pages/PageObjectManager.ts` (follow the `resolve('name', () => new XPage(this.page))` pattern of its neighbors).
+3. Access it in specs through the `pom` fixture (`pom.serviceRequestsPage`), imported from `fixtures/frameworkFixtures`. Never instantiate a page object with `new` inside a spec, and never `import { test } from '@playwright/test'` when a custom fixture is needed.
+4. A second browser context (e.g. the CRM tab in a cross-system test) gets its own manager: `new PageObjectManager(crmTab)`.
+5. Tags: every `test.describe`/`test` carries a runtime-target tag (`@portal`/`@crm`), a level tag (`@smoke`/`@regression`), a functional-area tag, and a type tag (`@positive`/`@negative`) — this enables `--grep @smoke` CI runs. `test.skip`/`fixme`/`fail` always carry a reason.
 
 ---
 

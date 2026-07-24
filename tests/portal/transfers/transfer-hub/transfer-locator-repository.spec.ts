@@ -1,7 +1,7 @@
-import { test, expect } from '../../../fixtures/portalRepositoryFixture';
-import { getLocatorRepositoryUsage } from '../../../utils/locatorRepository';
+import { test, expect } from '../../../../fixtures/frameworkFixtures';
+import { getLocatorRepositoryUsage } from '../../../../utils/locatorRepository';
 
-test.describe('Transfer Locator Repository Validation', () => {
+test.describe('Transfer Locator Repository Validation', { tag: ['@portal', '@transfers', '@transfer-hub', '@regression'] }, () => {
   test('LR-TRANSFER-001 - Transfer shell consumes repository locators', async ({ authenticatedTransferPage }, testInfo) => {
     await authenticatedTransferPage.expectTransferHubLoaded(testInfo);
 

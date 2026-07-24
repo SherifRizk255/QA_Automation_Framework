@@ -1,26 +1,15 @@
-import { test, expect } from '@playwright/test';
-import { ENV } from '../../../config/resources';
-import { LoginPage } from '../../../pages/portal/LoginPage.js';
-import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
-import { AccountsSummaryPage } from '../../../pages/portal/accounts/AccountsSummaryPage.ts';
-import { TransactionHistoryPage } from '../../../pages/portal/accounts/TransactionHistoryPage.ts';
-import { captureFailureEvidenceOnFailure } from '../../../utils/failureHandler.js';
+import { test, expect } from '../../../../fixtures/frameworkFixtures';
+import { captureFailureEvidenceOnFailure } from '../../../../utils/failureHandler.js';
 
 test.afterEach(async ({ page }, testInfo) => {
   await captureFailureEvidenceOnFailure(page, testInfo);
 });
 
-test.describe('Accounts Management - Transaction History', () => {
-  test('AM-TC-009/010 - Recent transactions display with basic details', async ({ page }, testInfo) => {
-    const loginPage = new LoginPage(page);
-    const dashboardPage = new DashboardPage(page);
-    const accountsSummaryPage = new AccountsSummaryPage(page);
-    const transactionHistoryPage = new TransactionHistoryPage(page);
+test.describe('Accounts Management - Transaction History', { tag: ['@portal', '@accounts', '@transaction-history', '@smoke', '@positive'] }, () => {
+  test('AM-TC-009/010 - Recent transactions display with basic details', async ({ authenticatedPom }, testInfo) => {
+    const transactionHistoryPage = authenticatedPom.transactionHistoryPage;
 
-    await loginPage.goto();
-    await loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
-    await dashboardPage.expectLoaded(testInfo);
-    await accountsSummaryPage.goto(testInfo);
+    await authenticatedPom.accountsSummaryPage.goto(testInfo);
     await transactionHistoryPage.expectRecentTransactionsExperienceVisible();
 
     if (await transactionHistoryPage.isEmptyStateVisible()) {

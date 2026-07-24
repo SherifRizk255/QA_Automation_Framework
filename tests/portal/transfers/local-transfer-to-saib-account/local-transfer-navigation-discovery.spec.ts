@@ -1,10 +1,9 @@
-import { test, type Page, type Locator } from '@playwright/test';
-import { ENV } from '../../../config/resources';
+import type { Page, Locator } from '@playwright/test';
+import { test } from '../../../../fixtures/frameworkFixtures';
+import { ENV } from '../../../../config/resources';
 import fs from 'node:fs';
 import path from 'node:path';
-import { LoginPage } from '../../../pages/portal/LoginPage.js';
-import { DashboardPage } from '../../../pages/portal/DashboardPage.js';
-import { LocatorRepository } from '../../../utils/locatorRepository';
+import { LocatorRepository } from '../../../../utils/locatorRepository';
 
 const evidenceDir = path.resolve('reports', 'system-walkthrough', 'transfers-local-transfer');
 
@@ -84,16 +83,14 @@ async function waitForTransferDetailOrStableSelector(page: Page) {
   await page.locator('body').waitFor({ state: 'visible', timeout: 15_000 });
 }
 
-test('system walkthrough - Transfers to Local Transfers to Another SAIB Account', async ({ page }, testInfo) => {
+test('system walkthrough - Transfers to Local Transfers to Another SAIB Account', { tag: ['@portal', '@transfers', '@local-transfer-to-saib-account', '@discovery'] }, async ({ pom, page }, testInfo) => {
   test.setTimeout(180_000);
 
-  const loginPage = new LoginPage(page);
-  const dashboardPage = new DashboardPage(page);
   const repository = new LocatorRepository(page);
 
-  await loginPage.goto();
-  await loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
-  await dashboardPage.expectLoaded(testInfo);
+  await pom.loginPage.goto();
+  await pom.loginPage.login(ENV.portal.username, ENV.portal.password, testInfo);
+  await pom.dashboardPage.expectLoaded(testInfo);
 
   await captureStep(page, '01-dashboard-after-login');
 

@@ -42,7 +42,7 @@ await crmTab.goto(ROUTES.crm.<entity>, { waitUntil: 'domcontentloaded' });
   so cookie reuse (`storageState`) cannot work for CRM auth.
 * `httpCredentials` at context level lets Chromium's native network stack negotiate NTLM per
   connection. This is the **only viable mechanism for D365** in this framework — verified by
-  TC-CROSS-001 (`tests/crm/cross-system/transfer-between-accounts-crm-log.spec.ts`).
+  TC-CROSS-001 (`tests/crm/transfers/transfer-between-accounts/transfer-between-accounts-crm-log.spec.ts`).
 * The alternative — intercepting requests with `page.route()` and fulfilling them through the
   Node `httpntlm` package (`setupNtlmAuth` in `tests/helpers/ntlm.ts`) — **was tested against
   D365 and crashes the native module (Windows 0xC0000409)**: D365 fires 100+ parallel
@@ -106,7 +106,7 @@ Read the actual error before touching code; the fix depends entirely on which sy
 
 # 8. REFERENCE IMPLEMENTATION
 
-`tests/crm/cross-system/transfer-between-accounts-crm-log.spec.ts` (TC-CROSS-001) is the
+`tests/crm/transfers/transfer-between-accounts/transfer-between-accounts-crm-log.spec.ts` (TC-CROSS-001) is the
 canonical working CRM + portal test. Mirror its structure for any new CRM test. If in doubt, match it.
 
 > **Bottom line:** CRM auth is already solved. Use context-level `httpCredentials`, keep

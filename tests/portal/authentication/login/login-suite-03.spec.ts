@@ -1,21 +1,16 @@
-import { test, expect } from '@playwright/test';
-import { ENV } from '../../config/resources';
-import { LoginPage } from '../../pages/portal/LoginPage.js';
-import { DashboardPage } from '../../pages/portal/DashboardPage.js';
-import { captureFailureEvidenceOnFailure } from '../../utils/failureHandler.js';
+import { test, expect } from '../../../../fixtures/frameworkFixtures';
+import { ENV } from '../../../../config/resources';
+import { captureFailureEvidenceOnFailure } from '../../../../utils/failureHandler.js';
 
 test.afterEach(async ({ page }, testInfo) => {
   await captureFailureEvidenceOnFailure(page, testInfo);
 });
 
-test.describe('Internet Banking Portal - Session Blocker Tests', () => {
-  test('IB-SESSION-001 - Active session blocker is documented and handled if displayed', async ({ page }, testInfo) => {
-    const loginPage = new LoginPage(page);
-    const dashboardPage = new DashboardPage(page);
+test.describe('Internet Banking Portal - Session Blocker Tests', { tag: ['@portal', '@authentication', '@regression'] }, () => {
+  test('IB-SESSION-001 - Active session blocker is documented and handled if displayed', async ({ pom }, testInfo) => {
+    await pom.loginPage.goto();
 
-    await loginPage.goto();
-
-    const activeSessionDisplayed = await loginPage.login(
+    const activeSessionDisplayed = await pom.loginPage.login(
       ENV.portal.username,
       ENV.portal.password,
       testInfo
@@ -40,6 +35,6 @@ test.describe('Internet Banking Portal - Session Blocker Tests', () => {
       });
     }
 
-    await dashboardPage.expectLoaded(testInfo);
+    await pom.dashboardPage.expectLoaded(testInfo);
   });
 });

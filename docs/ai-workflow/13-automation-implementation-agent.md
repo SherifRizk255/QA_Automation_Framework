@@ -254,9 +254,43 @@ Self-healing is NOT permitted for:
     page.fill(...)
    directly.
  - Tests should call:
-    loginPage.login()
-    transferPage.submitTransfer()
+    pom.loginPage.login()
+    pom.transferBetweenOwnAccountsPage.clickConfirm()
    instead.
+ - Page objects are reached through the `pom` fixture (a `PageObjectManager`), imported from
+   `fixtures/frameworkFixtures`. Never `new XPage(page)` in a spec; never
+   `import { test } from '@playwright/test'` when a fixture is needed. A second context
+   (e.g. the CRM tab) gets its own `new PageObjectManager(crmTab)`.
+
+---
+
+## Suite Organization, Smoke Tests, and Tags
+
+**Folder layout — hybrid feature-based.** Specs live under
+`tests/<system>/<business-feature>/<business-operation>/`, e.g.
+`tests/portal/transfers/transfer-between-accounts/`. The `portal`/`crm` system root is kept
+ONLY because the Playwright projects key the headed-CRM / headless-portal split off the path;
+within it, organize by business capability, never by raw screen name.
+
+**One smoke per operation.** Each business operation has exactly one
+`smoke-<operation>.spec.ts` — the primary valid end-to-end flow, the clearest positive
+scenario, the reference other tests are modelled on. It asserts business-critical outcomes
+(status, confirmation, created record, key API result), not decorative markup. Do not
+duplicate the smoke scenario in a suite file.
+
+**Suite files.** Remaining cases go in `<operation>-suite-NN.spec.ts` (two-digit, sequential).
+**Maximum 10 test cases per suite file.** Group related scenarios (validations, boundaries,
+currency rules, permissions, failures). Never one giant spec; never `test1`/`new-suite`/
+`remaining-tests` names.
+
+**Tags — mandatory on every describe/test.** Combine, at minimum:
+* runtime target — `@portal` or `@crm`
+* level — `@smoke`, `@regression`, `@sanity`, `@critical`
+* functional area — `@authentication`, `@transfers`, `@accounts`, `@service-requests`, plus the operation slug (`@transfer-between-accounts`)
+* type — `@positive`, `@negative`, `@validation`, `@security`
+
+This enables targeted runs (`npx playwright test --grep @smoke`). `test.skip`/`test.fixme`/
+`test.fail` must always carry a reason or issue reference — never a bare skip.
 
 ---
 
@@ -290,7 +324,7 @@ Rules:
 * Remove any leftover fixed `viewport` / `devices[...]` spread that would override the maximize.
 * Prove it when in doubt: `logWindowSize()` (gated by `LOG_WINDOW_SIZE`) logs
   `outerW/outerH` vs `screen.availWidth/availHeight`; a window is maximized when they match.
-* Reference implementation: `tests/crm/cross-system/transfer-between-accounts-crm-log.spec.ts`
+* Reference implementation: `tests/crm/transfers/transfer-between-accounts/transfer-between-accounts-crm-log.spec.ts`
   — portal uses the default `page` fixture + `maximizeWindow(page)`; CRM uses
   `browser.newContext({ viewport: null, httpCredentials, ... })` + `maximizeWindow(crmTab)`.
   Verified 2026-07-12: both windows logged 1536×816 == screen 1536×816.

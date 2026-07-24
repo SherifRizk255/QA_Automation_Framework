@@ -69,11 +69,13 @@ Additional rules:
 
 A spec file contains ONLY:
 
-1. Imports
+1. Imports — `test`/`expect` come from `fixtures/frameworkFixtures`, never from `@playwright/test`, whenever a fixture is used
 2. Test data constants (top of file, UPPER_SNAKE_CASE, sourced from `config/resources.ts`)
 3. One `test.afterEach` registering `captureFailureEvidenceOnFailure` (utils/failureHandler.ts) when the suite captures failure evidence
-4. `test.describe` blocks
-5. Allure metadata + business steps calling page-object methods
+4. `test.describe` blocks carrying the mandatory tags (runtime target + level + area + type — GUIDELINES §8)
+5. Allure metadata + business steps calling page-object methods through the `pom` fixture (`pom.loginPage.login(...)`)
+
+Page objects are NEVER constructed in a spec (`new XPage(page)` is banned); they are reached through `pom`. A second context (CRM tab) gets its own `new PageObjectManager(crmTab)` — the one exception, since a fixture cannot inject into a hand-made context.
 
 A spec file NEVER contains:
 

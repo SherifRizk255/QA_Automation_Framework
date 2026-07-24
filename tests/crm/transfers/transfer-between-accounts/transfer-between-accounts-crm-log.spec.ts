@@ -1,21 +1,18 @@
 import 'dotenv/config';
-import { test } from '@playwright/test';
+import { test } from '../../../../fixtures/frameworkFixtures';
 import * as allure from 'allure-js-commons';
-import { LoginPage } from '../../../pages/portal/LoginPage';
-import { DashboardPage } from '../../../pages/portal/DashboardPage';
-import { TransferBetweenOwnAccountsPage } from '../../../pages/portal/TransferBetweenOwnAccountsPage';
-import { BetweenMyAccountsTransferLogPage } from '../../../pages/crm/BetweenMyAccountsTransferLogPage';
-import { ENV, ROUTES, TEST_DATA } from '../../../config/resources';
-import { maximizeWindow, logWindowSize } from '../../../utils/browserWindow';
+import { PageObjectManager } from '../../../../pages/PageObjectManager';
+import { ENV, ROUTES, TEST_DATA } from '../../../../config/resources';
+import { maximizeWindow, logWindowSize } from '../../../../utils/browserWindow';
 
 // All URLs and correlation data come from the central resource file — skill 24.
 const CRM_BETWEEN_MY_ACCOUNTS_LOG_URL = ROUTES.crm.betweenMyAccountsTransferLog;
 const TRANSFER_AMOUNT = TEST_DATA.transferAmount;
 const PORTAL_IB_USERNAME = TEST_DATA.portalIbUsername;
 
-test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
+test.describe('Cross-System: Portal Transfer → CRM Log Validation', { tag: ['@crm', '@portal', '@cross-system', '@transfers', '@transfer-between-accounts', '@smoke', '@critical', '@positive'] }, () => {
 
-  test('TC-CROSS-001 | Between My Accounts transfer reflects as Completed log in CRM', async ({ page, browser }) => {
+  test('TC-CROSS-001 | Between My Accounts transfer reflects as Completed log in CRM', async ({ pom, page, browser }) => {
     // Skill 21 — mandatory Allure metadata (money movement → blocker severity).
     await allure.feature('Between My Accounts Transfer');
     await allure.story('Cross-System Validation — Portal → CRM Log');
@@ -24,20 +21,18 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
     // Cross-system tests include two auth sessions plus propagation delay — skill 20.
     test.setTimeout(240_000);
 
-    const loginPage = new LoginPage(page);
-    const dashboardPage = new DashboardPage(page);
-    const transferPage = new TransferBetweenOwnAccountsPage(page);
+    const transferPage = pom.transferBetweenOwnAccountsPage;
 
     // ── Portal: Login ─────────────────────────────────────────────────────
-    await loginPage.goto();
+    await pom.loginPage.goto();
     // Maximize the portal window (skill 13 maximize rule — CDP is the reliable path).
     await maximizeWindow(page);
     await logWindowSize('portal', page);
-    await loginPage.login(
+    await pom.loginPage.login(
       ENV.portal.username,
       ENV.portal.password
     );
-    await dashboardPage.expectLoaded();
+    await pom.dashboardPage.expectLoaded();
 
     // ── Portal: Navigate to Between My Accounts ───────────────────────────
     await transferPage.navigateToTransferBetweenOwnAccounts();
@@ -64,29 +59,28 @@ test.describe('Cross-System: Portal Transfer → CRM Log Validation', () => {
 
     // ── CRM: Open Transfer Logs in isolated context ───────────────────────
     // Portal uses form-login cookies; CRM uses NTLM — separate contexts per Skill 20.
-    // Browser-native NTLM via httpCredentials handles D365's 40+ concurrent init
-    // requests efficiently; the old httpntlm route-intercept caused ECONNRESET failures.
-    // viewport: null makes this second window fill the maximized frame — without it
-    // the context would clamp to Playwright's 1280×720 default (skill 13 maximize rule).
+    // httpCredentials lets Chrome handle NTLM natively at the TCP-connection level.
+    // D365 sends "Persistent-Auth: true" and no session cookie — auth is per-connection,
+    // so Chrome's built-in NTLM (via httpCredentials) is the only viable approach.
+    // The Node.js httpntlm route-intercept alternative was tested and causes a native
+    // module crash (Windows 0xC0000409) because D365 fires 100+ parallel sub-requests
+    // each requiring an independent NTLM handshake.
     const crmContext = await browser.newContext({
       viewport: null,
       httpCredentials: {
         username: ENV.crm.username,
         password: ENV.crm.password,
-        origin: ENV.crm.origin,
+        origin:   ENV.crm.origin,
       },
       ignoreHTTPSErrors: true,
     });
     const crmTab = await crmContext.newPage();
-    // Maximize the second (CRM) window — newContext windows never receive
-    // --start-maximized, so CDP is required here (skill 13 maximize rule).
-    // Log before goto: window dimensions are already valid on the blank page,
-    // so the maximize is proven even if the CRM host is transiently unreachable.
     await maximizeWindow(crmTab);
     await logWindowSize('crm', crmTab);
     await crmTab.goto(CRM_BETWEEN_MY_ACCOUNTS_LOG_URL, { waitUntil: 'domcontentloaded' });
 
-    const logPage = new BetweenMyAccountsTransferLogPage(crmTab);
+    // The CRM tab is a second context, so it gets its own page-object manager (skill 20).
+    const logPage = new PageObjectManager(crmTab).betweenMyAccountsTransferLogPage;
 
     // ── CRM: Open latest record, assert fields ───────────────────────────
     // The view sorts by Transaction Date descending — latest transfer is always row 2.
