@@ -261,6 +261,119 @@ Self-healing is NOT permitted for:
 
 ---
 
+## Feature Implementation Guardrails
+
+Complete `docs/ai-workflow/templates/feature-implementation-checklist.md` and obtain architecture approval before production implementation.
+
+### Required Architecture
+
+```text
+Tests
+  → call public feature-page methods only
+
+Feature Page
+  → navigation
+  → workflow orchestration
+  → feature-level Allure steps
+  → coordination between components and pure logic
+
+Components
+  → own one scoped UI region
+  → own UI actions and UI reading
+  → return typed actual UI values
+
+Pure Calculators / Utilities
+  → own deterministic browser-independent calculations
+
+Locator Repository
+  → owns locator definitions, keys, metadata, and ownership
+```
+
+| Responsibility | Owner |
+|---|---|
+| UI locating, reading, or clicking | Component |
+| Navigation or multi-component workflow | Feature Page |
+| Deterministic business calculation | Pure Calculator / Utility |
+| TC ID, title, tags, and test orchestration | Test |
+| Locator identity and metadata | Locator Repository |
+
+### Locator Rules
+
+Use private lazy getters:
+
+```typescript
+private get amountInput(): Locator {
+  return this.repository.locator(
+    'PORTAL.FEATURE.AMOUNT.INPUT'
+  );
+}
+```
+
+For scoped locators:
+
+```typescript
+private get balance(): Locator {
+  return this.repository.locator(
+    'PORTAL.FEATURE.ACCOUNT.BALANCE',
+    {
+      scope: this.activeAccount,
+    }
+  );
+}
+```
+
+Require:
+
+- Every locator key exists in `locator-repository.json`.
+- Runtime consumers use `repository.locator(...)`.
+- Locator getters are private and lazy.
+- Constructors store dependencies only.
+- Locator ownership metadata matches the Page Object or Component that owns the UI.
+
+Prohibit in committed Page Objects and Components:
+
+- `repository.resolve(...)`.
+- Raw `page.locator(...)`.
+- Raw `page.getByRole(...)`.
+- Raw `page.getByText(...)`.
+- Raw `page.getByLabel(...)`.
+- Locator initialization in constructors.
+- Eager `Locator` fields.
+- Returning `Locator` from Component public methods.
+
+### Layer Boundaries
+
+- Tests do not import or call Components directly.
+- Components do not import API observers or models for expected-value matching.
+- Components do not import calculators.
+- Components do not import Allure.
+- Expected API values never influence UI selection.
+- Page Objects do not contain large deterministic calculations.
+- Pure calculations have focused framework tests.
+- A UI region with multiple related locators is designed as a Component before regression expansion.
+
+### Mandatory Future-Feature Order
+
+1. Review feature test cases.
+2. Identify one representative smoke flow.
+3. Produce the feature architecture map.
+4. Wait for architecture approval.
+5. Register or reuse locator keys and ownership.
+6. Implement UI Components.
+7. Implement pure calculations only when needed.
+8. Implement the thin feature-page facade.
+9. Implement and run the representative smoke flow.
+10. Review architecture and ownership.
+11. Expand regression coverage.
+
+Do not automate the complete regression workbook in one pass.
+
+Do not build a large Feature Page first and extract Components later.
+
+Do not add a new abstraction without checking for an existing owner.
+
+---
+
 ## Component-Aware Implementation Workflow
 
 1. Search `pages/components/catalog/component-catalog.ts`.
