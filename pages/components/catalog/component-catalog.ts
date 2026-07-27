@@ -25,6 +25,7 @@ export const COMPONENT_CATALOG = {
       'AccountPickerComponent',
       'AccountRowComponent',
       'PortalLoadingComponent',
+      'PortalSwiperCarouselComponent',
     ],
     responsibilities: [
       'Provides the minimal shared root and visibility contract for reusable UI components.',
@@ -84,10 +85,128 @@ export const COMPONENT_CATALOG = {
     usedBy: [
       'AccountPickerComponent',
       'TransferBetweenOwnAccountsPage',
+      'DashboardPage',
     ],
     responsibilities: [
       'Locates the shared portal loading indicator.',
       'Waits for portal loading completion.',
+    ],
+  },
+  PORTAL_SWIPER_CAROUSEL: {
+    name: 'PortalSwiperCarouselComponent',
+    path: 'pages/components/portal/carousel/PortalSwiperCarouselComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardAccountsWidgetComponent',
+      'DashboardDepositsWidgetComponent',
+      'DashboardLoansWidgetComponent',
+    ],
+    responsibilities: [
+      'Owns the shared Swiper collection, active-item, and scoped Next-control mechanics.',
+      'Validates that one bounded active item is visible before feature-specific field reading.',
+      'Proves that carousel navigation changes the active item without interpreting business fields.',
+    ],
+  },
+  DASHBOARD_WELCOME: {
+    name: 'DashboardWelcomeComponent',
+    path: 'pages/components/portal/dashboard/DashboardWelcomeComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardPage',
+    ],
+    responsibilities: [
+      'Feature-scoped owner of PORTAL.DASHBOARD.WELCOME.* locator keys.',
+      'Exposes assertReady(), getCustomerName(), and getSummaryValues() as typed UI-only operations.',
+      'Reads the Welcome heading and three summary values without API comparison or reporting.',
+      'Is not classified as a globally reusable component.',
+    ],
+  },
+  DASHBOARD_ACCOUNTS_WIDGET: {
+    name: 'DashboardAccountsWidgetComponent',
+    path: 'pages/components/portal/dashboard/DashboardAccountsWidgetComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardPage',
+    ],
+    responsibilities: [
+      'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.* locator keys.',
+      'Exposes assertReady(), getActiveAccount(), moveNext(), and openManage() as typed UI-only operations.',
+      'Delegates active-slide and Next mechanics to PortalSwiperCarouselComponent.',
+      'Excludes API matching, financial comparison, navigation assertions, and reporting.',
+    ],
+  },
+  DASHBOARD_CARDS_WIDGET: {
+    name: 'DashboardCardsWidgetComponent',
+    path: 'pages/components/portal/dashboard/DashboardCardsWidgetComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardPage',
+    ],
+    responsibilities: [
+      'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.CARDS.* locator keys.',
+      'Exposes typed active-card values, including the actual displayed statistic currencies, and Next behavior.',
+      'Selects the visible front card through bounded opacity and z-index inspection of the Cards deck.',
+      'Remains separate from PortalSwiperCarouselComponent because Cards uses a stacked deck rather than Swiper active-slide mechanics.',
+      'Keeps missing post-navigation card statistics visible as the known SAIB-N-0181 application defect.',
+      'Excludes API matching, financial comparison, masking, Allure reporting, and navigation.',
+    ],
+  },
+  DASHBOARD_DEPOSITS_WIDGET: {
+    name: 'DashboardDepositsWidgetComponent',
+    path: 'pages/components/portal/dashboard/DashboardDepositsWidgetComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardPage',
+    ],
+    responsibilities: [
+      'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.DEPOSITS.* locator keys.',
+      'Exposes assertReady() and getActiveDeposit() as typed UI-only operations.',
+      'Delegates active-slide mechanics to PortalSwiperCarouselComponent.',
+      'Excludes API product mapping, financial comparison, and reporting.',
+    ],
+  },
+  DASHBOARD_LOANS_WIDGET: {
+    name: 'DashboardLoansWidgetComponent',
+    path: 'pages/components/portal/dashboard/DashboardLoansWidgetComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardPage',
+    ],
+    responsibilities: [
+      'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.LOANS.* locator keys.',
+      'Exposes typed active-loan values, bounded ordered amounts, Next behavior, and currency occurrence reading.',
+      'Delegates active-slide and Next mechanics to PortalSwiperCarouselComponent.',
+      'Excludes API matching, financial comparison, and reporting.',
+    ],
+  },
+  DASHBOARD_PORTFOLIO_WIDGET: {
+    name: 'DashboardPortfolioWidgetComponent',
+    path: 'pages/components/portal/dashboard/DashboardPortfolioWidgetComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardPage',
+    ],
+    responsibilities: [
+      'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.PORTFOLIO.ROOT and PORTAL.DASHBOARD.PORTFOLIO.* locator keys.',
+      'Exposes Portfolio readiness, active-mode reading, liability selection, typed UI-state reading, and chart screenshot capture.',
+      'Returns displayed totals, ordered legend labels and percentage text, and normalized panel text without API or financial interpretation.',
+      'Captures chart evidence bytes without naming attachments or performing reporting.',
+      'Excludes Portfolio calculations, API models, API/UI validation, percentage tolerance, Allure reporting, and business assertions.',
+      'Is not classified as a globally reusable component.',
     ],
   },
 } satisfies Record<string, ComponentCatalogEntry>;

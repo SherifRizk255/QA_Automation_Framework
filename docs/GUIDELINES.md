@@ -93,7 +93,7 @@ Follow skill 20 exactly: same-context new tab when auth allows, second context w
 
 * `config/resources.ts` is the ONLY file allowed to contain literal URLs, org paths, app ids, view ids, or shared test data — each as an env-overridable default. Specs and page objects import `ENV` / `ROUTES` / `TEST_DATA` from it.
 * `process.env` reads are forbidden in specs and page objects — only `config/`, `utils/`, and `playwright.config.ts` may read it.
-* Locators for registered elements resolve through `docs/analysis/locator-repository.json` via `LocatorRepository`.
+* Every committed runtime locator resolves by key through `docs/analysis/locator-repository.json` via `LocatorRepository`. Inline locator definitions are discovery-only and must not remain in tests, fixtures, pages, or components.
 * Verification greps that must return zero matches: `grep -rn "https\?://" tests/ pages/ fixtures/` and `grep -rn "process\.env\." tests/ pages/`.
 
 ## 7c. Execution reporting (skill 25)

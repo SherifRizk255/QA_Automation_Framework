@@ -59,7 +59,7 @@ Rules:
 * One class per screen/area. If a class serves two screens, split it.
 * Public methods = things a test would say in a business sentence. Private methods = mechanics.
 * Every public action/assertion wrapped in `allure.step` with a business-facing sentence (skill 21).
-* Helpers and raw locators are `private`. Nothing leaks `Locator` objects to spec files.
+* Helpers are `private`, and Locator objects never leak to spec files. Committed locator definitions belong in `docs/analysis/locator-repository.json`; page objects resolve them by key.
 
 ## Reusable UI components (`pages/components/`)
 
@@ -79,7 +79,7 @@ Rules:
 
 * Tests consume feature page-object facades and never import, instantiate, or directly consume reusable UI components.
 * Feature page objects own feature navigation, business rules, workflow orchestration, feature assertions, evidence capture, and page-state transitions.
-* Reusable components own scoped roots, stable child locators, reusable widget interactions, normalized component values, and component-level assertions.
+* Reusable components own scoped root/child behavior, reusable widget interactions, normalized component values, and component-level assertions. Their committed locator definitions are resolved from the Locator Repository.
 * Collection components own opening, count, ordering, indexed item access, and generic collection validation. Item components own item fields, text, actions, and item-level validation. The feature page decides which item satisfies a business rule.
 * Optional `find*()` readers return `undefined` when candidate data may be absent. Required `get*()` readers fail when required data is missing, hidden, or empty. Do not use `try/catch` as candidate-selection control flow.
 * Components search beneath their supplied root whenever that scope exists.
@@ -298,9 +298,9 @@ Priority order (highest first):
 Additional rules:
 
 * Chain from the narrowest available root (`this.recordForm().getByLabel(...)` or a component's `root`), never from bare `page` when a scope exists — prevents strict-mode collisions.
-* Every locator that exists in `docs/analysis/locator-repository.json` must be resolved through `LocatorRepository` (CRM pages get it via `BaseCrmPage.repository`). Never invent a competing locator for a registered element — skill 24 is authoritative for the resource layers.
+* Every stable locator used by committed automation must exist in `docs/analysis/locator-repository.json` and be resolved through `LocatorRepository` (CRM pages get it via `BaseCrmPage.repository`). Raw locator definitions are discovery-only and must not remain in tests, fixtures, pages, or components. Skill 24 is authoritative for the resource layers.
 * URLs, routes, env values, shared test data: ONLY from `config/resources.ts` (skill 24). `process.env` reads are forbidden in specs and page objects.
-* Locators live in their narrowest correct owner: shared widget internals belong to reusable components; feature-specific and selected-display elements belong to feature page objects.
+* Locator definitions live in the Locator Repository. Shared widget mechanics belong to reusable components; feature-specific and selected-display behavior belongs to feature page objects; each consumer resolves named keys within its narrowest correct scope.
 * Repeated locators remain private to their owner. Promote behavior to a shared component only when reusable DOM and interaction evidence exists.
 
 ---
@@ -335,7 +335,7 @@ Additional rules:
 
 When the Self-Healing Agent edits code it must ALSO obey this skill:
 
-* A healed locator replaces the old one in its current owning component or page-object getter — it does not add a second competing locator at another layer.
+* A healed locator replaces the old repository definition while its component or page-object consumer retains the same key — it does not add a competing raw locator at another layer.
 * Healing never introduces `waitForTimeout`, `try/catch` swallowing, or weakened assertions to force green.
 * Healed files must still pass the review checklist below.
 
@@ -347,7 +347,7 @@ When the Self-Healing Agent edits code it must ALSO obey this skill:
 2. Page object sections in the standard order with dividers.
 3. Every public method named per the naming table and allure-stepped.
 4. No magic numbers, no abbreviations, no dead code, no commented-out code.
-5. Locators follow the priority order and are scoped.
+5. Locators follow the priority order, are registered, resolve by repository key, and use the narrowest correct scope.
 6. `npx tsc --noEmit` passes.
 7. A colleague could tell what the file does from names alone.
 8. Playwright-native actions, actionability, and web-first assertions are used before custom waiting or polling.

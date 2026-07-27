@@ -151,7 +151,7 @@ Every automated test must be traceable back to its originating TC.
 11. Create a new Page Object or Component only when no existing owner satisfies the requirement.
 12. Select Primary Locators and Fallback Locator Chains from Locator Inventory.
 13. Apply contextual locator strategy for non-unique elements.
-14. Store locators in their narrowest correct Page Object or Component owner. Registered definitions remain authoritative in the Locator Repository.
+14. Register every committed locator definition in the Locator Repository. Page Objects and Components retain narrow behavioral ownership and resolve the registered key within their owned scope.
 15. Create or update Fixtures, Utilities, Test Data, and Supporting Helpers.
 16. Implement Playwright TypeScript tests using feature Page Object methods only.
 17. Add business assertions based on approved expected results.
@@ -329,6 +329,8 @@ Before generating or selecting a locator:
    - Repository entry does not exist
    - Repository locator fails validation
 6. Rediscover locators only when repository and inventory locators are invalid.
+
+If no equivalent repository entry exists, add and validate the missing entry before committing the consuming Page Object or Component. Never insert a competing raw locator into a test, fixture, page, or component.
 
 Repository validation must verify:
 
@@ -653,7 +655,7 @@ MEDIUM
 
 ### Self-Healing Support
 
-Fallback chains must be stored in Page Objects and Locator Inventory metadata.
+Fallback chains must be stored in the Locator Repository and Locator Inventory metadata. Page Objects and Components consume only the registered key.
 
 The Self-Healing Agent must evaluate fallback locators before initiating locator rediscovery.
 
@@ -945,7 +947,7 @@ Updated Automation
 - Application defects are not hidden.
 - Tests consume feature Page Object facades and do not import Components directly.
 - New or reused Components are cataloged and supported by equivalent DOM and behavior evidence.
-- Locators remain in their narrowest correct owner.
+- Locator definitions remain centralized in the Locator Repository; scoped behavior remains in its narrowest correct Page Object or Component consumer.
 - Playwright-native actions and web-first assertions were considered before custom waiting or polling.
 - No exception-based normal UI control flow was introduced.
 - No permanent runtime `.or()` fallback chain was introduced.

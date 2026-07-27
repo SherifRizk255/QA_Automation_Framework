@@ -145,8 +145,22 @@ export function portalHashRoute(hashRoute: string, fromUrl: string = ENV.portal.
 export const ROUTES = {
   portal: {
     login: ENV.portal.loginUrl,
+    dashboard: '#/dashboard',
     accounts: '#/accounts',
+    transfers: '#/transfers',
     transferHub: '#/transfers/transfer-money',
+    betweenMyAccounts: '#/transfers/transfer-money/between-my-accounts',
+    cards: '#/cards',
+    loans: '#/loans',
+    investments: '#/deposits',
+    more: '#/more',
+    profile: '#/profile',
+  },
+  portalApi: {
+    customerProfile: '/api/v1/auth/user/profile',
+    customerProducts: '/api/v1/customer/products',
+    customerCards: '/api/v1/customer/cards',
+    exchangeRates: '/api/v1/masterdata/exchange-rates',
   },
   crm: {
     smsLogs: crmEntityListUrl({

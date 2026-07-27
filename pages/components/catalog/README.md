@@ -85,6 +85,8 @@ Item components own:
 
 The feature page decides which item satisfies a business rule. A collection component may use `rows.nth(index)` for bounded iteration through its owned collection; positional selection must not be used to guess a business item.
 
+Every component root and stable child locator definition must be registered in `docs/analysis/locator-repository.json`. Components own their scoped mechanics and consume those definitions by repository key; raw Playwright locator definitions are permitted only during temporary discovery and must not remain in committed component code.
+
 ## Optional and required values
 
 Optional discovery supports candidate scanning:
@@ -123,14 +125,18 @@ The selected display remains feature-page-owned. Picker rows remain `AccountRowC
 
 ## Locator ownership and healing
 
-A locator lives in the narrowest correct owner:
+The Locator Repository is the mandatory definition owner for every committed locator. The narrowest page or component remains the behavioral consumer and resolves the registered key within its owned scope.
 
-- Shared widget child → reusable component.
-- Feature-specific or selected display → feature page object.
-- Registered definition and fallback history → Locator Repository.
+A locator definition and its runtime behavior have separate owners:
+
+- Every committed definition and fallback history → Locator Repository.
+- Shared widget behavior and scope → reusable component consuming a repository key.
+- Feature-specific or selected-display behavior and scope → feature page object consuming a repository key.
 - Test specification → never owns a locator.
 
-Self-healing updates the owning layer. It must not bypass an existing component or duplicate a locator in a feature page or specification. Optional and required reader semantics must remain unchanged.
+Self-healing updates the repository definition while preserving the owning behavioral consumer. It must not bypass an existing component or duplicate a locator in a feature page or specification. Optional and required reader semantics must remain unchanged.
+
+For a locator change, self-healing updates the repository entry and preserves the consumer key. It must never insert a competing raw selector into a page object or component.
 
 ## Lifecycle
 

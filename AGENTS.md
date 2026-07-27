@@ -228,6 +228,18 @@ over screenshots.
 
 # Locator Governance
 
+## Mandatory Repository Rule
+
+Every stable UI locator used by a committed page object or reusable component must be registered in `docs/analysis/locator-repository.json` and consumed by repository key. Raw locator definitions are allowed only during temporary discovery and must not remain in committed runtime tests, fixtures, pages, or components.
+
+Required workflow:
+
+1. Search the Locator Repository.
+2. Reuse an existing locator key when an equivalent entry exists.
+3. Add a missing repository entry when no equivalent exists.
+4. Update the repository entry during locator healing.
+5. Never bypass the repository with a competing raw locator in a test, fixture, page object, or component.
+
 ## Locator Philosophy
 
 Locator discovery must be DOM-first.
@@ -319,7 +331,7 @@ Screenshots are not locator discovery mechanisms.
 - Prefer Playwright locators, web-first assertions, actionability, and auto-waiting before custom TypeScript waiting, polling, or retry logic.
 - Keep TypeScript control flow explicit and readable; exceptional use of polling, locator unions, regex, or exception handling must be justified and must preserve behavior.
 - Tests must consume feature page-object facades and must not import, instantiate, or directly operate reusable UI components.
-- Keep each locator in its narrowest correct owner: reusable widget internals belong to components, feature-specific elements belong to feature page objects, and registered definitions remain authoritative in the locator repository.
+- Keep locator behavior in its narrowest correct consumer while the Locator Repository owns every committed locator definition: reusable widget mechanics belong to components, feature behavior belongs to feature page objects, and both consume definitions by repository key.
 - Reuse existing Page Objects and cataloged components whenever possible.
 - Keep tests independent.
 - No hardcoded credentials.

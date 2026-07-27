@@ -756,6 +756,8 @@ After locator discovery:
 6. Create new entries for previously unknown elements.
 7. Save updated locator metadata.
 
+Every stable locator selected for committed automation must be registered before implementation. Temporary raw discovery locators may exist only in discovery evidence; they must not be copied into committed tests, fixtures, page objects, or components. When no equivalent entry exists, create the repository entry rather than bypassing the repository.
+
 Repository updates must preserve:
 
 - Primary Locator

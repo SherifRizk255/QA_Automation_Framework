@@ -7,6 +7,15 @@ type LocatorDefinition = {
   value: string;
   name?: string;
   exact?: boolean;
+  includeHidden?: boolean;
+  hasText?: string;
+};
+
+type LocatorParameters = Readonly<Record<string, string>>;
+
+type LocatorOptions = {
+  readonly scope?: Locator;
+  readonly parameters?: LocatorParameters;
 };
 
 type LocatorRepositoryEntry = {
@@ -24,7 +33,7 @@ function loadRepository(): { entries: LocatorRepositoryEntry[] } {
   return JSON.parse(fs.readFileSync(repositoryPath, 'utf-8'));
 }
 
-function toRegex(value: string) {
+function toRegex(value: string): string | RegExp {
   if (value.startsWith('/') && value.endsWith('/i')) {
     return new RegExp(value.slice(1, -2), 'i');
   }
@@ -36,35 +45,60 @@ function toRegex(value: string) {
   return value;
 }
 
-function buildLocator(page: Page, definition: LocatorDefinition): Locator {
-  const value = toRegex(definition.value);
+function replaceParameters(value: string, parameters: LocatorParameters = {}): string {
+  let resolved = value;
+
+  for (const [name, replacement] of Object.entries(parameters)) {
+    resolved = resolved.replaceAll(`{{${name}}}`, replacement);
+  }
+
+  if (resolved.includes('{{')) {
+    throw new Error(`Locator repository parameters are incomplete for: ${value}`);
+  }
+
+  return resolved;
+}
+
+function buildLocator(
+  root: Page | Locator,
+  definition: LocatorDefinition,
+  parameters?: LocatorParameters
+): Locator {
+  const rawValue = replaceParameters(definition.value, parameters);
+  const value = toRegex(rawValue);
+  const rawName = definition.name
+    ? replaceParameters(definition.name, parameters)
+    : undefined;
+  let locator: Locator;
 
   if (definition.type === 'role') {
-    return page.getByRole(definition.value as Parameters<Page['getByRole']>[0], {
-      name: definition.name ? toRegex(definition.name) : undefined,
+    locator = root.getByRole(rawValue as Parameters<Page['getByRole']>[0], {
+      name: rawName ? toRegex(rawName) : undefined,
       exact: definition.exact,
+      includeHidden: definition.includeHidden,
     });
+  } else if (definition.type === 'text') {
+    locator = root.getByText(value, { exact: definition.exact });
+  } else if (definition.type === 'label') {
+    locator = root.getByLabel(value, { exact: definition.exact });
+  } else if (definition.type === 'placeholder') {
+    locator = root.getByPlaceholder(value);
+  } else {
+    locator = root.locator(rawValue);
   }
 
-  if (definition.type === 'text') {
-    return page.getByText(value, { exact: definition.exact });
+  if (definition.hasText) {
+    const hasText = replaceParameters(definition.hasText, parameters);
+    locator = locator.filter({ hasText: toRegex(hasText) });
   }
 
-  if (definition.type === 'label') {
-    return page.getByLabel(value, { exact: definition.exact });
-  }
-
-  if (definition.type === 'placeholder') {
-    return page.getByPlaceholder(value);
-  }
-
-  return page.locator(definition.value);
+  return locator;
 }
 
 export class LocatorRepository {
   constructor(private readonly page: Page) {}
 
-  locator(elementId: string): Locator {
+  resolve(elementId: string, options: LocatorOptions = {}): Locator {
     const entry = loadRepository().entries.find((item) => item.elementId === elementId);
 
     if (!entry) {
@@ -73,10 +107,14 @@ export class LocatorRepository {
 
     usage[elementId] = (usage[elementId] ?? 0) + 1;
 
-    return buildLocator(this.page, entry.primary);
+    return buildLocator(options.scope ?? this.page, entry.primary, options.parameters);
   }
 
-  async validateVisible(elementId: string) {
+  locator(elementId: string, options: LocatorOptions = {}): Locator {
+    return this.resolve(elementId, options);
+  }
+
+  async validateVisible(elementId: string, options: LocatorOptions = {}): Promise<Locator> {
     const entry = loadRepository().entries.find((item) => item.elementId === elementId);
 
     if (!entry) {
@@ -88,7 +126,11 @@ export class LocatorRepository {
     const candidates = [entry.primary, ...entry.fallbackChain];
 
     for (const candidate of candidates) {
-      const locator = buildLocator(this.page, candidate);
+      const locator = buildLocator(
+        options.scope ?? this.page,
+        candidate,
+        options.parameters
+      );
       const count = await locator.count().catch(() => 0);
       const visible = count === 1 ? await locator.isVisible().catch(() => false) : false;
 
@@ -98,11 +140,16 @@ export class LocatorRepository {
       }
     }
 
-    await expect(buildLocator(this.page, entry.primary)).toBeVisible();
-    return buildLocator(this.page, entry.primary);
+    const primary = buildLocator(
+      options.scope ?? this.page,
+      entry.primary,
+      options.parameters
+    );
+    await expect(primary).toBeVisible();
+    return primary;
   }
 }
 
-export function getLocatorRepositoryUsage() {
+export function getLocatorRepositoryUsage(): Readonly<Record<string, number>> {
   return { ...usage };
 }

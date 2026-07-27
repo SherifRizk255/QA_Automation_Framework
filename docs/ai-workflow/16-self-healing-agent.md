@@ -224,7 +224,7 @@ Possible fixes:
  - Locator rediscovery
  - Locator replacement
  - Fallback locator activation
- - Owning Page Object or Component locator update
+ - Locator Repository update with the owning Page Object or Component consumer preserved
 
 ---
 
@@ -341,13 +341,13 @@ AUT_ASYNC_RENDER
 Before healing a locator or widget interaction:
 
 1. Trace the failure through the feature Page Object facade to the owning Page Object or Component.
-2. Heal at the narrowest existing owner.
+2. Heal the Locator Repository entry and preserve the narrowest existing behavioral consumer.
 3. Do not bypass a Component by adding a competing locator to a Page Object or specification.
 4. Do not duplicate locators across layers.
 5. Preserve optional `find*()` behavior and required `get*()` validation behavior.
 6. Preserve the feature Page Object's public facade and business sequencing.
 
-Registered locator healing updates the Locator Repository. Unregistered locator healing updates its current narrowest owner according to skill 24.
+Every committed locator is registered. Locator healing updates the Locator Repository entry while preserving the current narrowest Page Object or Component consumer and its repository key.
 
 ---
 
@@ -365,7 +365,7 @@ A healing change must not:
 * Weaken assertions or diagnostics.
 * Bypass the feature Page Object facade.
 
-When a locator fails, replace it in its narrowest owner after evidence-backed validation. Repository fallbacks are evaluated independently; they are not accumulated into an unbounded runtime union. Exceptional handling must remain justified and preserve the original behavior.
+When a locator fails, replace its repository definition after evidence-backed validation while preserving the narrowest behavioral consumer. Repository fallbacks are evaluated independently; they are not accumulated into an unbounded runtime union. Exceptional handling must remain justified and preserve the original behavior.
 
 ---
 
@@ -676,6 +676,8 @@ Whenever locator recovery succeeds:
 3. Record old locator.
 4. Record new locator.
 5. Update validation timestamp.
+
+Never bypass synchronization by inserting the recovered selector directly into a Page Object or Component. The consumer must continue resolving the same repository key unless an approved semantic rename is required.
 
 Repository updates must occur only after successful test validation.
 
