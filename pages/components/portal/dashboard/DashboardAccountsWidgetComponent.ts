@@ -39,6 +39,13 @@ export class DashboardAccountsWidgetComponent {
     );
   }
 
+  private get slides(): Locator {
+    return this.repository.locator(
+      'PORTAL.COMPONENTS.SWIPER.SLIDES',
+      { scope: this.root }
+    );
+  }
+
   private get manageLink(): Locator {
     return this.repository.locator(
       'PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.MANAGE_LINK',
@@ -55,7 +62,29 @@ export class DashboardAccountsWidgetComponent {
   }
 
   async getActiveAccount(): Promise<DashboardAccountUi> {
+    const account = await this.findActiveAccount();
+
+    if (!account) {
+      throw new Error(
+        'The active Accounts slide must contain an account balance.'
+      );
+    }
+
+    return account;
+  }
+
+  async findActiveAccount(): Promise<DashboardAccountUi | undefined> {
     await this.carousel.assertReady();
+    const balanceCount = await this.balance.count();
+
+    if (balanceCount === 0) {
+      return undefined;
+    }
+
+    expect(
+      balanceCount,
+      'An account product slide must expose exactly one balance.'
+    ).toBe(1);
     await expect(this.balance).toBeVisible();
 
     return {
@@ -66,6 +95,15 @@ export class DashboardAccountsWidgetComponent {
 
   async moveNext(): Promise<void> {
     await this.carousel.moveNextAndAssertActiveItemChanged();
+  }
+
+  async getItemCount(): Promise<number> {
+    const count = await this.slides.count();
+    expect(
+      count,
+      'The Accounts carousel must contain at least one account.'
+    ).toBeGreaterThan(0);
+    return count;
   }
 
   async openManage(): Promise<void> {

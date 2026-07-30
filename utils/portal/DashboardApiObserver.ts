@@ -14,13 +14,17 @@ export interface DashboardAccount {
   readonly accountName: string;
   readonly currency: string;
   readonly availableBalance: string;
+  readonly holdAmount: string;
+  readonly holdCurrency: string;
 }
 
 export interface DashboardCard {
   readonly cardIdentifier: string;
   readonly productName: string;
+  readonly cardType: string;
   readonly currency: string;
   readonly cardLimit: string;
+  readonly availableBalance: string;
   readonly availableLimit: string;
   readonly outstanding: string;
 }
@@ -114,6 +118,12 @@ function mapAccounts(data: JsonRecord): readonly DashboardAccount[] {
   return requireArray(data.AccountList, 'customer products AccountList').map((entry, index) => {
     const account = requireRecord(entry, `AccountList[${index}]`);
     const balance = nestedRecord(account, 'AcctBal', `AccountList[${index}]`);
+    const holdInfo = nestedRecord(account, 'HoldInfoList', `AccountList[${index}]`);
+    const holdAmount = nestedRecord(
+      holdInfo,
+      'HoldAmt',
+      `AccountList[${index}].HoldInfoList`
+    );
 
     return {
       accountNumber: requireString(account, 'AcctNum', `AccountList[${index}]`),
@@ -121,6 +131,16 @@ function mapAccounts(data: JsonRecord): readonly DashboardAccount[] {
       accountName: requireString(account, 'AcctTypeDesc', `AccountList[${index}]`),
       currency: requireString(account, 'CurCodeValue', `AccountList[${index}]`),
       availableBalance: requireString(balance, 'AccountBalance', `AccountList[${index}].AcctBal`),
+      holdAmount: requireString(
+        holdAmount,
+        'Amt',
+        `AccountList[${index}].HoldInfoList.HoldAmt`
+      ),
+      holdCurrency: requireString(
+        holdAmount,
+        'CurCodeValue',
+        `AccountList[${index}].HoldInfoList.HoldAmt`
+      ),
     };
   });
 }
@@ -169,8 +189,10 @@ function mapCards(data: JsonRecord): readonly DashboardCard[] {
     return {
       cardIdentifier: maskedPan || cardNumber,
       productName: requireString(card, 'ProductDescription', `Cards[${index}]`),
+      cardType: requireString(card, 'CardType', `Cards[${index}]`),
       currency: requireString(card, 'CardCurrency', `Cards[${index}]`),
       cardLimit: requireString(card, 'CardLimit', `Cards[${index}]`),
+      availableBalance: requireString(card, 'AvailableBalance', `Cards[${index}]`),
       availableLimit:
         availableToSpend || requireString(card, 'AvailableBalance', `Cards[${index}]`),
       outstanding: requireString(card, 'OutStandingBalance', `Cards[${index}]`),

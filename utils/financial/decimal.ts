@@ -40,6 +40,16 @@ export function addDecimals(
   };
 }
 
+export function subtractDecimals(
+  left: DecimalValue,
+  right: DecimalValue
+): DecimalValue {
+  return addDecimals(left, {
+    units: -right.units,
+    scale: right.scale,
+  });
+}
+
 export function multiplyDecimals(
   left: DecimalValue,
   right: DecimalValue

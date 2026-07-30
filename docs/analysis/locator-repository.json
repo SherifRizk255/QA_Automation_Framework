@@ -181,6 +181,23 @@
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {
+      "elementId": "PORTAL.DASHBOARD.CURRENCY.OPTION",
+      "screenName": "Portal Dashboard",
+      "elementName": "Display Currency Option",
+      "owner": "DashboardPage",
+      "scope": "GLOBAL_OVERLAY",
+      "locatorType": "ACCESSIBILITY_PARAMETERIZED",
+      "primaryLocator": "getByRole('option', { name: '{{currency}}', exact: true })",
+      "primary": { "type": "role", "value": "option", "name": "{{currency}}", "exact": true },
+      "fallbackLocatorChain": ["[role=\"option\"]:has-text(\"{{currency}}\")"],
+      "fallbackChain": [{ "type": "text", "value": "{{currency}}", "exact": true }],
+      "confidence": "HIGH", "confidenceScore": 97, "volatility": "LOW",
+      "discoverySource": "Controlled live Dashboard DOM inspection 2026-07-27: the expanded Display currency combobox exposed unique role=option elements for EGP, USD, CAD, EUR, GBP, CHF, JPY, SAR, AED and KWD",
+      "uniqueness": "PARAMETERIZED_UNIQUE", "lastVerifiedDate": "2026-07-27",
+      "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
       "elementId": "PORTAL.DASHBOARD.NAV.DASHBOARD_TAB",
       "screenName": "Portal Shell",
       "elementName": "Dashboard Navigation Tab",
@@ -583,6 +600,37 @@
       "fallbackLocatorChain": ["text={{currency}}"], "fallbackChain": [{ "type": "text", "value": "{{currency}}", "exact": true }],
       "confidence": "HIGH", "confidenceScore": 92, "volatility": "LOW", "discoverySource": "Live Loans widget DOM and Dashboard smoke execution evidence 2026-07-22",
       "uniqueness": "COLLECTION", "lastVerifiedDate": "2026-07-22", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.LOANS.PROGRESS_TEXT",
+      "screenName": "Portal Dashboard", "elementName": "Active Loan Percentage Paid", "owner": "DashboardLoansWidgetComponent", "scope": "PORTAL.COMPONENTS.SWIPER.ACTIVE_SLIDE",
+      "locatorType": "ACCESSIBILITY_CONTEXTUAL", "primaryLocator": "getByRole('paragraph').filter({ hasText: 'paid' })",
+      "primary": { "type": "role", "value": "paragraph", "hasText": "paid" },
+      "fallbackLocatorChain": ["p.field-caption"], "fallbackChain": [{ "type": "css", "value": "p.field-caption" }],
+      "confidence": "HIGH", "confidenceScore": 95, "volatility": "LOW",
+      "discoverySource": "Retained Dashboard trace, controlled live DOM inspection, and targeted SAIB-N-0199 execution 2026-07-27: active loan slides expose one paragraph containing paid, such as 35% paid or 28% paid; exact text regexes did not resolve because the rendered text node contains non-observable spacing",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-27", "verificationCount": 4, "successCount": 2, "failureCount": 2,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.LOANS.PROGRESS_TRACK",
+      "screenName": "Portal Dashboard", "elementName": "Active Loan Progress Track", "owner": "DashboardLoansWidgetComponent", "scope": "PORTAL.COMPONENTS.SWIPER.ACTIVE_SLIDE",
+      "locatorType": "CSS", "primaryLocator": "section > div", "primary": { "type": "css", "value": "section > div" },
+      "fallbackLocatorChain": ["section [class*=\"overflow-hidden\"]"], "fallbackChain": [{ "type": "css", "value": "section [class*=\"overflow-hidden\"]" }],
+      "confidence": "HIGH", "confidenceScore": 91, "volatility": "MEDIUM",
+      "discoverySource": "Retained Dashboard trace DOM 2026-07-27: the active loan slide contains one section whose direct div child is the full-width progress track; the observed control has no aria-valuenow",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-27", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.LOANS.PROGRESS_FILL",
+      "screenName": "Portal Dashboard", "elementName": "Active Loan Progress Fill", "owner": "DashboardLoansWidgetComponent", "scope": "PORTAL.DASHBOARD.WIDGETS.LOANS.PROGRESS_TRACK",
+      "locatorType": "CSS", "primaryLocator": ":scope > div", "primary": { "type": "css", "value": ":scope > div" },
+      "fallbackLocatorChain": ["div[style*=\"width\"]"], "fallbackChain": [{ "type": "css", "value": "div[style*=\"width\"]" }],
+      "confidence": "HIGH", "confidenceScore": 94, "volatility": "LOW",
+      "discoverySource": "Retained Dashboard trace DOM 2026-07-27: each scoped progress track has one direct fill div with an inline percentage width (observed 35.0029% and 28.0667%)",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-27", "verificationCount": 1, "successCount": 1, "failureCount": 0,
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {

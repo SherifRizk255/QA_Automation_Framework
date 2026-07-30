@@ -11,10 +11,13 @@ import {
   multiplyDecimals,
   parseDecimal,
   roundDecimal,
+  subtractDecimals,
 } from '../../../utils/financial/decimal.js';
 import {
   extractPercentage,
+  formatDashboardMoney,
   formatApiDate,
+  isDashboardMoneyDisplay,
   normalizeText,
 } from '../../../utils/portal/dashboard/dashboardDisplayFormatter.js';
 
@@ -164,6 +167,17 @@ test.describe('Dashboard pure decimal logic', () => {
     expect(decimalToNumber(parseDecimal('-2', 'percentage'))).toBe(-2);
     expect(decimalToNumber(parseDecimal('0.05', 'percentage'))).toBe(0.05);
   });
+
+  test('UT-DASHBOARD-DECIMAL-009 | subtracts decimal values with aligned scales', () => {
+    expect(subtractDecimals(
+      parseDecimal('100.00', 'left'),
+      parseDecimal('25.5', 'right')
+    )).toEqual({ units: 7_450n, scale: 2 });
+    expect(subtractDecimals(
+      parseDecimal('25.5', 'left'),
+      parseDecimal('100.00', 'right')
+    )).toEqual({ units: -7_450n, scale: 2 });
+  });
 });
 
 test.describe('Dashboard pure display formatting', () => {
@@ -198,5 +212,35 @@ test.describe('Dashboard pure display formatting', () => {
     expect(() => extractPercentage('No progress value', 'loan progress')).toThrow(
       'loan progress was not found.'
     );
+  });
+
+  test('UT-DASHBOARD-FORMAT-004 | formats Dashboard monetary values as #,##0.00 without locale drift', () => {
+    expect(formatDashboardMoney(parseDecimal('15000.54', 'value'))).toBe(
+      '15,000.54'
+    );
+    expect(formatDashboardMoney(parseDecimal('1000', 'value'))).toBe(
+      '1,000.00'
+    );
+    expect(formatDashboardMoney(parseDecimal('0.5', 'value'))).toBe('0.50');
+    expect(formatDashboardMoney(parseDecimal('0', 'value'))).toBe('0.00');
+    expect(formatDashboardMoney(parseDecimal('-15000.545', 'value'))).toBe(
+      '-15,000.55'
+    );
+  });
+
+  test('UT-DASHBOARD-FORMAT-005 | recognizes only the approved visible Dashboard monetary format', () => {
+    expect(isDashboardMoneyDisplay('15,000.54')).toBe(true);
+    expect(isDashboardMoneyDisplay('1,000.00')).toBe(true);
+    expect(isDashboardMoneyDisplay('0.50')).toBe(true);
+    expect(isDashboardMoneyDisplay('0.00')).toBe(true);
+    expect(isDashboardMoneyDisplay('-1,250.75')).toBe(true);
+    expect(isDashboardMoneyDisplay('15000.50')).toBe(false);
+    expect(isDashboardMoneyDisplay('15000.5')).toBe(false);
+    expect(isDashboardMoneyDisplay('1000.00')).toBe(false);
+    expect(isDashboardMoneyDisplay('15.000,54')).toBe(false);
+    expect(isDashboardMoneyDisplay('1,000')).toBe(false);
+    expect(isDashboardMoneyDisplay('1,000.0')).toBe(false);
+    expect(isDashboardMoneyDisplay('1,000.000')).toBe(false);
+    expect(isDashboardMoneyDisplay('1.000,00')).toBe(false);
   });
 });

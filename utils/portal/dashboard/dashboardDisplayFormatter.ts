@@ -1,5 +1,6 @@
 import {
   parseDecimal,
+  roundDecimal,
   type DecimalValue,
 } from '../../financial/decimal.js';
 
@@ -44,4 +45,21 @@ export function extractPercentage(
   }
 
   return parseDecimal(percentage, description);
+}
+
+export function formatDashboardMoney(value: DecimalValue): string {
+  const rounded = roundDecimal(value, 2);
+  const negative = rounded.units < 0n;
+  const magnitude = (negative ? -rounded.units : rounded.units)
+    .toString()
+    .padStart(3, '0');
+  const integerPart = magnitude.slice(0, -2);
+  const fractionalPart = magnitude.slice(-2);
+  const groupedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+  return `${negative ? '-' : ''}${groupedInteger}.${fractionalPart}`;
+}
+
+export function isDashboardMoneyDisplay(value: string): boolean {
+  return /^-?(?:0|[1-9]\d{0,2}(?:,\d{3})*)\.\d{2}$/.test(value);
 }

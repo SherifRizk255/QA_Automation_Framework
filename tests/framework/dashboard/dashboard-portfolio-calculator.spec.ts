@@ -6,6 +6,7 @@ import { decimalToString } from '../../../utils/financial/decimal.js';
 import {
   calculateAssetPortfolio,
   calculateLiabilityPortfolio,
+  calculateNetWorth,
   type DashboardPortfolioCategoryExpectation,
   type DashboardPortfolioCategoryLabel,
   type DashboardPortfolioExpectation,
@@ -13,6 +14,7 @@ import {
 import type {
   DashboardAccount,
   DashboardApiSnapshot,
+  DashboardCard,
   DashboardDeposit,
   DashboardExchangeRate,
   DashboardLoan,
@@ -20,7 +22,7 @@ import type {
 
 type PortfolioSnapshotInput = Pick<
   DashboardApiSnapshot,
-  'accounts' | 'deposits' | 'loans' | 'exchangeRates'
+  'accounts' | 'cards' | 'deposits' | 'loans' | 'exchangeRates'
 >;
 
 function createSnapshot(
@@ -32,7 +34,7 @@ function createSnapshot(
       customerId: 'PORTFOLIO-TEST-CUSTOMER',
     },
     accounts: input.accounts ?? [],
-    cards: [],
+    cards: input.cards ?? [],
     deposits: input.deposits ?? [],
     loans: input.loans ?? [],
     exchangeRates: input.exchangeRates ?? [],
@@ -41,26 +43,50 @@ function createSnapshot(
 
 function createAccount(
   availableBalance: string,
-  currency = 'EGP'
+  currency = 'EGP',
+  accountName = 'CURRENT ACCOUNT',
+  holdAmount = '0',
+  holdCurrency = currency
 ): DashboardAccount {
   return {
     accountNumber: `ACCOUNT-${currency}-${availableBalance}`,
     accountType: 'TEST',
-    accountName: 'Test Account',
+    accountName,
     currency,
     availableBalance,
+    holdAmount,
+    holdCurrency,
+  };
+}
+
+function createCard(
+  cardType: 'CC' | 'DC' | 'PP',
+  availableBalance: string,
+  outstanding: string,
+  currency = 'EGP'
+): DashboardCard {
+  return {
+    cardIdentifier: `CARD-${cardType}-${currency}`,
+    productName: `${cardType} Test Card`,
+    cardType,
+    currency,
+    cardLimit: '1000',
+    availableBalance,
+    availableLimit: availableBalance,
+    outstanding,
   };
 }
 
 function createDeposit(
   totalAmount: string,
-  currency = 'EGP'
+  currency = 'EGP',
+  depositType = 'TD'
 ): DashboardDeposit {
   return {
     productId: `DEPOSIT-${currency}-${totalAmount}`,
     productCode: 'TD',
     productName: 'Test Deposit',
-    depositType: 'TD',
+    depositType,
     interestRate: '10',
     maturityDate: '2027-01-01',
     currency,
@@ -111,16 +137,20 @@ test.describe('Dashboard Portfolio calculator', () => {
   test('UT-DASHBOARD-PORTFOLIO-001 | classifies and sums asset categories in the approved order', () => {
     const result = calculateAssetPortfolio(createSnapshot({
       accounts: [
-        createAccount('100.00'),
-        createAccount('0.00'),
-        createAccount('-25.00'),
-        createAccount('50.00'),
+        createAccount('100.00', 'EGP', 'CURRENT ACCOUNT'),
+        createAccount('50.00', 'EGP', 'SAVING ACCOUNTS 3M INTR'),
+        createAccount('999.00', 'EGP', 'ADV. TRST RECPT'),
       ],
       deposits: [
-        createDeposit('200.00'),
-        createDeposit('0.00'),
-        createDeposit('-10.00'),
-        createDeposit('50.00'),
+        createDeposit('100.00', 'EGP', 'MF'),
+        createDeposit('100.00', 'EGP', 'CD'),
+        createDeposit('50.00', 'EGP', 'TD'),
+        createDeposit('999.00', 'EGP', 'UNRELATED'),
+      ],
+      cards: [
+        createCard('PP', '25.00', '0.00'),
+        createCard('CC', '900.00', '40.00'),
+        createCard('DC', '800.00', '0.00'),
       ],
     }));
 
@@ -131,22 +161,37 @@ test.describe('Dashboard Portfolio calculator', () => {
     ]);
     expect(decimalToString(getCategory(result, 'Accounts').value)).toBe('150');
     expect(decimalToString(getCategory(result, 'Deposits').value)).toBe('250');
-    expect(decimalToString(getCategory(result, 'Cards').value)).toBe('0');
-    expect(decimalToString(result.total)).toBe('400');
-    expect(getCategory(result, 'Accounts').percentage).toBe(37.5);
-    expect(getCategory(result, 'Deposits').percentage).toBe(62.5);
-    expect(getCategory(result, 'Cards').percentage).toBe(0);
+    expect(decimalToString(getCategory(result, 'Cards').value)).toBe('25');
+    expect(decimalToString(result.total)).toBe('425');
+    expect(getCategory(result, 'Accounts').percentage).toBeCloseTo(
+      35.2941176471,
+      10
+    );
+    expect(getCategory(result, 'Deposits').percentage).toBeCloseTo(
+      58.8235294118,
+      10
+    );
+    expect(getCategory(result, 'Cards').percentage).toBeCloseTo(
+      5.8823529412,
+      10
+    );
+    expect(result.categories.map((category) => category.displayedPercentage)).toEqual([
+      35,
+      59,
+      6,
+    ]);
   });
 
   test('UT-DASHBOARD-PORTFOLIO-002 | returns a zero-safe all-zero asset expectation', () => {
     const result = calculateAssetPortfolio(createSnapshot({
       accounts: [
-        createAccount('0'),
-        createAccount('-10'),
+        createAccount('0', 'EGP', 'CURRENT ACCOUNT'),
       ],
       deposits: [
         createDeposit('0'),
-        createDeposit('-20'),
+      ],
+      cards: [
+        createCard('PP', '0', '0'),
       ],
     }));
 
@@ -157,6 +202,9 @@ test.describe('Dashboard Portfolio calculator', () => {
       0,
       0,
     ]);
+    expect(
+      result.categories.map((category) => category.displayedPercentage)
+    ).toEqual([0, 0, 0]);
   });
 
   test('UT-DASHBOARD-PORTFOLIO-003 | classifies absolute liabilities in the approved order', () => {
@@ -167,10 +215,13 @@ test.describe('Dashboard Portfolio calculator', () => {
         createLoan('0.00'),
       ],
       accounts: [
-        createAccount('-25.00'),
-        createAccount('-75.00'),
-        createAccount('0.00'),
-        createAccount('20.00'),
+        createAccount('-999.00', 'EGP', 'CURRENT ACCOUNT', '25.00'),
+        createAccount('20.00', 'EGP', 'CURRENT ACCOUNT', '-75.00'),
+        createAccount('0.00', 'EGP', 'CURRENT ACCOUNT', '0.00'),
+      ],
+      cards: [
+        createCard('CC', '900.00', '-40.00'),
+        createCard('PP', '500.00', '300.00'),
       ],
     }));
 
@@ -181,21 +232,32 @@ test.describe('Dashboard Portfolio calculator', () => {
     ]);
     expect(decimalToString(getCategory(result, 'Loans').value)).toBe('150');
     expect(decimalToString(getCategory(result, 'Overdraft').value)).toBe('100');
-    expect(decimalToString(getCategory(result, 'Cards').value)).toBe('0');
-    expect(decimalToString(result.total)).toBe('250');
-    expect(getCategory(result, 'Loans').percentage).toBe(60);
-    expect(getCategory(result, 'Overdraft').percentage).toBe(40);
-    expect(getCategory(result, 'Cards').percentage).toBe(0);
+    expect(decimalToString(getCategory(result, 'Cards').value)).toBe('40');
+    expect(decimalToString(result.total)).toBe('290');
+    expect(getCategory(result, 'Loans').percentage).toBeCloseTo(
+      51.724137931,
+      9
+    );
+    expect(getCategory(result, 'Overdraft').percentage).toBeCloseTo(
+      34.4827586207,
+      9
+    );
+    expect(getCategory(result, 'Cards').percentage).toBeCloseTo(
+      13.7931034483,
+      9
+    );
   });
 
   test('UT-DASHBOARD-PORTFOLIO-004 | returns a zero-safe all-zero liability expectation', () => {
     const result = calculateLiabilityPortfolio(createSnapshot({
       accounts: [
-        createAccount('0'),
-        createAccount('10'),
+        createAccount('-10', 'EGP', 'CURRENT ACCOUNT', '0'),
       ],
       loans: [
         createLoan('0'),
+      ],
+      cards: [
+        createCard('PP', '100', '100'),
       ],
     }));
 
@@ -240,8 +302,8 @@ test.describe('Dashboard Portfolio calculator', () => {
         createLoan('-1.00', 'EUR'),
       ],
       accounts: [
-        createAccount('-3.00', 'USD'),
-        createAccount('4.00', 'EUR'),
+        createAccount('999.00', 'USD', 'CURRENT ACCOUNT', '-3.00', 'USD'),
+        createAccount('-999.00', 'EUR', 'CURRENT ACCOUNT', '0.00', 'EUR'),
       ],
       exchangeRates: [
         createRate('USD', '30.125'),
@@ -268,7 +330,7 @@ test.describe('Dashboard Portfolio calculator', () => {
     }));
     const liabilities = calculateLiabilityPortfolio(createSnapshot({
       accounts: [
-        createAccount('-25.50'),
+        createAccount('-999.00', 'EGP', 'CURRENT ACCOUNT', '-25.50'),
       ],
       loans: [
         createLoan('74.50'),
@@ -383,10 +445,59 @@ test.describe('Dashboard Portfolio calculator', () => {
       getCategory(exactTotalDiffersFromDisplay, 'Accounts').percentage
     ).toBeCloseTo(67.1140939597, 10);
     expect(
+      getCategory(exactTotalDiffersFromDisplay, 'Accounts')
+        .displayedPercentage
+    ).toBe(67);
+    expect(
       getCategory(exactTotalDiffersFromDisplay, 'Deposits').percentage
     ).toBeCloseTo(32.8859060403, 10);
+    expect(
+      getCategory(exactTotalDiffersFromDisplay, 'Deposits')
+        .displayedPercentage
+    ).toBe(33);
     expect(getCategory(exactTotalDiffersFromDisplay, 'Cards').percentage).toBe(
       0
     );
+  });
+
+  test('UT-DASHBOARD-PORTFOLIO-011 | allows independently rounded displayed percentages to total 99 through 101', () => {
+    const roundedToNinetyNine = calculateAssetPortfolio(createSnapshot({
+      accounts: [
+        createAccount('1', 'EGP', 'CURRENT ACCOUNT'),
+      ],
+      deposits: [
+        createDeposit('1'),
+      ],
+      cards: [
+        createCard('PP', '1', '0'),
+      ],
+    }));
+    const displayedSum = roundedToNinetyNine.categories.reduce(
+      (total, category) => total + category.displayedPercentage,
+      0
+    );
+    const exactSum = roundedToNinetyNine.categories.reduce(
+      (total, category) => total + category.percentage,
+      0
+    );
+
+    expect(displayedSum).toBe(99);
+    expect(exactSum).toBeCloseTo(100, 10);
+  });
+
+  test('UT-DASHBOARD-PORTFOLIO-012 | calculates exact positive and negative Net Worth values', () => {
+    const positive = createSnapshot({
+      accounts: [
+        createAccount('100', 'EGP', 'CURRENT ACCOUNT', '25'),
+      ],
+    });
+    const negative = createSnapshot({
+      accounts: [
+        createAccount('25', 'EGP', 'CURRENT ACCOUNT', '100'),
+      ],
+    });
+
+    expect(decimalToString(calculateNetWorth(positive))).toBe('75');
+    expect(decimalToString(calculateNetWorth(negative))).toBe('-75');
   });
 });

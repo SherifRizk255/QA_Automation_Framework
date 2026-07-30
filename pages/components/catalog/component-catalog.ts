@@ -136,7 +136,8 @@ export const COMPONENT_CATALOG = {
     ],
     responsibilities: [
       'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.* locator keys.',
-      'Exposes assertReady(), getActiveAccount(), moveNext(), and openManage() as typed UI-only operations.',
+      'Exposes assertReady(), required and optional active-account readers, getItemCount(), moveNext(), and openManage() as typed UI-only operations.',
+      'Lets DashboardPage skip the bounded Open new account action slide without treating it as an API account.',
       'Delegates active-slide and Next mechanics to PortalSwiperCarouselComponent.',
       'Excludes API matching, financial comparison, navigation assertions, and reporting.',
     ],
@@ -186,7 +187,8 @@ export const COMPONENT_CATALOG = {
     ],
     responsibilities: [
       'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.LOANS.* locator keys.',
-      'Exposes typed active-loan values, bounded ordered amounts, Next behavior, and currency occurrence reading.',
+      'Exposes typed active-loan values, bounded ordered amounts, Next behavior, currency occurrence reading, and semantic/style-derived progress data.',
+      'Prefers aria-valuenow and otherwise returns the measured fill-to-track width ratio without performing the business comparison.',
       'Delegates active-slide and Next mechanics to PortalSwiperCarouselComponent.',
       'Excludes API matching, financial comparison, and reporting.',
     ],

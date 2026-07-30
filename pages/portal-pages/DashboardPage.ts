@@ -1,16 +1,16 @@
 import {expect,type Locator,type Page,type TestInfo,} from '@playwright/test';
 import * as allure from 'allure-js-commons';
 import { portalHashRoute, ROUTES } from '../../config/resources.js';
-import { decimalsEqual, decimalToNumber, decimalToString, parseDecimal, type DecimalValue} from '../../utils/financial/decimal.js';
+import { decimalsEqual, decimalToNumber, decimalToString, parseDecimal, roundDecimal, type DecimalValue} from '../../utils/financial/decimal.js';
 import { LocatorRepository } from '../../utils/locatorRepository.ts';
-import {extractPercentage,formatApiDate,normalizeText,} from '../../utils/portal/dashboard/dashboardDisplayFormatter.js';
-import { calculateAssetPortfolio,calculateLiabilityPortfolio, type DashboardPortfolioExpectation,} from '../../utils/portal/dashboard/DashboardPortfolioCalculator.js';
+import {extractPercentage,formatApiDate,isDashboardMoneyDisplay,normalizeText,} from '../../utils/portal/dashboard/dashboardDisplayFormatter.js';
+import { calculateAssetPortfolio,calculateLiabilityPortfolio,calculateNetWorth,type DashboardPortfolioCategoryExpectation, type DashboardPortfolioExpectation,} from '../../utils/portal/dashboard/DashboardPortfolioCalculator.js';
 import {DashboardAccountsWidgetComponent,type DashboardAccountUi,} from '../components/portal/dashboard/DashboardAccountsWidgetComponent.js';
 import {DashboardCardsWidgetComponent,type DashboardCardUi,} from '../components/portal/dashboard/DashboardCardsWidgetComponent.js';
 import { DashboardDepositsWidgetComponent } from '../components/portal/dashboard/DashboardDepositsWidgetComponent.js';
 import { DashboardLoansWidgetComponent, type DashboardLoanUi,} from '../components/portal/dashboard/DashboardLoansWidgetComponent.js';
 import { DashboardPortfolioWidgetComponent,type DashboardPortfolioUiState,} from '../components/portal/dashboard/DashboardPortfolioWidgetComponent.js';
-import { DashboardWelcomeComponent } from '../components/portal/dashboard/DashboardWelcomeComponent.js';
+import { DashboardWelcomeComponent, type DashboardSummaryLabel, type DashboardSummaryUiValue,} from '../components/portal/dashboard/DashboardWelcomeComponent.js';
 import { PortalLoadingComponent } from '../components/portal/loading/PortalLoadingComponent.js';
 import type {
   DashboardAccount,
@@ -25,6 +25,11 @@ function maskIdentifier(value: string): string {
   const compact = value.replace(/\s+/g, '');
   return compact.length <= 4 ? '****' : `****${compact.slice(-4)}`;
 }
+
+type DashboardAccountDisplayValue = {
+  readonly currency: string;
+  readonly balance: string;
+};
 
 export class DashboardPage {
   private readonly repository: LocatorRepository;
@@ -52,6 +57,13 @@ export class DashboardPage {
 
   private get currencySelector(): Locator {
     return this.repository.locator('PORTAL.DASHBOARD.CURRENCY.SELECTOR');
+  }
+
+  private currencyOption(currency: string): Locator {
+    return this.repository.locator(
+      'PORTAL.DASHBOARD.CURRENCY.OPTION',
+      { parameters: { currency } }
+    );
   }
 
   private get dashboardTab(): Locator {
@@ -241,6 +253,93 @@ export class DashboardPage {
     });
   }
 
+  async assertWelcomeNetWorthMatches(api: DashboardApiSnapshot): Promise<void> {
+    await allure.step('Verify Welcome Net Worth uses the exact approved calculation', async () => {
+      await this.assertWelcomeSummaryValue(
+        'Net Worth',
+        calculateNetWorth(api),
+        'welcome-net-worth-comparison'
+      );
+    });
+  }
+
+  async assertWelcomeAssetsMatch(api: DashboardApiSnapshot): Promise<void> {
+    await allure.step('Verify Welcome I Have uses the approved asset calculation', async () => {
+      await this.assertWelcomeSummaryValue(
+        'I Have',
+        calculateAssetPortfolio(api).total,
+        'approved-i-have-calculation'
+      );
+    });
+  }
+
+  async assertWelcomeLiabilitiesMatch(api: DashboardApiSnapshot): Promise<void> {
+    await allure.step('Verify Welcome I Owe uses the approved liability calculation', async () => {
+      await this.assertWelcomeSummaryValue(
+        'I Owe',
+        calculateLiabilityPortfolio(api).total,
+        'approved-i-owe-calculation'
+      );
+    });
+  }
+
+  async assertWelcomeMonetaryValuesUseTwoDecimalFormat(): Promise<void> {
+    await allure.step('Verify all Welcome monetary values use #,##0.00', async () => {
+      const summaries = await this.welcomeComponent.getSummaryValues();
+
+      for (const summary of summaries) {
+        expect(
+          isDashboardMoneyDisplay(summary.displayedValue),
+          `${summary.label} displayed value "${summary.displayedValue}" must use the visible #,##0.00 format.`
+        ).toBe(true);
+        expect(
+          () => parseDecimal(
+            summary.displayedValue,
+            `${summary.label} displayed monetary value`
+          ),
+          `${summary.label} displayed value "${summary.displayedValue}" must represent a valid monetary number.`
+        ).not.toThrow();
+      }
+    });
+  }
+
+  async assertAccountBalancesRemainNativeAfterAggregateCurrencyChange(
+    accounts: readonly DashboardAccount[],
+    targetAggregateCurrency: string
+  ): Promise<void> {
+    await allure.step('Verify account balances remain native after aggregate currency change', async () => {
+      expect(accounts.length,'The account-currency case requires at least two API accounts.').toBeGreaterThanOrEqual(2);
+      const beforeChange = await this.readAllDisplayedAccounts(accounts);
+
+      await this.selectAggregateCurrency(targetAggregateCurrency);
+
+      const afterChange = await this.readAllDisplayedAccounts(accounts);
+      expect(afterChange.size).toBe(beforeChange.size);
+
+      for (const [accountNumber, before] of beforeChange) {
+        const after = afterChange.get(accountNumber);
+        expect(after, 'Every account shown before the currency change must remain visible.').toBeDefined();
+        expect(after?.currency).toBe(before.currency);
+        expect(after?.balance).toBe(before.balance);
+      }
+
+      await this.attachComparison('account-native-currency-comparison', {
+        matchedRecordIdentity: 'authenticated-customer-account-collection',
+        expected: [...beforeChange.entries()].map(([accountNumber, value]) => ({
+          account: maskIdentifier(accountNumber),
+          currency: value.currency,
+          balance: value.balance,
+        })),
+        actual: [...afterChange.entries()].map(([accountNumber, value]) => ({
+          account: maskIdentifier(accountNumber),
+          currency: value.currency,
+          balance: value.balance,
+        })),
+        comparisonOutcome: 'PASS',
+      });
+    });
+  }
+
   async assertActiveAccountMatches(accounts: readonly DashboardAccount[]): Promise<void> {
     await allure.step('Verify the active account matches the accounts API', async () => {
       const activeAccount = await this.accountsComponent.getActiveAccount();
@@ -314,6 +413,168 @@ export class DashboardPage {
       }
 
       await this.assertPortfolioMatches(liabilitiesState, expectedPortfolio, 'I Owe');
+    });
+  }
+
+  async assertPortfolioAssetsTotalMatchesWelcome(
+    api: DashboardApiSnapshot
+  ): Promise<void> {
+    await allure.step('Verify Portfolio I Have total matches Welcome I Have', async () => {
+      const expectedPortfolio = calculateAssetPortfolio(api);
+      const welcomeSummary = await this.getWelcomeSummary('I Have');
+      const uiState = await this.portfolioComponent.readState();
+      const welcomeValue = parseDecimal(
+        welcomeSummary.displayedValue,
+        'Welcome I Have displayed value'
+      );
+      const portfolioValue = parseDecimal(
+        uiState.displayedTotal,
+        'Portfolio I Have displayed total'
+      );
+
+      expect(uiState.mode).toBe('I Have');
+      expect(welcomeSummary.currency).toBe('EGP');
+      expect(normalizeText(await this.currencySelector.innerText())).toBe('EGP');
+      expect(decimalsEqual(welcomeValue, expectedPortfolio.total)).toBe(true);
+      expect(
+        decimalsEqual(portfolioValue, expectedPortfolio.roundedDisplayTotal)
+      ).toBe(true);
+
+      await this.attachComparison('portfolio-total-comparison', {
+        matchedRecordIdentity: 'authenticated-customer-i-have',
+        expected: {
+          welcomeExactTotal: decimalToString(expectedPortfolio.total),
+          portfolioRoundedTotal: decimalToString(
+            expectedPortfolio.roundedDisplayTotal
+          ),
+          currency: 'EGP',
+        },
+        actual: {
+          welcomeExactTotal: decimalToString(welcomeValue),
+          portfolioRoundedTotal: decimalToString(portfolioValue),
+          currency: 'EGP',
+        },
+        comparisonOutcome: 'PASS',
+      });
+    });
+  }
+
+  async assertPortfolioAssetBreakdownIsComplete(
+    api: DashboardApiSnapshot
+  ): Promise<void> {
+    await allure.step('Verify the complete Portfolio I Have category breakdown', async () => {
+      const expectedPortfolio = calculateAssetPortfolio(api);
+      const uiState = await this.portfolioComponent.readState();
+      const percentages = this.readPortfolioPercentages(uiState);
+
+      expect(uiState.mode).toBe('I Have');
+      expect([...percentages.keys()]).toEqual(
+        expectedPortfolio.categories.map((category) => category.label)
+      );
+      this.assertExactDisplayedPercentages(percentages, expectedPortfolio);
+
+      const displayedSum = [...percentages.values()].reduce(
+        (total, percentage) => total + percentage,
+        0
+      );
+      expect(displayedSum).toBeGreaterThanOrEqual(99);
+      expect(displayedSum).toBeLessThanOrEqual(101);
+
+      if (expectedPortfolio.total.units !== 0n) {
+        const exactSum = expectedPortfolio.categories.reduce(
+          (total, category) => total + category.percentage,
+          0
+        );
+        expect(exactSum).toBeCloseTo(100, 10);
+      }
+
+      await this.attachPortfolioPercentageComparison(
+        'portfolio-category-percentage-comparison',
+        expectedPortfolio,
+        percentages
+      );
+    });
+  }
+
+  async assertPortfolioAssetPercentagesMatch(
+    api: DashboardApiSnapshot
+  ): Promise<void> {
+    await allure.step('Verify each Portfolio I Have percentage uses its exact proportion', async () => {
+      const expectedPortfolio = calculateAssetPortfolio(api);
+      const percentages = this.readPortfolioPercentages(
+        await this.portfolioComponent.readState()
+      );
+
+      this.assertExactDisplayedPercentages(percentages, expectedPortfolio);
+      await this.attachPortfolioPercentageComparison(
+        'portfolio-individual-percentage-comparison',
+        expectedPortfolio,
+        percentages
+      );
+    });
+  }
+
+  async assertDepositContributionMatchesPortfolio(
+    api: DashboardApiSnapshot
+  ): Promise<void> {
+    await allure.step('Verify eligible deposits contribute to I Have and Portfolio Deposits', async () => {
+      const eligibleDeposits = api.deposits.filter((deposit) =>
+        ['MF', 'CD', 'TD'].includes(deposit.depositType)
+      );
+      expect(
+        eligibleDeposits.length,
+        'At least one eligible Mutual Fund, CD, or TD record is required.'
+      ).toBeGreaterThan(0);
+
+      const activeDeposit = await this.depositsComponent.getActiveDeposit();
+      const activeAmount = parseDecimal(
+        activeDeposit.totalAmount,
+        'active deposit total amount'
+      );
+      const matchingDeposits = eligibleDeposits.filter((deposit) =>
+        decimalsEqual(
+          activeAmount,
+          parseDecimal(deposit.totalAmount, 'eligible deposit API amount')
+        ) &&
+        activeDeposit.rawText.includes(formatApiDate(deposit.maturityDate)) &&
+        activeDeposit.rawText.includes(deposit.currency)
+      );
+      expect(
+        matchingDeposits.length,
+        'The active deposit must uniquely match an eligible API record.'
+      ).toBe(1);
+
+      const expectedPortfolio = calculateAssetPortfolio(api);
+      const expectedDeposits = this.getExpectedPortfolioCategory(
+        expectedPortfolio,
+        'Deposits'
+      );
+      await this.assertWelcomeSummaryValue(
+        'I Have',
+        expectedPortfolio.total,
+        'deposits-welcome-i-have-comparison'
+      );
+      const percentages = this.readPortfolioPercentages(
+        await this.portfolioComponent.readState()
+      );
+      expect(percentages.get('Deposits')).toBe(
+        expectedDeposits.displayedPercentage
+      );
+
+      await this.attachComparison('deposits-contribution-comparison', {
+        matchedRecordIdentity: 'eligible-deposit-collection',
+        expected: {
+          eligibleRecordCount: eligibleDeposits.length,
+          exactDepositsTotal: decimalToString(expectedDeposits.value),
+          displayedPercentage: expectedDeposits.displayedPercentage,
+        },
+        actual: {
+          activeRecord: maskIdentifier(matchingDeposits[0].productId),
+          exactDepositsTotal: decimalToString(expectedDeposits.value),
+          displayedPercentage: percentages.get('Deposits'),
+        },
+        comparisonOutcome: 'PASS',
+      });
     });
   }
 
@@ -417,6 +678,56 @@ export class DashboardPage {
     });
   }
 
+  async assertActiveLoanProgressMatchesDisplayedPercentage(): Promise<void> {
+    await allure.step('Verify loan progress fill matches the displayed percentage paid', async () => {
+      const uiLoan = await this.loansComponent.getActiveLoan();
+      const displayedPercentage = extractPercentage(
+        uiLoan.displayedPaidPercentage,
+        'displayed loan percentage paid'
+      );
+      let progressSource: 'aria-valuenow' | 'fill-width-ratio';
+      let actualProgress: DecimalValue;
+
+      if (uiLoan.progressAriaValue) {
+        progressSource = 'aria-valuenow';
+        actualProgress = parseDecimal(
+          uiLoan.progressAriaValue,
+          'loan progress aria-valuenow'
+        );
+      } else {
+        expect(
+          uiLoan.progressFillRatio,
+          'Loan progress fill ratio must be available when aria-valuenow is absent.'
+        ).toBeDefined();
+        progressSource = 'fill-width-ratio';
+        actualProgress = roundDecimal(
+          parseDecimal(
+            (uiLoan.progressFillRatio as number).toString(),
+            'loan progress fill ratio'
+          ),
+          0
+        );
+      }
+
+      expect(
+        decimalsEqual(actualProgress, displayedPercentage),
+        'The semantic or style-derived loan progress must exactly equal the displayed whole percentage.'
+      ).toBe(true);
+
+      await this.attachComparison('loan-progress-comparison', {
+        matchedRecordIdentity: 'active-dashboard-loan',
+        expected: {
+          displayedPercentage: `${decimalToString(displayedPercentage)}%`,
+        },
+        actual: {
+          source: progressSource,
+          derivedPercentage: `${decimalToString(actualProgress)}%`,
+        },
+        comparisonOutcome: 'PASS',
+      });
+    });
+  }
+
   async assertRequiredWidgetsAreReady(): Promise<void> {
     await allure.step('Verify all required Dashboard widgets are ready', async () => {
       await this.assertDashboardIsLoaded();
@@ -427,6 +738,182 @@ export class DashboardPage {
       await this.depositsComponent.assertReady();
       await this.loansComponent.assertReady();
     });
+  }
+
+  private async selectAggregateCurrency(currency: string): Promise<void> {
+    const currentCurrency = normalizeText(
+      await this.currencySelector.innerText()
+    );
+    expect(
+      currentCurrency,
+      'The aggregate currency interaction must select a different currency.'
+    ).not.toBe(currency);
+
+    await this.currencySelector.click();
+    const option = this.currencyOption(currency);
+    await expect(option).toHaveCount(1);
+    await expect(option).toBeVisible();
+    await expect(option).toBeEnabled();
+    await option.click();
+    await this.loading.waitForCompletion();
+    await expect(this.currencySelector).toHaveText(currency);
+  }
+
+  private async readAllDisplayedAccounts(
+    accounts: readonly DashboardAccount[]
+  ): Promise<ReadonlyMap<string, DashboardAccountDisplayValue>> {
+    const itemCount = await this.accountsComponent.getItemCount();
+    const displayedAccounts = new Map<string, DashboardAccountDisplayValue>();
+
+    for (let index = 0; index < itemCount; index += 1) {
+      const uiAccount = await this.accountsComponent.findActiveAccount();
+
+      if (uiAccount) {
+        const account = this.findAccountByIdentity(accounts, uiAccount.rawText);
+        const actualBalance = parseDecimal(
+          uiAccount.availableBalance,
+          'displayed account balance'
+        );
+        const expectedBalance = parseDecimal(
+          account.availableBalance,
+          'account API balance'
+        );
+
+        expect(uiAccount.rawText).toContain(account.currency);
+        expect(decimalsEqual(actualBalance, expectedBalance)).toBe(true);
+        expect(
+          displayedAccounts.has(account.accountNumber),
+          'Each Accounts carousel item must expose a unique account identity.'
+        ).toBe(false);
+        displayedAccounts.set(account.accountNumber, {
+          currency: account.currency,
+          balance: decimalToString(actualBalance),
+        });
+      }
+
+      if (index < itemCount - 1) {
+        await this.accountsComponent.moveNext();
+      }
+    }
+
+    expect(
+      displayedAccounts.size,
+      'The Accounts carousel must expose at least two distinct account products.'
+    ).toBeGreaterThanOrEqual(2);
+    return displayedAccounts;
+  }
+
+  private async getWelcomeSummary(
+    label: DashboardSummaryLabel
+  ): Promise<DashboardSummaryUiValue> {
+    const summaries = await this.welcomeComponent.getSummaryValues();
+    const matches = summaries.filter((summary) => summary.label === label);
+    expect(matches, `${label} must appear exactly once in Welcome.`).toHaveLength(1);
+    return matches[0];
+  }
+
+  private async assertWelcomeSummaryValue(
+    label: DashboardSummaryLabel,
+    expectedValue: DecimalValue,
+    attachmentName: string
+  ): Promise<void> {
+    const summary = await this.getWelcomeSummary(label);
+    const actualValue = parseDecimal(
+      summary.displayedValue,
+      `${label} displayed value`
+    );
+    const matches = decimalsEqual(actualValue, expectedValue);
+
+    await this.attachComparison(attachmentName, {
+      matchedRecordIdentity: `authenticated-customer-${label.toLowerCase().replaceAll(' ', '-')}`,
+      expected: {
+        currency: 'EGP',
+        value: decimalToString(expectedValue),
+      },
+      actual: {
+        currency: summary.currency,
+        value: decimalToString(actualValue),
+      },
+      comparisonOutcome: matches && summary.currency === 'EGP' ? 'PASS' : 'FAIL',
+    });
+    expect(summary.currency).toBe('EGP');
+    expect(
+      matches,
+      `${label} must match the exact API-derived value.`
+    ).toBe(true);
+  }
+
+  private readPortfolioPercentages(
+    uiState: DashboardPortfolioUiState
+  ): ReadonlyMap<string, number> {
+    const percentages = new Map<string, number>();
+
+    for (const category of uiState.categories) {
+      expect(
+        percentages.has(category.label),
+        `Portfolio category ${category.label} must be unique.`
+      ).toBe(false);
+      percentages.set(
+        category.label,
+        decimalToNumber(
+          extractPercentage(
+            category.percentageText,
+            `${category.label} portfolio percentage`
+          )
+        )
+      );
+    }
+
+    return percentages;
+  }
+
+  private assertExactDisplayedPercentages(
+    actualPercentages: ReadonlyMap<string, number>,
+    expectedPortfolio: DashboardPortfolioExpectation
+  ): void {
+    for (const category of expectedPortfolio.categories) {
+      const actualPercentage = actualPercentages.get(category.label);
+      expect(
+        actualPercentage,
+        `${category.label} must appear in the Portfolio legend.`
+      ).toBeDefined();
+      expect(
+        actualPercentage,
+        `${category.label} must use its independently rounded exact percentage.`
+      ).toBe(category.displayedPercentage);
+    }
+  }
+
+  private async attachPortfolioPercentageComparison(
+    attachmentName: string,
+    expectedPortfolio: DashboardPortfolioExpectation,
+    actualPercentages: ReadonlyMap<string, number>
+  ): Promise<void> {
+    await this.attachComparison(attachmentName, {
+      matchedRecordIdentity: 'authenticated-customer-i-have-categories',
+      expected: expectedPortfolio.categories.map((category) => ({
+        label: category.label,
+        exactValue: decimalToString(category.value),
+        exactPercentage: category.percentage,
+        displayedPercentage: category.displayedPercentage,
+      })),
+      actual: expectedPortfolio.categories.map((category) => ({
+        label: category.label,
+        displayedPercentage: actualPercentages.get(category.label),
+      })),
+      comparisonOutcome: 'PASS',
+    });
+  }
+
+  private getExpectedPortfolioCategory(
+    expectation: DashboardPortfolioExpectation,
+    label: DashboardPortfolioCategoryExpectation['label']
+  ): DashboardPortfolioCategoryExpectation {
+    const matches = expectation.categories.filter(
+      (category) => category.label === label
+    );
+    expect(matches, `${label} must be calculated exactly once.`).toHaveLength(1);
+    return matches[0];
   }
 
   private async openTopNavigationDestination(
@@ -614,18 +1101,12 @@ export class DashboardPage {
       matchedRecordIdentity: `authenticated-customer-${stateName.toLowerCase().replaceAll(' ', '-')}`,
       expected: {
         total: decimalToString(expectedPortfolio.roundedDisplayTotal),
-        categories: expectedPortfolio.categories.map(
-          (category) => category.label
-        ),
-      },
+        categories: expectedPortfolio.categories.map((category) => category.label)},
       actual: {
         total: decimalToString(displayedTotal),
         categories: [...percentages.keys()],
       },
-      comparisonOutcome: decimalsEqual(
-        displayedTotal,
-        expectedPortfolio.roundedDisplayTotal
-      ) ? 'PASS' : 'FAIL',
+      comparisonOutcome: decimalsEqual(displayedTotal,expectedPortfolio.roundedDisplayTotal) ? 'PASS' : 'FAIL',
     });
     expect(
       decimalsEqual(
