@@ -65,6 +65,13 @@ export class DashboardLoansWidgetComponent {
     );
   }
 
+  private get manageLink(): Locator {
+    return this.repository.locator(
+      'PORTAL.DASHBOARD.WIDGETS.LOANS.MANAGE_LINK',
+      { scope: this.root }
+    );
+  }
+
   async assertReady(): Promise<void> {
     await expect(this.root).toHaveCount(1);
     await expect(this.root).toBeAttached();
@@ -112,6 +119,12 @@ export class DashboardLoansWidgetComponent {
 
   async getCurrencyOccurrenceCount(currency: string): Promise<number> {
     return this.currencyValues(currency).count();
+  }
+
+  async openManage(): Promise<void> {
+    await expect(this.manageLink).toHaveCount(1);
+    await expect(this.manageLink).toBeVisible();
+    await this.manageLink.click();
   }
 
   private currencyValues(currency: string): Locator {

@@ -10,6 +10,7 @@ import { PortalSwiperCarouselComponent } from '../carousel/PortalSwiperCarouselC
 export type DashboardAccountUi = {
   readonly rawText: string;
   readonly availableBalance: string;
+  readonly hasDefaultBadge: boolean;
 };
 
 export class DashboardAccountsWidgetComponent {
@@ -53,6 +54,27 @@ export class DashboardAccountsWidgetComponent {
     );
   }
 
+  private get defaultBadge(): Locator {
+    return this.repository.locator(
+      'PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.DEFAULT_BADGE',
+      { scope: this.activeItemRoot }
+    );
+  }
+
+  private get previousButton(): Locator {
+    return this.repository.locator(
+      'PORTAL.COMPONENTS.SWIPER.PREVIOUS_BUTTON',
+      { scope: this.root }
+    );
+  }
+
+  private get openNewAccountLink(): Locator {
+    return this.repository.locator(
+      'PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.OPEN_NEW_ACCOUNT_LINK',
+      { scope: this.activeItemRoot }
+    );
+  }
+
   async assertReady(): Promise<void> {
     await expect(this.root).toHaveCount(1);
     await expect(this.root).toBeAttached();
@@ -86,15 +108,36 @@ export class DashboardAccountsWidgetComponent {
       'An account product slide must expose exactly one balance.'
     ).toBe(1);
     await expect(this.balance).toBeVisible();
+    const defaultBadgeCount = await this.defaultBadge.count();
+    expect(
+      defaultBadgeCount,
+      'An account product slide may expose at most one Default badge.'
+    ).toBeLessThanOrEqual(1);
+    let hasDefaultBadge = false;
+
+    if (defaultBadgeCount === 1) {
+      hasDefaultBadge = await this.defaultBadge.isVisible();
+    }
 
     return {
       rawText: await this.carousel.getActiveItemText(),
       availableBalance: normalizeText(await this.balance.innerText()),
+      hasDefaultBadge,
     };
   }
 
   async moveNext(): Promise<void> {
     await this.carousel.moveNextAndAssertActiveItemChanged();
+  }
+
+  async movePrevious(): Promise<void> {
+    const previousText = await this.carousel.getActiveItemText();
+    await expect(this.previousButton).toHaveCount(1);
+    await expect(this.previousButton).toBeVisible();
+    await expect(this.previousButton).toBeEnabled();
+    await this.previousButton.click();
+    await expect(this.activeItemRoot).not.toHaveText(previousText);
+    await expect(this.activeItemRoot).toBeVisible();
   }
 
   async getItemCount(): Promise<number> {
@@ -109,5 +152,32 @@ export class DashboardAccountsWidgetComponent {
   async openManage(): Promise<void> {
     await expect(this.manageLink).toBeVisible();
     await this.manageLink.click();
+  }
+
+  async openNewAccount(): Promise<void> {
+    const itemCount = await this.getItemCount();
+
+    for (let index = 0; index < itemCount; index += 1) {
+      const openLinkCount = await this.openNewAccountLink.count();
+
+      if (openLinkCount === 1) {
+        await expect(this.openNewAccountLink).toBeVisible();
+        await this.openNewAccountLink.click();
+        return;
+      }
+
+      expect(
+        openLinkCount,
+        'The active Accounts slide may expose at most one Open new account action.'
+      ).toBe(0);
+
+      if (index < itemCount - 1) {
+        await this.moveNext();
+      }
+    }
+
+    throw new Error(
+      'The Accounts carousel did not expose the Open new account action.'
+    );
   }
 }

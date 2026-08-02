@@ -78,6 +78,13 @@ export class DashboardCardsWidgetComponent {
     );
   }
 
+  private get manageLink(): Locator {
+    return this.repository.locator(
+      'PORTAL.DASHBOARD.WIDGETS.CARDS.MANAGE_LINK',
+      { scope: this.root }
+    );
+  }
+
   async assertReady(): Promise<void> {
     await expect(this.root).toHaveCount(1);
     await expect(this.root).toBeAttached();
@@ -108,6 +115,12 @@ export class DashboardCardsWidgetComponent {
     await expect(this.nextButton).toBeVisible();
     await expect(this.nextButton).toBeEnabled();
     await this.nextButton.click();
+  }
+
+  async openManage(): Promise<void> {
+    await expect(this.manageLink).toHaveCount(1);
+    await expect(this.manageLink).toBeVisible();
+    await this.manageLink.click();
   }
 
   private statisticItem(label: DashboardCardStatistic): Locator {

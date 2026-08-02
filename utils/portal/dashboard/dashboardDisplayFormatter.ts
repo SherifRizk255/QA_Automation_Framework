@@ -8,6 +8,62 @@ export function normalizeText(value: string): string {
   return value.replace(/\s+/g, ' ').trim();
 }
 
+export function normalizeDashboardAccountNumber(value: string): string {
+  const normalized = value.replace(/\s+/g, '');
+
+  if (!normalized) {
+    throw new Error('Dashboard account number must contain a value.');
+  }
+
+  return normalized;
+}
+
+export function formatLastLoginForCairo(value: string): string {
+  const utcTimestampPattern =
+    /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z$/;
+  const instant = new Date(value);
+
+  if (
+    !utcTimestampPattern.test(value) ||
+    Number.isNaN(instant.getTime())
+  ) {
+    throw new Error(`Unsupported LastLoginTime format: ${value}`);
+  }
+
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Africa/Cairo',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }).formatToParts(instant);
+  const valueFor = (type: Intl.DateTimeFormatPartTypes): string => {
+    const part = parts.find((candidate) => candidate.type === type)?.value;
+
+    if (!part) {
+      throw new Error(`Unsupported LastLoginTime format: ${value}`);
+    }
+
+    return part;
+  };
+
+  return [
+    'Last Login: ',
+    valueFor('day'),
+    ' ',
+    valueFor('month'),
+    ' ',
+    valueFor('year'),
+    ', ',
+    valueFor('hour'),
+    ':',
+    valueFor('minute'),
+    valueFor('dayPeriod').toUpperCase(),
+  ].join('');
+}
+
 export function formatApiDate(value: string): string {
   const [year, month, day] = value.split('-');
   const monthIndex = Number(month) - 1;

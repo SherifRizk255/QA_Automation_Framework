@@ -29,9 +29,11 @@ function createSnapshot(
   input: Partial<PortfolioSnapshotInput> = {}
 ): DashboardApiSnapshot {
   return {
+    primaryAccount: 'PORTFOLIO-PRIMARY-ACCOUNT',
     profile: {
       name: 'Portfolio Test User',
       customerId: 'PORTFOLIO-TEST-CUSTOMER',
+      lastLoginTime: '2026-07-27T12:25:16Z',
     },
     accounts: input.accounts ?? [],
     cards: input.cards ?? [],

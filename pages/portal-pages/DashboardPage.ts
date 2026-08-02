@@ -3,12 +3,21 @@ import * as allure from 'allure-js-commons';
 import { portalHashRoute, ROUTES } from '../../config/resources.js';
 import { decimalsEqual, decimalToNumber, decimalToString, parseDecimal, roundDecimal, type DecimalValue} from '../../utils/financial/decimal.js';
 import { LocatorRepository } from '../../utils/locatorRepository.ts';
-import {extractPercentage,formatApiDate,isDashboardMoneyDisplay,normalizeText,} from '../../utils/portal/dashboard/dashboardDisplayFormatter.js';
+import {
+  extractPercentage,
+  formatApiDate,
+  formatDashboardMoney,
+  formatLastLoginForCairo,
+  isDashboardMoneyDisplay,
+  normalizeDashboardAccountNumber,
+  normalizeText,
+} from '../../utils/portal/dashboard/dashboardDisplayFormatter.js';
 import { calculateAssetPortfolio,calculateLiabilityPortfolio,calculateNetWorth,type DashboardPortfolioCategoryExpectation, type DashboardPortfolioExpectation,} from '../../utils/portal/dashboard/DashboardPortfolioCalculator.js';
 import {DashboardAccountsWidgetComponent,type DashboardAccountUi,} from '../components/portal/dashboard/DashboardAccountsWidgetComponent.js';
 import {DashboardCardsWidgetComponent,type DashboardCardUi,} from '../components/portal/dashboard/DashboardCardsWidgetComponent.js';
 import { DashboardDepositsWidgetComponent } from '../components/portal/dashboard/DashboardDepositsWidgetComponent.js';
 import { DashboardLoansWidgetComponent, type DashboardLoanUi,} from '../components/portal/dashboard/DashboardLoansWidgetComponent.js';
+import { DashboardNotificationsComponent } from '../components/portal/dashboard/DashboardNotificationsComponent.js';
 import { DashboardPortfolioWidgetComponent,type DashboardPortfolioUiState,} from '../components/portal/dashboard/DashboardPortfolioWidgetComponent.js';
 import { DashboardWelcomeComponent, type DashboardSummaryLabel, type DashboardSummaryUiValue,} from '../components/portal/dashboard/DashboardWelcomeComponent.js';
 import { PortalLoadingComponent } from '../components/portal/loading/PortalLoadingComponent.js';
@@ -29,6 +38,16 @@ function maskIdentifier(value: string): string {
 type DashboardAccountDisplayValue = {
   readonly currency: string;
   readonly balance: string;
+};
+
+type DashboardMatchedAccountUi = {
+  readonly account: DashboardAccount;
+  readonly ui: DashboardAccountUi;
+};
+
+type DashboardDestinationQueryContract = {
+  readonly requireProductIdentity: boolean;
+  readonly queryType?: string;
 };
 
 export class DashboardPage {
@@ -53,6 +72,13 @@ export class DashboardPage {
 
   private get dashboardSections(): Locator {
     return this.repository.locator('PORTAL.DASHBOARD.SECTIONS');
+  }
+
+  private get lastLoginInfo(): Locator {
+    return this.repository.locator(
+      'PORTAL.DASHBOARD.INFO.LAST_LOGIN',
+      { scope: this.dashboardRegion }
+    );
   }
 
   private get currencySelector(): Locator {
@@ -94,6 +120,10 @@ export class DashboardPage {
     return new DashboardPortfolioWidgetComponent(this.repository);
   }
 
+  private get notificationsComponent(): DashboardNotificationsComponent {
+    return new DashboardNotificationsComponent(this.repository);
+  }
+
   async dismissApiErrorPopupIfPresent(testInfo: TestInfo | undefined = this.testInfo): Promise<void> {
     const apiErrorPopup = this.repository.locator('PORTAL.COMMON.API_ERROR_DIALOG');
 
@@ -130,7 +160,7 @@ export class DashboardPage {
         timeout: 60_000,
       });
       await expect(this.dashboardHeading).toBeVisible();
-      await expect(this.repository.locator('PORTAL.DASHBOARD.INFO.LAST_LOGIN', {scope: this.dashboardRegion,})).toBeVisible();
+      await expect(this.lastLoginInfo).toBeVisible();
       await expect(this.currencySelector).toBeVisible();
       await this.welcomeComponent.assertReady();
       await expect(this.dashboardSections).toBeVisible();
@@ -147,6 +177,41 @@ export class DashboardPage {
     await allure.step('Open Dashboard from the SAIB logo', async () => {
       const logo = this.repository.locator('PORTAL.DASHBOARD.NAV.LOGO');
       await this.clickAndAssertDestination(logo,ROUTES.portal.dashboard,'PORTAL.DASHBOARD.HEADING');
+    });
+  }
+
+  async openNotificationPanel(): Promise<void> {
+    await allure.step('Open the Dashboard notification panel', async () => {
+      await this.notificationsComponent.openPanel();
+      await this.attachComparison('notification-panel-state', {
+        matchedRecordIdentity: 'authenticated-dashboard-notifications',
+        expected: 'notification panel visible',
+        actual: 'notification panel visible',
+        comparisonOutcome: 'PASS',
+      });
+    });
+  }
+
+  async assertNotificationPanelShowsEmptyState(): Promise<void> {
+    await allure.step('Verify the notification panel empty state', async () => {
+      await this.notificationsComponent.openPanel();
+      const actualText =
+        await this.notificationsComponent.getEmptyStateText();
+      const expectedText = 'No notifications yet';
+
+      await this.attachComparison('notification-empty-state', {
+        matchedRecordIdentity: 'authenticated-dashboard-notifications',
+        expected: expectedText,
+        actual: actualText,
+        comparisonOutcome:
+          actualText === expectedText
+            ? 'PASS'
+            : 'FAIL',
+      });
+      expect(
+        actualText,
+        'The notification panel must display the exact approved empty state.'
+      ).toBe(expectedText);
     });
   }
 
@@ -224,6 +289,35 @@ export class DashboardPage {
       await expect(this.currencySelector).toHaveCount(1);
       await expect(this.currencySelector).toBeVisible();
       expect(normalizeText(await this.currencySelector.innerText())).toBe('EGP');
+    });
+  }
+
+  async assertLastLoginMatchesProfile(
+    profile: DashboardCustomerProfile
+  ): Promise<void> {
+    await allure.step('Verify Last Login matches Cairo local time', async () => {
+      const expectedText = formatLastLoginForCairo(profile.lastLoginTime);
+      const actualText = normalizeText(await this.lastLoginInfo.innerText());
+
+      await this.attachComparison('last-login-cairo-comparison', {
+        matchedRecordIdentity: 'authenticated-customer-profile',
+        expected: {
+          sourceUtc: profile.lastLoginTime,
+          timezone: 'Africa/Cairo',
+          displayedText: expectedText,
+        },
+        actual: {
+          displayedText: actualText,
+        },
+        comparisonOutcome:
+          actualText === expectedText
+            ? 'PASS'
+            : 'FAIL',
+      });
+      expect(
+        actualText,
+        'Last Login must equal the profile timestamp converted through Africa/Cairo.'
+      ).toBe(expectedText);
     });
   }
 
@@ -362,11 +456,209 @@ export class DashboardPage {
     });
   }
 
+  async assertOnlyPrimaryAccountIsDefault(
+    api: DashboardApiSnapshot
+  ): Promise<void> {
+    await allure.step('Verify only the login-defined primary account is Default', async () => {
+      const displayedAccounts =
+        await this.readDisplayedAccountRecords(api.accounts);
+      const defaultAccounts = displayedAccounts.filter(
+        ({ ui }) => ui.hasDefaultBadge
+      );
+
+      expect(
+        displayedAccounts,
+        'Every API account must be represented by one Dashboard account card.'
+      ).toHaveLength(api.accounts.length);
+      expect(
+        defaultAccounts,
+        'Exactly one Dashboard account card must display Default.'
+      ).toHaveLength(1);
+
+      const expectedIdentity = normalizeDashboardAccountNumber(
+        api.primaryAccount
+      );
+      const actualIdentity = normalizeDashboardAccountNumber(
+        defaultAccounts[0].account.accountNumber
+      );
+      const identityMatches = actualIdentity === expectedIdentity;
+
+      await this.attachComparison('default-account-comparison', {
+        matchedRecordIdentity: maskIdentifier(api.primaryAccount),
+        expected: {
+          primaryAccount: maskIdentifier(api.primaryAccount),
+          defaultBadgeCount: 1,
+        },
+        actual: {
+          account: maskIdentifier(
+            defaultAccounts[0].account.accountNumber
+          ),
+          defaultBadgeCount: defaultAccounts.length,
+        },
+        comparisonOutcome: identityMatches ? 'PASS' : 'FAIL',
+      });
+      expect(
+        identityMatches,
+        'The sole Default account must match login-defined PrimaryAccount.'
+      ).toBe(true);
+    });
+  }
+
+  async assertNegativeAccountBalanceMatches(
+    accounts: readonly DashboardAccount[]
+  ): Promise<void> {
+    await allure.step('Verify the API-backed negative account balance and native currency', async () => {
+      const negativeAccounts = accounts.filter(
+        (account) =>
+          parseDecimal(
+            account.availableBalance,
+            'account API balance'
+          ).units < 0n
+      );
+      expect(
+        negativeAccounts,
+        'The negative-balance case requires exactly one API account with a negative balance.'
+      ).toHaveLength(1);
+
+      const displayedAccounts =
+        await this.readDisplayedAccountRecords(accounts);
+      const negativeAccount = negativeAccounts[0];
+      const displayedAccount = displayedAccounts.find(
+        ({ account }) =>
+          normalizeDashboardAccountNumber(account.accountNumber) ===
+          normalizeDashboardAccountNumber(negativeAccount.accountNumber)
+      );
+      expect(
+        displayedAccount,
+        'The API-backed negative account must be visible in the Accounts carousel.'
+      ).toBeDefined();
+
+      const expectedBalance = parseDecimal(
+        negativeAccount.availableBalance,
+        'negative account API balance'
+      );
+      const expectedDisplay = formatDashboardMoney(expectedBalance);
+      const actualDisplay = displayedAccount?.ui.availableBalance ?? '';
+      const actualBalance = parseDecimal(
+        actualDisplay,
+        'displayed negative account balance'
+      );
+      const exactValueMatches = decimalsEqual(
+        actualBalance,
+        expectedBalance
+      );
+      const currencyMatches =
+        displayedAccount?.ui.rawText.includes(
+          negativeAccount.currency
+        ) ?? false;
+
+      await this.attachComparison('negative-account-balance-comparison', {
+        matchedRecordIdentity: maskIdentifier(
+          negativeAccount.accountNumber
+        ),
+        expected: {
+          balance: expectedDisplay,
+          currency: negativeAccount.currency,
+        },
+        actual: {
+          balance: actualDisplay,
+          currency: currencyMatches
+            ? negativeAccount.currency
+            : '[not matched]',
+        },
+        comparisonOutcome:
+          exactValueMatches &&
+          currencyMatches &&
+          actualDisplay === expectedDisplay
+            ? 'PASS'
+            : 'FAIL',
+      });
+      expect(
+        isDashboardMoneyDisplay(actualDisplay),
+        `Negative account balance "${actualDisplay}" must use -#,##0.00.`
+      ).toBe(true);
+      expect(actualDisplay.startsWith('-')).toBe(true);
+      expect(actualDisplay).toBe(expectedDisplay);
+      expect(exactValueMatches).toBe(true);
+      expect(
+        currencyMatches,
+        'The negative account must retain its native API currency.'
+      ).toBe(true);
+    });
+  }
+
+  async moveToNextAccountThenPreviousAndAssertOriginal(
+    accounts: readonly DashboardAccount[]
+  ): Promise<void> {
+    await allure.step('Verify Accounts Previous returns to the original account', async () => {
+      const firstUi = await this.accountsComponent.getActiveAccount();
+      const firstAccount = this.findAccountByIdentity(
+        accounts,
+        firstUi.rawText
+      );
+
+      await this.accountsComponent.moveNext();
+      const secondUi = await this.accountsComponent.getActiveAccount();
+      const secondAccount = this.findAccountByIdentity(
+        accounts,
+        secondUi.rawText
+      );
+      const movedToDifferentAccount =
+        normalizeDashboardAccountNumber(secondAccount.accountNumber) !==
+        normalizeDashboardAccountNumber(firstAccount.accountNumber);
+      expect(
+        movedToDifferentAccount,
+        'Accounts Next must activate a different account identity.'
+      ).toBe(true);
+
+      await this.accountsComponent.movePrevious();
+      const returnedUi = await this.accountsComponent.getActiveAccount();
+      const returnedAccount = this.findAccountByIdentity(
+        accounts,
+        returnedUi.rawText
+      );
+      const returnedToOriginal =
+        normalizeDashboardAccountNumber(returnedAccount.accountNumber) ===
+        normalizeDashboardAccountNumber(firstAccount.accountNumber);
+
+      await this.attachComparison('accounts-previous-navigation', {
+        matchedRecordIdentity: 'accounts-carousel',
+        expected: {
+          first: maskIdentifier(firstAccount.accountNumber),
+          second: maskIdentifier(secondAccount.accountNumber),
+          returned: maskIdentifier(firstAccount.accountNumber),
+        },
+        actual: {
+          first: maskIdentifier(firstAccount.accountNumber),
+          second: maskIdentifier(secondAccount.accountNumber),
+          returned: maskIdentifier(returnedAccount.accountNumber),
+        },
+        comparisonOutcome: returnedToOriginal ? 'PASS' : 'FAIL',
+      });
+      expect(
+        returnedToOriginal,
+        'Accounts Previous must restore the original account identity.'
+      ).toBe(true);
+    });
+  }
+
   async openAccountsManagement(): Promise<void> {
     await allure.step('Open Accounts management from the Dashboard', async () => {
       await this.accountsComponent.openManage();
       await this.loading.waitForCompletion();
       await expect( this.repository.locator('PORTAL.DASHBOARD.DESTINATION.ACCOUNTS_HEADING')).toBeVisible();});
+  }
+
+  async openNewAccount(): Promise<void> {
+    await allure.step('Open the approved new-account page', async () => {
+      await this.accountsComponent.openNewAccount();
+      await this.assertDashboardDestination(
+        ROUTES.portal.openNewAccount,
+        'PORTAL.DASHBOARD.DESTINATION.OPEN_NEW_ACCOUNT_HEADING',
+        'Open New Account',
+        'open-new-account-navigation'
+      );
+    });
   }
 
   async assertPortfolioDefaultsToAssets(api: DashboardApiSnapshot): Promise<void> {
@@ -514,6 +806,54 @@ export class DashboardPage {
     });
   }
 
+  async assertZeroValueAssetCategoryRemainsVisible(
+    api: DashboardApiSnapshot
+  ): Promise<void> {
+    await allure.step('Verify zero-value I Have categories remain visible as 0%', async () => {
+      const expectedPortfolio = calculateAssetPortfolio(api);
+      const zeroCategories = expectedPortfolio.categories.filter(
+        (category) => category.value.units === 0n
+      );
+      expect(
+        zeroCategories.length,
+        'The zero-category case requires at least one exact zero I Have category.'
+      ).toBeGreaterThan(0);
+
+      const uiState = await this.portfolioComponent.readState();
+      const percentages = this.readPortfolioPercentages(uiState);
+
+      expect(uiState.mode).toBe('I Have');
+      expect([...percentages.keys()]).toEqual(
+        expectedPortfolio.categories.map((category) => category.label)
+      );
+      this.assertExactDisplayedPercentages(
+        percentages,
+        expectedPortfolio
+      );
+
+      for (const category of zeroCategories) {
+        expect(
+          percentages.get(category.label),
+          `${category.label} must remain visible as 0%.`
+        ).toBe(0);
+      }
+
+      await this.attachComparison('portfolio-zero-category-comparison', {
+        matchedRecordIdentity: 'authenticated-customer-i-have-categories',
+        expected: zeroCategories.map((category) => ({
+          label: category.label,
+          exactValue: decimalToString(category.value),
+          displayedPercentage: 0,
+        })),
+        actual: zeroCategories.map((category) => ({
+          label: category.label,
+          displayedPercentage: percentages.get(category.label),
+        })),
+        comparisonOutcome: 'PASS',
+      });
+    });
+  }
+
   async assertDepositContributionMatchesPortfolio(
     api: DashboardApiSnapshot
   ): Promise<void> {
@@ -597,6 +937,18 @@ export class DashboardPage {
     });
   }
 
+  async openCardsManagement(): Promise<void> {
+    await allure.step('Open Cards management from the Dashboard', async () => {
+      await this.cardsComponent.openManage();
+      await this.assertDashboardDestination(
+        ROUTES.portal.cards,
+        'PORTAL.DASHBOARD.DESTINATION.CARDS_HEADING',
+        'Cards',
+        'cards-manage-navigation'
+      );
+    });
+  }
+
   async assertActiveDepositMatches(deposits: readonly DashboardDeposit[]): Promise<void> {
     await allure.step('Verify the active deposit or investment matches the products API', async () => {
       const activeDeposit = await this.depositsComponent.getActiveDeposit();
@@ -649,6 +1001,34 @@ export class DashboardPage {
       });
       expect(typeMatches, 'Displayed deposit type must match the API-backed product type.').toBe(true);
       expect(rateMatches).toBe(true);
+    });
+  }
+
+  async openDepositsManagement(): Promise<void> {
+    await allure.step('Open Investments management from the Dashboard', async () => {
+      await this.depositsComponent.openManage();
+      await this.assertDashboardDestination(
+        ROUTES.portal.investments,
+        'PORTAL.DASHBOARD.DESTINATION.INVESTMENTS_HEADING',
+        'Investments',
+        'deposits-manage-navigation',
+        {
+          requireProductIdentity: true,
+          queryType: 'TD',
+        }
+      );
+    });
+  }
+
+  async openNewDeposit(): Promise<void> {
+    await allure.step('Open the approved new-deposit booking flow', async () => {
+      await this.depositsComponent.openNewDeposit();
+      await this.assertDashboardDestination(
+        ROUTES.portal.bookTimeDeposit,
+        'PORTAL.DASHBOARD.DESTINATION.NEW_DEPOSIT_HEADING',
+        'New Deposit',
+        'open-new-deposit-navigation'
+      );
     });
   }
 
@@ -728,6 +1108,21 @@ export class DashboardPage {
     });
   }
 
+  async openLoansManagement(): Promise<void> {
+    await allure.step('Open Loans management from the Dashboard', async () => {
+      await this.loansComponent.openManage();
+      await this.assertDashboardDestination(
+        ROUTES.portal.loans,
+        'PORTAL.DASHBOARD.DESTINATION.LOANS_HEADING',
+        'Loans',
+        'loans-manage-navigation',
+        {
+          requireProductIdentity: true,
+        }
+      );
+    });
+  }
+
   async assertRequiredWidgetsAreReady(): Promise<void> {
     await allure.step('Verify all required Dashboard widgets are ready', async () => {
       await this.assertDashboardIsLoaded();
@@ -800,6 +1195,40 @@ export class DashboardPage {
       displayedAccounts.size,
       'The Accounts carousel must expose at least two distinct account products.'
     ).toBeGreaterThanOrEqual(2);
+    return displayedAccounts;
+  }
+
+  private async readDisplayedAccountRecords(
+    accounts: readonly DashboardAccount[]
+  ): Promise<readonly DashboardMatchedAccountUi[]> {
+    const itemCount = await this.accountsComponent.getItemCount();
+    const displayedAccounts: DashboardMatchedAccountUi[] = [];
+    const matchedIdentities = new Set<string>();
+
+    for (let index = 0; index < itemCount; index += 1) {
+      const ui = await this.accountsComponent.findActiveAccount();
+
+      if (ui) {
+        const account = this.findAccountByIdentity(
+          accounts,
+          ui.rawText
+        );
+        const identity = normalizeDashboardAccountNumber(
+          account.accountNumber
+        );
+        expect(
+          matchedIdentities.has(identity),
+          'Each Dashboard account card must expose a unique API-backed identity.'
+        ).toBe(false);
+        matchedIdentities.add(identity);
+        displayedAccounts.push({ account, ui });
+      }
+
+      if (index < itemCount - 1) {
+        await this.accountsComponent.moveNext();
+      }
+    }
+
     return displayedAccounts;
   }
 
@@ -916,6 +1345,79 @@ export class DashboardPage {
     return matches[0];
   }
 
+  private async assertDashboardDestination(
+    route: string,
+    headingLocatorKey: string,
+    heading: string,
+    attachmentName: string,
+    queryContract?: DashboardDestinationQueryContract
+  ): Promise<void> {
+    await this.loading.waitForCompletion();
+
+    if (queryContract) {
+      await expect(this.page).toHaveURL((url) => {
+        const [actualRoute, queryString = ''] = url.hash.split('?');
+        const query = new URLSearchParams(queryString);
+
+        if (actualRoute !== route) {
+          return false;
+        }
+
+        if (
+          queryContract.requireProductIdentity &&
+          !query.get('ProductIdent')?.trim()
+        ) {
+          return false;
+        }
+
+        if (
+          queryContract.queryType &&
+          query.get('queryType') !== queryContract.queryType
+        ) {
+          return false;
+        }
+
+        return true;
+      }, {
+        timeout: 60_000,
+      });
+    } else {
+      const expectedUrl = portalHashRoute(route, this.page.url());
+      await expect(this.page).toHaveURL(expectedUrl, {
+        timeout: 60_000,
+      });
+    }
+
+    const destinationHeading =
+      this.repository.locator(headingLocatorKey);
+    await expect(destinationHeading).toHaveCount(1);
+    await expect(destinationHeading).toBeVisible();
+    const currentUrl = new URL(this.page.url());
+    const [, queryString = ''] = currentUrl.hash.split('?');
+    const actualQuery = new URLSearchParams(queryString);
+
+    await this.attachComparison(attachmentName, {
+      matchedRecordIdentity: 'dashboard-destination',
+      expected: {
+        route,
+        heading,
+        selectedProductIdentity: queryContract?.requireProductIdentity
+          ? 'required'
+          : 'not-required',
+        queryType: queryContract?.queryType,
+      },
+      actual: {
+        route: currentUrl.hash.split('?')[0],
+        heading,
+        selectedProductIdentity: actualQuery.get('ProductIdent')
+          ? 'present'
+          : 'absent',
+        queryType: actualQuery.get('queryType') ?? undefined,
+      },
+      comparisonOutcome: 'PASS',
+    });
+  }
+
   private async openTopNavigationDestination(
     controlLocatorKey: string,
     route: string,
@@ -946,7 +1448,13 @@ export class DashboardPage {
     accounts: readonly DashboardAccount[],
     activeText: string
   ): DashboardAccount {
-    const matches = accounts.filter((account) => activeText.includes(account.accountNumber));
+    const normalizedActiveText =
+      normalizeDashboardAccountNumber(activeText);
+    const matches = accounts.filter((account) =>
+      normalizedActiveText.includes(
+        normalizeDashboardAccountNumber(account.accountNumber)
+      )
+    );
     expect(matches.length, 'Active account number must uniquely match the accounts API.').toBe(1);
     return matches[0];
   }

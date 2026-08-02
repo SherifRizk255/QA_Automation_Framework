@@ -130,6 +130,57 @@
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {
+      "elementId": "PORTAL.DASHBOARD.NOTIFICATIONS.BUTTON",
+      "screenName": "Portal Dashboard",
+      "elementName": "Notifications Button",
+      "owner": "DashboardNotificationsComponent",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBILITY",
+      "primaryLocator": "getByRole('button', { name: 'Notifications', exact: true })",
+      "primary": { "type": "role", "value": "button", "name": "Notifications", "exact": true },
+      "fallbackLocatorChain": ["button[aria-label=\"Notifications\"]"],
+      "fallbackChain": [{ "type": "css", "value": "button[aria-label=\"Notifications\"]" }],
+      "confidence": "HIGH", "confidenceScore": 98, "volatility": "LOW",
+      "discoverySource": "Live Dashboard DOM inspection 2026-07-30",
+      "uniqueness": "UNIQUE", "lastVerifiedDate": "2026-07-30",
+      "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.NOTIFICATIONS.PANEL",
+      "screenName": "Portal Dashboard",
+      "elementName": "Notifications Panel",
+      "owner": "DashboardNotificationsComponent",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBILITY",
+      "primaryLocator": "getByRole('dialog')",
+      "primary": { "type": "role", "value": "dialog" },
+      "fallbackLocatorChain": ["[role=\"dialog\"]"],
+      "fallbackChain": [{ "type": "css", "value": "[role=\"dialog\"]" }],
+      "confidence": "HIGH", "confidenceScore": 94, "volatility": "LOW",
+      "discoverySource": "Live opened notification popover DOM inspection 2026-07-30",
+      "uniqueness": "UNIQUE_WHEN_OPEN", "lastVerifiedDate": "2026-07-30",
+      "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.NOTIFICATIONS.EMPTY_STATE",
+      "screenName": "Portal Dashboard",
+      "elementName": "Notifications Empty State",
+      "owner": "DashboardNotificationsComponent",
+      "scope": "PORTAL.DASHBOARD.NOTIFICATIONS.PANEL",
+      "locatorType": "TEXT",
+      "primaryLocator": "getByText('No notifications yet', { exact: true })",
+      "primary": { "type": "text", "value": "No notifications yet", "exact": true },
+      "fallbackLocatorChain": ["text=No notifications yet"],
+      "fallbackChain": [{ "type": "text", "value": "No notifications yet", "exact": true }],
+      "confidence": "HIGH", "confidenceScore": 98, "volatility": "LOW",
+      "discoverySource": "Live opened notification popover DOM inspection 2026-07-30",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-30",
+      "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
       "elementId": "PORTAL.DASHBOARD.WELCOME.REGION",
       "screenName": "Portal Dashboard",
       "elementName": "Welcome Summary Region",
@@ -305,6 +356,16 @@
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {
+      "elementId": "PORTAL.DASHBOARD.DESTINATION.OPEN_NEW_ACCOUNT_HEADING",
+      "screenName": "Portal Open New Account", "elementName": "Open New Account Page Heading", "owner": "DashboardPage", "scope": "GLOBAL",
+      "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('heading', { name: 'Open New Account', exact: true })",
+      "primary": { "type": "role", "value": "heading", "name": "Open New Account", "exact": true },
+      "fallbackLocatorChain": ["getByText('Open New Account', { exact: true })"], "fallbackChain": [{ "type": "text", "value": "Open New Account", "exact": true }],
+      "confidence": "HIGH", "confidenceScore": 94, "volatility": "LOW", "discoverySource": "Approved Batch 2 destination contract and live Open new account action-link DOM inspection 2026-07-30",
+      "uniqueness": "UNIQUE", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
       "elementId": "PORTAL.DASHBOARD.DESTINATION.TRANSFER_HEADING",
       "screenName": "Between My Accounts", "elementName": "Transfer Page Heading", "owner": "DashboardPage", "scope": "GLOBAL",
       "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('heading', { name: 'Transfer', exact: true })",
@@ -342,6 +403,16 @@
       "fallbackLocatorChain": ["getByText('Investments', { exact: true })"], "fallbackChain": [{ "type": "text", "value": "Investments", "exact": true }],
       "confidence": "HIGH", "confidenceScore": 94, "volatility": "LOW", "discoverySource": "Dashboard navigation execution evidence 2026-07-22",
       "uniqueness": "UNIQUE", "lastVerifiedDate": "2026-07-22", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.DESTINATION.NEW_DEPOSIT_HEADING",
+      "screenName": "Portal New Deposit", "elementName": "New Deposit Page Heading", "owner": "DashboardPage", "scope": "GLOBAL",
+      "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('heading', { name: 'New Deposit', exact: true })",
+      "primary": { "type": "role", "value": "heading", "name": "New Deposit", "exact": true },
+      "fallbackLocatorChain": ["getByText('New Deposit', { exact: true })"], "fallbackChain": [{ "type": "text", "value": "New Deposit", "exact": true }],
+      "confidence": "HIGH", "confidenceScore": 96, "volatility": "LOW", "discoverySource": "Live Batch 2 SAIB-N-0195 destination DOM and execution evidence 2026-07-30",
+      "uniqueness": "UNIQUE", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {
@@ -473,6 +544,26 @@
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.DEFAULT_BADGE",
+      "screenName": "Portal Dashboard", "elementName": "Active Account Default Badge", "owner": "DashboardAccountsWidgetComponent", "scope": "PORTAL.COMPONENTS.SWIPER.ACTIVE_SLIDE",
+      "locatorType": "TEXT", "primaryLocator": "getByText('Default', { exact: true })",
+      "primary": { "type": "text", "value": "Default", "exact": true },
+      "fallbackLocatorChain": [".dash-badge:has-text(\"Default\")"], "fallbackChain": [{ "type": "css", "value": ".dash-badge", "hasText": "Default" }],
+      "confidence": "HIGH", "confidenceScore": 96, "volatility": "LOW", "discoverySource": "Live Accounts widget DOM inspection 2026-07-30",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.OPEN_NEW_ACCOUNT_LINK",
+      "screenName": "Portal Dashboard", "elementName": "Open New Account Link", "owner": "DashboardAccountsWidgetComponent", "scope": "PORTAL.COMPONENTS.SWIPER.ACTIVE_SLIDE",
+      "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('link', { name: 'Open new account', exact: true })",
+      "primary": { "type": "role", "value": "link", "name": "Open new account", "exact": true },
+      "fallbackLocatorChain": ["a[href=\"#/accounts/open-new-account\"]"], "fallbackChain": [{ "type": "css", "value": "a[href=\"#/accounts/open-new-account\"]" }],
+      "confidence": "HIGH", "confidenceScore": 98, "volatility": "LOW", "discoverySource": "Live Accounts widget DOM inspection 2026-07-30",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
       "elementId": "PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.MANAGE_LINK",
       "screenName": "Portal Dashboard", "elementName": "Manage Accounts Link", "owner": "DashboardAccountsWidgetComponent", "scope": "PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.ROOT",
       "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('link', { name: 'Manage Accounts', exact: true })",
@@ -489,6 +580,16 @@
       "fallbackLocatorChain": ["[aria-label=\"Cards\"] .cards-deck"], "fallbackChain": [{ "type": "css", "value": "[aria-label=\"Cards\"] .cards-deck" }],
       "confidence": "HIGH", "confidenceScore": 90, "volatility": "LOW", "discoverySource": "Live Cards widget DOM and Dashboard smoke execution evidence 2026-07-22",
       "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-22", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.CARDS.MANAGE_LINK",
+      "screenName": "Portal Dashboard", "elementName": "Manage Cards Link", "owner": "DashboardCardsWidgetComponent", "scope": "PORTAL.DASHBOARD.WIDGETS.CARDS.ROOT",
+      "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('link', { name: 'Manage Cards', exact: true })",
+      "primary": { "type": "role", "value": "link", "name": "Manage Cards", "exact": true },
+      "fallbackLocatorChain": ["a[href=\"#/cards\"]"], "fallbackChain": [{ "type": "css", "value": "a[href=\"#/cards\"]" }],
+      "confidence": "HIGH", "confidenceScore": 98, "volatility": "LOW", "discoverySource": "Live Cards widget DOM inspection 2026-07-30",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {
@@ -584,12 +685,42 @@
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.DEPOSITS.MANAGE_LINK",
+      "screenName": "Portal Dashboard", "elementName": "Manage Investments Link", "owner": "DashboardDepositsWidgetComponent", "scope": "PORTAL.DASHBOARD.WIDGETS.DEPOSITS.ROOT",
+      "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('link', { name: 'Manage Investments', exact: true })",
+      "primary": { "type": "role", "value": "link", "name": "Manage Investments", "exact": true },
+      "fallbackLocatorChain": ["a[href=\"#/deposits\"]"], "fallbackChain": [{ "type": "css", "value": "a[href=\"#/deposits\"]" }],
+      "confidence": "HIGH", "confidenceScore": 98, "volatility": "LOW", "discoverySource": "Live Deposits and Investments widget DOM inspection 2026-07-30",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.DEPOSITS.OPEN_NEW_DEPOSIT_LINK",
+      "screenName": "Portal Dashboard", "elementName": "Open New Deposit Link", "owner": "DashboardDepositsWidgetComponent", "scope": "PORTAL.COMPONENTS.SWIPER.ACTIVE_SLIDE",
+      "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('link', { name: 'Open new deposit', exact: true })",
+      "primary": { "type": "role", "value": "link", "name": "Open new deposit", "exact": true },
+      "fallbackLocatorChain": ["a[href=\"#/deposits/book/TD\"]"], "fallbackChain": [{ "type": "css", "value": "a[href=\"#/deposits/book/TD\"]" }],
+      "confidence": "HIGH", "confidenceScore": 98, "volatility": "LOW", "discoverySource": "Live Deposits and Investments widget DOM inspection 2026-07-30",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
       "elementId": "PORTAL.DASHBOARD.WIDGETS.LOANS.AMOUNTS",
       "screenName": "Portal Dashboard", "elementName": "Active Loan Amount Values", "owner": "DashboardLoansWidgetComponent", "scope": "PORTAL.COMPONENTS.SWIPER.ACTIVE_SLIDE",
       "locatorType": "CSS", "primaryLocator": "strong", "primary": { "type": "css", "value": "strong" },
       "fallbackLocatorChain": ["[aria-live] strong"], "fallbackChain": [{ "type": "css", "value": "[aria-live] strong" }],
       "confidence": "MEDIUM", "confidenceScore": 84, "volatility": "MEDIUM", "discoverySource": "Live Loans widget DOM and Dashboard smoke execution evidence 2026-07-22",
       "uniqueness": "COLLECTION", "lastVerifiedDate": "2026-07-22", "verificationCount": 1, "successCount": 1, "failureCount": 0,
+      "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
+    },
+    {
+      "elementId": "PORTAL.DASHBOARD.WIDGETS.LOANS.MANAGE_LINK",
+      "screenName": "Portal Dashboard", "elementName": "Manage Loans Link", "owner": "DashboardLoansWidgetComponent", "scope": "PORTAL.DASHBOARD.WIDGETS.LOANS.ROOT",
+      "locatorType": "ACCESSIBILITY", "primaryLocator": "getByRole('link', { name: 'Manage Loans', exact: true })",
+      "primary": { "type": "role", "value": "link", "name": "Manage Loans", "exact": true },
+      "fallbackLocatorChain": ["a[href=\"#/loans\"]"], "fallbackChain": [{ "type": "css", "value": "a[href=\"#/loans\"]" }],
+      "confidence": "HIGH", "confidenceScore": 98, "volatility": "LOW", "discoverySource": "Live Loans widget DOM inspection 2026-07-30",
+      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": "2026-07-30", "verificationCount": 1, "successCount": 1, "failureCount": 0,
       "repositoryStatus": "ACTIVE", "originalLocatorHistory": [], "healingMetadata": []
     },
     {

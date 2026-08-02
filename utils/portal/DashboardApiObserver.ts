@@ -6,6 +6,7 @@ type JsonRecord = Record<string, unknown>;
 export interface DashboardCustomerProfile {
   readonly name: string;
   readonly customerId: string;
+  readonly lastLoginTime: string;
 }
 
 export interface DashboardAccount {
@@ -55,6 +56,7 @@ export interface DashboardExchangeRate {
 }
 
 export interface DashboardApiSnapshot {
+  readonly primaryAccount: string;
   readonly profile: DashboardCustomerProfile;
   readonly accounts: readonly DashboardAccount[];
   readonly cards: readonly DashboardCard[];
@@ -212,13 +214,14 @@ function mapExchangeRates(data: JsonRecord): readonly DashboardExchangeRate[] {
 }
 
 export class DashboardApiObserver {
+  private readonly authenticationResponses: Response[] = [];
   private profileResponse?: Response;
   private productsResponse?: Response;
   private cardsResponse?: Response;
   private exchangeRatesResponse?: Response;
 
   constructor(page: Page) {
-    page.on('response', (response) => this.captureSuccessfulGet(response));
+    page.on('response', (response) => this.captureRelevantResponse(response));
   }
 
   async getSnapshot(): Promise<DashboardApiSnapshot> {
@@ -235,17 +238,47 @@ export class DashboardApiObserver {
       this.exchangeRatesResponse,
       'exchange rates'
     );
-    const [profileData, productsData, cardsData, exchangeRatesData] = await Promise.all([
+    const [
+      authenticationData,
+      profileData,
+      productsData,
+      cardsData,
+      exchangeRatesData,
+    ] = await Promise.all([
+      Promise.all(
+        this.authenticationResponses.map((response, index) =>
+          responseData(response, `authentication response ${index + 1}`)
+        )
+      ),
       responseData(profileResponse, 'customer profile response'),
       responseData(productsResponse, 'customer products response'),
       responseData(cardsResponse, 'customer cards response'),
       responseData(exchangeRatesResponse, 'exchange rates response'),
     ]);
+    const primaryAccounts = [
+      ...new Set(
+        authenticationData
+          .map((data) => optionalString(data, 'PrimaryAccount'))
+          .filter((value) => value.length > 0)
+      ),
+    ];
+
+    if (primaryAccounts.length !== 1) {
+      throw new Error(
+        'Exactly one completed authentication response must expose PrimaryAccount.'
+      );
+    }
 
     return {
+      primaryAccount: primaryAccounts[0],
       profile: {
         name: requireString(profileData, 'Name', 'customer profile data'),
         customerId: requireString(profileData, 'CIF', 'customer profile data'),
+        lastLoginTime: requireString(
+          profileData,
+          'LastLoginTime',
+          'customer profile data'
+        ),
       },
       accounts: mapAccounts(productsData),
       cards: mapCards(cardsData),
@@ -255,12 +288,28 @@ export class DashboardApiObserver {
     };
   }
 
-  private captureSuccessfulGet(response: Response): void {
-    if (response.request().method() !== 'GET' || !response.ok()) {
+  private captureRelevantResponse(response: Response): void {
+    if (!response.ok()) {
       return;
     }
 
     const path = new URL(response.url()).pathname;
+    const method = response.request().method();
+
+    if (
+      method === 'POST' &&
+      (
+        path.endsWith(ROUTES.portalApi.login) ||
+        path.endsWith(ROUTES.portalApi.terminateSession)
+      )
+    ) {
+      this.authenticationResponses.push(response);
+      return;
+    }
+
+    if (method !== 'GET') {
+      return;
+    }
 
     if (!this.profileResponse && path.endsWith(ROUTES.portalApi.customerProfile)) {
       this.profileResponse = response;

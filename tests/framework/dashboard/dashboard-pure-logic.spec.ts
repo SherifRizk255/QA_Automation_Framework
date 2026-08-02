@@ -17,7 +17,9 @@ import {
   extractPercentage,
   formatDashboardMoney,
   formatApiDate,
+  formatLastLoginForCairo,
   isDashboardMoneyDisplay,
+  normalizeDashboardAccountNumber,
   normalizeText,
 } from '../../../utils/portal/dashboard/dashboardDisplayFormatter.js';
 
@@ -226,6 +228,9 @@ test.describe('Dashboard pure display formatting', () => {
     expect(formatDashboardMoney(parseDecimal('-15000.545', 'value'))).toBe(
       '-15,000.55'
     );
+    expect(formatDashboardMoney(parseDecimal('-15000', 'value'))).toBe(
+      '-15,000.00'
+    );
   });
 
   test('UT-DASHBOARD-FORMAT-005 | recognizes only the approved visible Dashboard monetary format', () => {
@@ -242,5 +247,54 @@ test.describe('Dashboard pure display formatting', () => {
     expect(isDashboardMoneyDisplay('1,000.0')).toBe(false);
     expect(isDashboardMoneyDisplay('1,000.000')).toBe(false);
     expect(isDashboardMoneyDisplay('1.000,00')).toBe(false);
+  });
+
+  test('UT-DASHBOARD-FORMAT-006 | formats Last Login through the Africa/Cairo timezone', () => {
+    expect(formatLastLoginForCairo('2026-07-27T12:25:16Z')).toBe(
+      'Last Login: 27 Jul 2026, 03:25PM'
+    );
+    expect(formatLastLoginForCairo('2026-01-15T12:25:59Z')).toBe(
+      'Last Login: 15 Jan 2026, 02:25PM'
+    );
+    expect(formatLastLoginForCairo('2026-07-27T12:25:59.999Z')).toBe(
+      'Last Login: 27 Jul 2026, 03:25PM'
+    );
+    expect(formatLastLoginForCairo('2026-01-14T22:00:00Z')).toBe(
+      'Last Login: 15 Jan 2026, 12:00AM'
+    );
+    expect(formatLastLoginForCairo('2026-01-15T10:00:00Z')).toBe(
+      'Last Login: 15 Jan 2026, 12:00PM'
+    );
+  });
+
+  test('UT-DASHBOARD-FORMAT-007 | rejects unsupported Last Login timestamps', () => {
+    expect(() => formatLastLoginForCairo('')).toThrow(
+      'Unsupported LastLoginTime format: '
+    );
+    expect(() =>
+      formatLastLoginForCairo('2026-07-27T12:25:16')
+    ).toThrow(
+      'Unsupported LastLoginTime format: 2026-07-27T12:25:16'
+    );
+    expect(() =>
+      formatLastLoginForCairo('2026-13-27T12:25:16Z')
+    ).toThrow(
+      'Unsupported LastLoginTime format: 2026-13-27T12:25:16Z'
+    );
+  });
+
+  test('UT-DASHBOARD-FORMAT-008 | normalizes Dashboard account numbers by whitespace only', () => {
+    expect(normalizeDashboardAccountNumber('0280123456720300')).toBe(
+      '0280123456720300'
+    );
+    expect(normalizeDashboardAccountNumber('0280 1234 5672 0300')).toBe(
+      '0280123456720300'
+    );
+    expect(normalizeDashboardAccountNumber(' 0280\t1234\n5672 0300 ')).toBe(
+      '0280123456720300'
+    );
+    expect(() => normalizeDashboardAccountNumber(' \t ')).toThrow(
+      'Dashboard account number must contain a value.'
+    );
   });
 });

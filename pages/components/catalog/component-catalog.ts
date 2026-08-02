@@ -125,6 +125,21 @@ export const COMPONENT_CATALOG = {
       'Is not classified as a globally reusable component.',
     ],
   },
+  DASHBOARD_NOTIFICATIONS: {
+    name: 'DashboardNotificationsComponent',
+    path: 'pages/components/portal/dashboard/DashboardNotificationsComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'DashboardPage',
+    ],
+    responsibilities: [
+      'Feature-scoped owner of the Dashboard notification bell, panel, and empty-state locator keys.',
+      'Opens the notification panel and returns its normalized empty-state text without API assumptions.',
+      'Excludes unread-count behavior, notification records, API validation, and Allure reporting.',
+    ],
+  },
   DASHBOARD_ACCOUNTS_WIDGET: {
     name: 'DashboardAccountsWidgetComponent',
     path: 'pages/components/portal/dashboard/DashboardAccountsWidgetComponent.ts',
@@ -136,7 +151,7 @@ export const COMPONENT_CATALOG = {
     ],
     responsibilities: [
       'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.ACCOUNTS.* locator keys.',
-      'Exposes assertReady(), required and optional active-account readers, getItemCount(), moveNext(), and openManage() as typed UI-only operations.',
+      'Exposes active-account Default state, bounded Next/Previous navigation, item counting, Manage, and Open New Account actions as typed UI-only operations.',
       'Lets DashboardPage skip the bounded Open new account action slide without treating it as an API account.',
       'Delegates active-slide and Next mechanics to PortalSwiperCarouselComponent.',
       'Excludes API matching, financial comparison, navigation assertions, and reporting.',
@@ -154,6 +169,7 @@ export const COMPONENT_CATALOG = {
     responsibilities: [
       'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.CARDS.* locator keys.',
       'Exposes typed active-card values, including the actual displayed statistic currencies, and Next behavior.',
+      'Owns the Cards Manage action without performing destination assertions.',
       'Selects the visible front card through bounded opacity and z-index inspection of the Cards deck.',
       'Remains separate from PortalSwiperCarouselComponent because Cards uses a stacked deck rather than Swiper active-slide mechanics.',
       'Keeps missing post-navigation card statistics visible as the known SAIB-N-0181 application defect.',
@@ -172,6 +188,7 @@ export const COMPONENT_CATALOG = {
     responsibilities: [
       'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.DEPOSITS.* locator keys.',
       'Exposes assertReady() and getActiveDeposit() as typed UI-only operations.',
+      'Owns the Investments Manage and bounded Open New Deposit actions.',
       'Delegates active-slide mechanics to PortalSwiperCarouselComponent.',
       'Excludes API product mapping, financial comparison, and reporting.',
     ],
@@ -188,6 +205,7 @@ export const COMPONENT_CATALOG = {
     responsibilities: [
       'Feature-scoped owner of PORTAL.DASHBOARD.WIDGETS.LOANS.* locator keys.',
       'Exposes typed active-loan values, bounded ordered amounts, Next behavior, currency occurrence reading, and semantic/style-derived progress data.',
+      'Owns the Loans Manage action without performing destination assertions.',
       'Prefers aria-valuenow and otherwise returns the measured fill-to-track width ratio without performing the business comparison.',
       'Delegates active-slide and Next mechanics to PortalSwiperCarouselComponent.',
       'Excludes API matching, financial comparison, and reporting.',
