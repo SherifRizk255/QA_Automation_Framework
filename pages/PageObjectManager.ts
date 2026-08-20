@@ -1,16 +1,4 @@
 import type { Page } from '@playwright/test';
-import { LoginPage } from './portal/LoginPage';
-import { DashboardPage } from './portal/DashboardPage';
-import { TransferBetweenOwnAccountsPage } from './portal/TransferBetweenOwnAccountsPage';
-import { LocalTransferToSaibAccountPage } from './portal/LocalTransferToSaibAccountPage';
-import { TransferRepositoryPage } from './portal/TransferRepositoryPage';
-import { AccountsSummaryPage } from './portal/accounts/AccountsSummaryPage';
-import { AccountStatementsPage } from './portal/accounts/AccountStatementsPage';
-import { AccountDetailsPage } from './portal/accounts/AccountDetailsPage';
-import { TransactionHistoryPage } from './portal/accounts/TransactionHistoryPage';
-import { SmsLogsPage } from './crm/SmsLogsPage';
-import { ServiceRequestsPage } from './crm/ServiceRequestsPage';
-import { BetweenMyAccountsTransferLogPage } from './crm/BetweenMyAccountsTransferLogPage';
 
 /**
  * One controlled access point to every page object for a given Page (GUIDELINES §8).
@@ -21,6 +9,19 @@ import { BetweenMyAccountsTransferLogPage } from './crm/BetweenMyAccountsTransfe
  * Specs receive an instance via the `pom` fixture. A second browser context
  * (e.g. the CRM tab in cross-system tests, skill 20) gets its own manager:
  * `new PageObjectManager(crmTab)`.
+ *
+ * ── How to wire a new page object (GUIDELINES §8) ────────────────────────────
+ *   1. Create the class in `pages/`, extending the correct base
+ *      (CRM pages extend `pages/crm/BaseCrmPage`).
+ *   2. Add a lazy getter here, following the `resolve(...)` pattern below:
+ *
+ *        import { AccountsSummaryPage } from './portal/accounts/AccountsSummaryPage';
+ *
+ *        get accountsSummaryPage(): AccountsSummaryPage {
+ *          return this.resolve('accountsSummaryPage', () => new AccountsSummaryPage(this.page));
+ *        }
+ *
+ *   3. Access it in specs through the `pom` fixture (`pom.accountsSummaryPage`).
  */
 export class PageObjectManager {
   private readonly cache = new Map<string, unknown>();
@@ -33,52 +34,8 @@ export class PageObjectManager {
   }
 
   // ─── Portal ──────────────────────────────────────────────
-  get loginPage(): LoginPage {
-    return this.resolve('loginPage', () => new LoginPage(this.page));
-  }
-
-  get dashboardPage(): DashboardPage {
-    return this.resolve('dashboardPage', () => new DashboardPage(this.page));
-  }
-
-  get transferBetweenOwnAccountsPage(): TransferBetweenOwnAccountsPage {
-    return this.resolve('transferBetweenOwnAccountsPage', () => new TransferBetweenOwnAccountsPage(this.page));
-  }
-
-  get localTransferToSaibAccountPage(): LocalTransferToSaibAccountPage {
-    return this.resolve('localTransferToSaibAccountPage', () => new LocalTransferToSaibAccountPage(this.page));
-  }
-
-  get transferRepositoryPage(): TransferRepositoryPage {
-    return this.resolve('transferRepositoryPage', () => new TransferRepositoryPage(this.page));
-  }
-
-  get accountsSummaryPage(): AccountsSummaryPage {
-    return this.resolve('accountsSummaryPage', () => new AccountsSummaryPage(this.page));
-  }
-
-  get accountStatementsPage(): AccountStatementsPage {
-    return this.resolve('accountStatementsPage', () => new AccountStatementsPage(this.page));
-  }
-
-  get accountDetailsPage(): AccountDetailsPage {
-    return this.resolve('accountDetailsPage', () => new AccountDetailsPage(this.page));
-  }
-
-  get transactionHistoryPage(): TransactionHistoryPage {
-    return this.resolve('transactionHistoryPage', () => new TransactionHistoryPage(this.page));
-  }
+  // Add portal page-object getters here.
 
   // ─── CRM (Dynamics 365 — auth rules in skill 26) ─────────
-  get smsLogsPage(): SmsLogsPage {
-    return this.resolve('smsLogsPage', () => new SmsLogsPage(this.page));
-  }
-
-  get serviceRequestsPage(): ServiceRequestsPage {
-    return this.resolve('serviceRequestsPage', () => new ServiceRequestsPage(this.page));
-  }
-
-  get betweenMyAccountsTransferLogPage(): BetweenMyAccountsTransferLogPage {
-    return this.resolve('betweenMyAccountsTransferLogPage', () => new BetweenMyAccountsTransferLogPage(this.page));
-  }
+  // Add CRM page-object getters here (each page extends BaseCrmPage).
 }

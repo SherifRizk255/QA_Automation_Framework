@@ -8,10 +8,12 @@
  *  - Spec files and page objects NEVER contain a literal URL, host, org path,
  *    app id, or view id. They import ENV / ROUTES / TEST_DATA from here.
  *  - Every value can be overridden per project/environment through `.env`
- *    (skill 22 — Multi-Project Configuration). The literals below are the
- *    committed defaults for the currently active project (SAIB UAT).
+ *    (skill 22 — Multi-Project Configuration).
  *  - Locators are NOT defined here — they live in
  *    `docs/analysis/locator-repository.json`, resolved via `utils/locatorRepository.ts`.
+ *
+ * This is a CLEAN PROJECT TEMPLATE. Fill the committed defaults / `.env` values
+ * for the active project, then register real ROUTES and TEST_DATA below.
  */
 import 'dotenv/config';
 
@@ -35,11 +37,20 @@ function requireEnv(name: string): string {
   return value;
 }
 
+/** Safely derive an origin from a possibly-empty/invalid URL (skeleton-safe). */
+function originOf(url: string): string {
+  try {
+    return url ? new URL(url).origin : '';
+  } catch {
+    return '';
+  }
+}
+
 // ─── Project context (skill 22 guard rules) ──────────────────────────────────
 
 export const PROJECT = {
-  /** Client project key, e.g. SAIB | ABK | HDB. */
-  name: env('PROJECT_NAME', 'SAIB'),
+  /** Client project key, e.g. ABK | SAIB | HDB. */
+  name: env('PROJECT_NAME', 'ABK'),
   /** SIT | UAT | DEV — never PROD. */
   targetEnv: env('TARGET_ENV', 'UAT'),
   /** When true, agents must not attempt network installs or external fetches. */
@@ -51,19 +62,16 @@ if (PROJECT.targetEnv.toUpperCase() === 'PROD') {
 }
 
 // ─── Committed defaults for the active project (override via .env) ───────────
+// Fill these in per project. Leave blank to require the value from `.env`.
 
 const PORTAL_BASE_URL = env('PORTAL_BASE_URL', '');
 const PORTAL_LOGIN_PATH = env('PORTAL_LOGIN_PATH', '');
 
-const CRM_BASE_URL = env('CRM_BASE_URL', 'https://crm.cubicsystems.com');
-/** D365 organization paths — UAT org hosts SMS Logs / Service Requests; main org hosts transfer logs. */
-const CRM_ORG_PATH_UAT = env('CRM_ORG_PATH_UAT', '/SaibUAT');
-const CRM_ORG_PATH_MAIN = env('CRM_ORG_PATH_MAIN', '/Saib');
-/** Model-driven app id (same app is deployed to both orgs for this tenant). */
-const CRM_APP_ID = env('CRM_APP_ID', 'c6546de1-f7f5-f011-a74c-000c290f08a3');
-/** Saved-view ids per entity list. */
-const CRM_VIEW_ID_SMS_LOGS = env('CRM_VIEW_ID_SMS_LOGS', '4111affe-b728-482e-b44f-540508c30c3b');
-const CRM_VIEW_ID_BMA_TRANSFER_LOG = env('CRM_VIEW_ID_BMA_TRANSFER_LOG', 'bae3b8ea-4de3-4510-bfcb-687442f58866');
+const CRM_BASE_URL = env('CRM_BASE_URL', '');
+/** D365 organization path(s) for this tenant, e.g. '/OrgName'. */
+const CRM_ORG_PATH = env('CRM_ORG_PATH', '');
+/** Model-driven app id for this tenant. */
+const CRM_APP_ID = env('CRM_APP_ID', '');
 
 // ─── ENV: runtime environment values ─────────────────────────────────────────
 
@@ -83,9 +91,9 @@ export const ENV = {
   crm: {
     baseUrl: CRM_BASE_URL,
     /** Origin for context-level httpCredentials (NTLM — skill 19). */
-    origin: new URL(CRM_BASE_URL).origin,
+    origin: originOf(CRM_BASE_URL),
     /** Route-interception glob for the httpntlm fallback helper. */
-    routePattern: `${new URL(CRM_BASE_URL).origin}/**`,
+    routePattern: originOf(CRM_BASE_URL) ? `${originOf(CRM_BASE_URL)}/**` : '',
     get username(): string {
       return requireEnv('CRM_USERNAME');
     },
@@ -115,7 +123,7 @@ export function crmEntityListUrl(options: {
 }
 
 /**
- * Build a portal SPA hash route (portal is a hash-routed Angular app).
+ * Build a portal SPA hash route (for hash-routed Angular-style apps).
  * `fromUrl` defaults to the configured login URL; pass `page.url()` as a
  * fallback base when the login URL is not configured.
  */
@@ -126,36 +134,20 @@ export function portalHashRoute(hashRoute: string, fromUrl: string = ENV.portal.
 export const ROUTES = {
   portal: {
     login: ENV.portal.loginUrl,
-    accounts: '#/accounts',
-    transferHub: '#/transfers/transfer-money',
-    toAnotherSaibAccount: '#/transfers/to-another-saib-account',
+    // Register portal routes here, e.g.:
+    //   accounts: '#/accounts',
   },
   crm: {
-    smsLogs: crmEntityListUrl({
-      orgPath: CRM_ORG_PATH_UAT,
-      entityName: 'cis_smslog',
-      viewId: CRM_VIEW_ID_SMS_LOGS,
-    }),
-    serviceRequests: crmEntityListUrl({
-      orgPath: CRM_ORG_PATH_UAT,
-      entityName: 'cis_servicerequest',
-    }),
-    betweenMyAccountsTransferLog: crmEntityListUrl({
-      orgPath: CRM_ORG_PATH_MAIN,
-      entityName: 'cis_betweenmyaccountstransferlog',
-      viewId: CRM_VIEW_ID_BMA_TRANSFER_LOG,
-    }),
+    // Register CRM entity-list routes here via crmEntityListUrl(), e.g.:
+    //   serviceRequests: crmEntityListUrl({ orgPath: CRM_ORG_PATH, entityName: 'cis_servicerequest' }),
   },
 } as const;
 
 // ─── TEST_DATA: shared, non-secret test data constants ───────────────────────
+// Register shared, non-secret test-data constants here (each env-overridable),
+// e.g.:  transferAmount: env('TEST_TRANSFER_AMOUNT', '1'),
 
-export const TEST_DATA = {
-  /** Non-posting-safe amount approved for Between My Accounts transfer runs. */
-  transferAmount: env('TEST_TRANSFER_AMOUNT', '77'),
-  /** Internet Banking user expected on the CRM transfer-log record. */
-  portalIbUsername: env('PORTAL_IB_USERNAME', 'OSerry'),
-} as const;
+export const TEST_DATA = {} as const;
 
 // ─── Reporting identity (skill 25 — Cubic HTML Execution Report) ─────────────
 
