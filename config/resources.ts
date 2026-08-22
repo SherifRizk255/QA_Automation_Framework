@@ -76,6 +76,18 @@ const CRM_VIEW_ID_BMA_TRANSFER_LOG = env('CRM_VIEW_ID_BMA_TRANSFER_LOG', 'bae3b8
 const CRM_VIEW_ID_LOCALTRANSFER_LOG = env('CRM_VIEW_ID_LOCALTRANSFER_LOG', '9434451f-4390-462f-95c6-6a01e66721d9');
 const CRM_VIEW_ID_PAY_MY_CARD_LOG = env('CRM_VIEW_ID_PAY_MY_CARD_LOG', '6a3e26c6-ee02-4966-8e03-a4f35baa20d5');
 
+// IScore Asset Management project (docs/projects/iscore-asset-management) — skill 22.
+// Committed defaults left blank for the portal (client-identifying host); CRM routing
+// values below are non-secret tenant routing ids, same category as the SAIB ones above.
+const ASSET_PORTAL_BASE_URL = env('ASSET_PORTAL_BASE_URL', '');
+const ASSET_PORTAL_LOGIN_PATH = env('ASSET_PORTAL_LOGIN_PATH', '');
+
+const ASSET_CRM_BASE_URL = env('ASSET_CRM_BASE_URL', 'https://crm.cubicsystems.com');
+const ASSET_CRM_APP_ID = env('ASSET_CRM_APP_ID', 'a33fc2ad-6922-4822-92c5-4ec79ed129b0');
+const ASSET_CRM_ORG_PATH = env('ASSET_CRM_ORG_PATH', '/ISCORE');
+/** cis_users record whose role field drives Maker/Checker/Finance Checker portal access. */
+const ASSET_CRM_USER_RECORD_ID = env('ASSET_CRM_USER_RECORD_ID', 'fd45443c-c79b-f111-a74f-000c290f08a3');
+
 
 // ─── ENV: runtime environment values ─────────────────────────────────────────
 
@@ -105,6 +117,30 @@ export const ENV = {
       return requireEnv('CRM_PASSWORD');
     },
   },
+  assetPortal: {
+    baseUrl: ASSET_PORTAL_BASE_URL,
+    loginPath: ASSET_PORTAL_LOGIN_PATH,
+    /** Full login URL; ASSET_PORTAL_LOGIN_URL wins when set, else base + path. */
+    loginUrl: env('ASSET_PORTAL_LOGIN_URL', `${ASSET_PORTAL_BASE_URL}${ASSET_PORTAL_LOGIN_PATH}`),
+    get username(): string {
+      return requireEnv('ASSET_PORTAL_USERNAME');
+    },
+    get password(): string {
+      return requireEnv('ASSET_PORTAL_PASSWORD');
+    },
+  },
+  assetCrm: {
+    baseUrl: ASSET_CRM_BASE_URL,
+    /** Origin for context-level httpCredentials (NTLM — skill 19). */
+    origin: new URL(ASSET_CRM_BASE_URL).origin,
+    routePattern: `${new URL(ASSET_CRM_BASE_URL).origin}/**`,
+    get username(): string {
+      return requireEnv('ASSET_CRM_USERNAME');
+    },
+    get password(): string {
+      return requireEnv('ASSET_CRM_PASSWORD');
+    },
+  },
 } as const;
 
 // ─── ROUTES: every navigable URL used by specs and page objects ──────────────
@@ -128,6 +164,23 @@ export function crmEntityListUrl(options: {
   }
 
   return `${CRM_BASE_URL}${options.orgPath}/main.aspx?${params.toString()}`;
+}
+
+/** Build a D365 entity-record URL (a single opened record, not a list). */
+export function crmRecordUrl(options: {
+  orgPath: string;
+  entityName: string;
+  id: string;
+  appId?: string;
+}): string {
+  const params = new URLSearchParams({
+    appid: options.appId ?? ASSET_CRM_APP_ID,
+    pagetype: 'entityrecord',
+    etn: options.entityName,
+    id: options.id,
+  });
+
+  return `${ASSET_CRM_BASE_URL}${options.orgPath}/main.aspx?${params.toString()}`;
 }
 
 /**
@@ -190,7 +243,44 @@ export const ROUTES = {
       viewId: CRM_VIEW_ID_PAY_MY_CARD_LOG,
     }),
   },
+  assetPortal: {
+    login: ENV.assetPortal.loginUrl,
+    /** Hash route for the Tagging module; compose with portalHashRoute() to navigate directly. */
+    tagging: '#/tagging',
+  },
+  assetCrm: {
+    /** cis_users record whose role field drives Maker/Checker/Finance Checker portal access. */
+    userRecord: crmRecordUrl({
+      orgPath: ASSET_CRM_ORG_PATH,
+      entityName: 'cis_users',
+      id: ASSET_CRM_USER_RECORD_ID,
+    }),
+  },
 } as const;
+
+// ─── ROLES: IScore Asset Management role model (skill 19 / 20) ───────────────
+
+/**
+ * All three roles authenticate with the same portal credentials
+ * (ENV.assetPortal.username/password). The active role is a field on the CRM
+ * cis_users record, not a portal-side setting — see RoleSwitchOrchestrator.
+ */
+export const ROLES = {
+  MAKER: {
+    crmFieldValue: env('ASSET_ROLE_LABEL_MAKER', 'Maker'),
+    storageStatePath: '.auth/asset-maker-state.json',
+  },
+  CHECKER: {
+    crmFieldValue: env('ASSET_ROLE_LABEL_CHECKER', 'Checker'),
+    storageStatePath: '.auth/asset-checker-state.json',
+  },
+  FINANCE_CHECKER: {
+    crmFieldValue: env('ASSET_ROLE_LABEL_FINANCE_CHECKER', 'Finance Checker'),
+    storageStatePath: '.auth/asset-finance-checker-state.json',
+  },
+} as const;
+
+export type AssetPortalRole = keyof typeof ROLES;
 
 // ─── TEST_DATA: shared, non-secret test data constants ───────────────────────
 
@@ -199,6 +289,16 @@ export const TEST_DATA = {
   transferAmount: env('TEST_TRANSFER_AMOUNT', '77'),
   /** Internet Banking user expected on the CRM transfer-log record. */
   portalIbUsername: env('PORTAL_IB_USERNAME', 'OSerry'),
+  assetTagging: {
+    /** How many eligible grid rows the multi-select regression cases check. */
+    multiSelectCount: Number(env('ASSET_TAGGING_MULTI_SELECT_COUNT', '2')),
+    /** Advanced filter field label exercised by the filter regression cases. */
+    filterFieldLabel: env('ASSET_TAGGING_FILTER_FIELD_LABEL', 'Asset Category'),
+    /** A value expected to narrow (not empty) the grid; blank = derive from a live row. */
+    filterMatchValue: env('ASSET_TAGGING_FILTER_MATCH_VALUE', ''),
+    /** A value guaranteed not to match any row, to exercise the empty-state case. */
+    filterNoMatchValue: env('ASSET_TAGGING_FILTER_NO_MATCH_VALUE', 'Unmatched-Filter-Value-QA'),
+  },
 } as const;
 
 // ─── Reporting identity (skill 25 — Cubic HTML Execution Report) ─────────────

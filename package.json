@@ -13,7 +13,11 @@
     "report:allure": "allure generate allure-results --clean -o allure-report",
     "cleanup:drivers": "powershell -ExecutionPolicy Bypass -File scripts/cleanup-drivers.ps1",
     "diagnose:node": "powershell -ExecutionPolicy Bypass -File scripts/diagnose-node.ps1",
-    "discover:local-transfer": "node --experimental-strip-types scripts/discovery/transfers/local-transfer-navigation.ts"
+    "discover:local-transfer": "node --experimental-strip-types scripts/discovery/transfers/local-transfer-navigation.ts",
+    "test:asset-management": "playwright test --project=asset-management",
+    "test:asset-management:auth": "playwright test tests/regression-tcs/asset-management/authentication --project=asset-management",
+    "test:asset-management:tagging": "playwright test tests/regression-tcs/asset-management/tagging --project=asset-management",
+    "test:asset-management:framework": "playwright test tests/framework/asset-management --project=asset-management"
   },
   "keywords": [],
   "author": "",

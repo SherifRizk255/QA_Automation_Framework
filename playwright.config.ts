@@ -55,7 +55,7 @@ export default defineConfig({
       // Explicitly excludes CRM specs so the browser never switches
       // headless mode mid-run, which would orphan the previous instance.
       name: 'Portal',
-      testIgnore: ['crm/**', 'transfers/cross-system/**'],
+      testIgnore: ['crm/**', 'transfers/cross-system/**', 'regression-tcs/asset-management/**', 'framework/asset-management/**'],
       use: {
         browserName: 'chromium',
         headless: false,
@@ -68,6 +68,18 @@ export default defineConfig({
       name: 'crm',
       testMatch: ['crm/**', 'transfers/cross-system/**'],
       timeout: 180_000,
+      use: {
+        browserName: 'chromium',
+        headless: false,
+      },
+    },
+    {
+      // IScore Asset Management — cross-system regression (Portal + CRM role
+      // switch) plus its offline framework self-tests. Isolated into its own
+      // project so it never shares a browser session with SAIB Portal/CRM.
+      name: 'asset-management',
+      testMatch: ['regression-tcs/asset-management/**', 'framework/asset-management/**'],
+      timeout: 240_000,
       use: {
         browserName: 'chromium',
         headless: false,
