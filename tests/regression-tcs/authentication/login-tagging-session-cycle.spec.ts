@@ -5,35 +5,33 @@ import { TaggingPage } from '../../../pages/portal-pages/tagging/TaggingPage';
 import { test } from '../../../fixtures/portalFixtures';
 
 test.describe('IScore Asset Management - Login & Tagging Session Cycle', () => {
-  test('TC-AUTH-ASSET-010 | Maker signs in and opens Tagging from the header', async ({ signInAs }) => {
+  test('TC-AUTH-ASSET-010 | Maker signs in and opens Tagging from the header', async ({ authenticatedPortal }) => {
     await allure.feature('IScore Asset Management');
     await allure.story('Login & Tagging Session Cycle');
     await allure.severity('blocker');
 
-    const { page } = await signInAs('MAKER');
-    const taggingPage = new TaggingPage(page);
+    const taggingPage = new TaggingPage(authenticatedPortal);
 
     await taggingPage.openFromHeader();
     await taggingPage.assertTaggingModuleLoaded();
   });
 
-  test('TC-AUTH-ASSET-011 | Maker signs out of the portal', async ({ signInAs }) => {
+  test('TC-AUTH-ASSET-011 | Maker signs out of the portal', async ({ authenticatedPortal }) => {
     await allure.feature('IScore Asset Management');
     await allure.story('Login & Tagging Session Cycle');
     await allure.severity('critical');
 
-    const { page } = await signInAs('MAKER');
-    const shell = new PortalShellPage(page);
+    const shell = new PortalShellPage(authenticatedPortal);
 
     await shell.logout();
   });
 
-  test('TC-AUTH-ASSET-012 | Maker repeats the login-Tagging cycle after logout', async ({ signInAs }) => {
+  test('TC-AUTH-ASSET-012 | Maker repeats the login-Tagging cycle after logout', async ({ authenticatedPortal }) => {
     await allure.feature('IScore Asset Management');
     await allure.story('Login & Tagging Session Cycle');
     await allure.severity('critical');
 
-    const { page } = await signInAs('MAKER');
+    const page = authenticatedPortal;
 
     const firstTaggingPage = new TaggingPage(page);
     await firstTaggingPage.openFromHeader();

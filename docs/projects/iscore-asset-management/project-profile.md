@@ -37,7 +37,12 @@ active role is a field on the CRM `cis_users` record, not a portal-side setting:
 
 To test as a given role: write the role field on the CRM record → clear the portal
 session → fresh portal login → read back the active role label from the portal shell
-to confirm the switch took effect. See `utils/roles/RoleSwitchOrchestrator.ts`.
+to confirm the switch took effect. See `utils/roles/RoleSwitchOrchestrator.ts`
+(`signInAs()` fixture). This is opt-in — the default regression suite uses the
+portal-only `authenticatedPortal`/`makerTaggingPage` fixtures instead (form login
+only, no CRM), since CRM (`crm.cubicsystems.com`, NTLM/on-prem) is typically reachable
+only from the corporate network, while the Portal demo host is reachable more widely.
+Use `signInAs` only for a test that must prove or actively switch the active role.
 
 ## Environments
 

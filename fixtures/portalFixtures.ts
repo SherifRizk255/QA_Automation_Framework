@@ -1,5 +1,5 @@
 import { test as base } from '@playwright/test';
-import type { BrowserContext } from '@playwright/test';
+import type { BrowserContext, Page } from '@playwright/test';
 import type { PortalRole } from '../config/resources';
 import { LoginPage } from '../pages/portal-pages/LoginPage';
 import { TaggingPage } from '../pages/portal-pages/tagging/TaggingPage';
@@ -8,9 +8,15 @@ import { RoleSwitchOrchestrator, type PortalSession } from '../utils/roles/RoleS
 
 type PortalFixtures = {
   loginPage: LoginPage;
-  /** Switch the active portal session to the given role; closed automatically after the test. */
+  /**
+   * Portal-only FORM_LOGIN session (skill 19) — no CRM role write. Assumes the
+   * account's CRM role is already whatever a given regression case needs;
+   * use `signInAs` instead when a test must prove or change the active role.
+   */
+  authenticatedPortal: Page;
+  /** Switch the active portal session to the given role via CRM; closed automatically after the test. */
   signInAs: (role: PortalRole) => Promise<PortalSession>;
-  /** Pre-authenticated as Maker, already on the Tagging module. */
+  /** Pre-authenticated (portal-only, no CRM), already on the Tagging module. */
   makerTaggingPage: TaggingPage;
 };
 
@@ -38,6 +44,13 @@ export const test = base.extend<PortalFixtures, PortalWorkerFixtures>({
     await use(new LoginPage(page));
   },
 
+  authenticatedPortal: async ({ page, loginPage }, use) => {
+    await loginPage.goto();
+    await loginPage.loginWithConfiguredUser();
+    await loginPage.assertLoginRouteLeft();
+    await use(page);
+  },
+
   signInAs: async ({ roleSwitchOrchestrator }, use) => {
     const openedContexts: BrowserContext[] = [];
 
@@ -52,9 +65,8 @@ export const test = base.extend<PortalFixtures, PortalWorkerFixtures>({
     }
   },
 
-  makerTaggingPage: async ({ signInAs }, use, testInfo) => {
-    const { page } = await signInAs('MAKER');
-    const taggingPage = new TaggingPage(page, testInfo);
+  makerTaggingPage: async ({ authenticatedPortal }, use, testInfo) => {
+    const taggingPage = new TaggingPage(authenticatedPortal, testInfo);
     await taggingPage.openFromHeader();
     await use(taggingPage);
   },

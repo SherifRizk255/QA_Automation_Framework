@@ -12,13 +12,12 @@ test.describe('IScore Asset Management - Tagging Navigation', () => {
     await makerTaggingPage.assertTaggingModuleLoaded();
   });
 
-  test('TC-TAG-ASSET-002 | Header link and direct route both resolve to Tagging', async ({ signInAs }) => {
+  test('TC-TAG-ASSET-002 | Header link and direct route both resolve to Tagging', async ({ authenticatedPortal }) => {
     await allure.feature('IScore Asset Management');
     await allure.story('Tagging Navigation');
     await allure.severity('normal');
 
-    const { page } = await signInAs('MAKER');
-    const taggingPage = new TaggingPage(page);
+    const taggingPage = new TaggingPage(authenticatedPortal);
 
     await taggingPage.openFromHeader();
     await taggingPage.assertTaggingModuleLoaded();
@@ -27,13 +26,14 @@ test.describe('IScore Asset Management - Tagging Navigation', () => {
     await taggingPage.assertTaggingModuleLoaded();
   });
 
-  test('TC-TAG-ASSET-003 | Tagging opens by direct route without using the header', async ({ signInAs }) => {
+  test('TC-TAG-ASSET-003 | Tagging opens by direct route without using the header', async ({
+    authenticatedPortal,
+  }) => {
     await allure.feature('IScore Asset Management');
     await allure.story('Tagging Navigation');
     await allure.severity('normal');
 
-    const { page } = await signInAs('MAKER');
-    const taggingPage = new TaggingPage(page);
+    const taggingPage = new TaggingPage(authenticatedPortal);
 
     await taggingPage.openByRoute();
     await taggingPage.assertTaggingModuleLoaded();
