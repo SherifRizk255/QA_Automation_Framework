@@ -51,34 +51,10 @@ export default defineConfig({
 
   projects: [
     {
-      // Portal tests — headless, 60 s default timeout (from root config).
-      // Explicitly excludes CRM specs so the browser never switches
-      // headless mode mid-run, which would orphan the previous instance.
-      name: 'Portal',
-      testIgnore: ['crm/**', 'transfers/cross-system/**', 'regression-tcs/asset-management/**', 'framework/asset-management/**'],
-      use: {
-        browserName: 'chromium',
-        headless: false,
-      },
-    },
-    {
-      // CRM tests — non-headless (NTLM auth requires visible session),
-      // isolated into their own project so the browser is launched once
-      // in the correct mode and torn down cleanly after all CRM tests.
-      name: 'crm',
-      testMatch: ['crm/**', 'transfers/cross-system/**'],
-      timeout: 180_000,
-      use: {
-        browserName: 'chromium',
-        headless: false,
-      },
-    },
-    {
-      // IScore Asset Management — cross-system regression (Portal + CRM role
-      // switch) plus its offline framework self-tests. Isolated into its own
-      // project so it never shares a browser session with SAIB Portal/CRM.
+      // IScore Asset Management — cross-system regression (Portal form login +
+      // CRM NTLM role switch) plus its offline framework self-tests. Non-headless
+      // because NTLM auth requires a visible session (skill 19).
       name: 'asset-management',
-      testMatch: ['regression-tcs/asset-management/**', 'framework/asset-management/**'],
       timeout: 240_000,
       use: {
         browserName: 'chromium',

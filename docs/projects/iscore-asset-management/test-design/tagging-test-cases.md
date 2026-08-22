@@ -1,8 +1,8 @@
 # IScore Asset Management — Tagging Regression Test Cases
 
-> Test design artifact (skills 11/12) for `tests/regression-tcs/asset-management/`.
-> Role under test: Maker, via `fixtures/assetManagementFixtures.ts`.
-> Locator status: every `ASSET.*` repository entry is `UNVERIFIED` — see
+> Test design artifact (skills 11/12) for `tests/regression-tcs/{authentication,tagging}/`.
+> Role under test: Maker, via `fixtures/portalFixtures.ts`.
+> Locator status: every locator repository entry is `UNVERIFIED` — see
 > `docs/projects/iscore-asset-management/project-profile.md` §"Locator verification status".
 
 | TC id | Spec file | Severity | Scenario |
@@ -30,16 +30,17 @@
 | TC-TAG-ASSET-035 | tagging/tagging-asset-container.spec.ts | normal | Clearing selection resets checked count to zero |
 
 21 regression cases across 5 spec files, plus 13 offline framework self-tests
-(`tests/framework/asset-management/resources-contract.spec.ts`,
-`locator-repository-integrity.spec.ts`) that require no live app.
+(`tests/framework/config/resources-contract.spec.ts`,
+`tests/framework/locator-repository/locator-repository-integrity.spec.ts`) that
+require no live app.
 
 ## Environment prerequisites
 
-* `.env` populated with `ASSET_PORTAL_*` and `ASSET_CRM_*` (see `.env.example`).
+* `.env` populated with `PORTAL_*` and `CRM_*` (see `.env.example`).
 * The Tagging grid must contain at least 2 eligible (checkbox-selectable) asset
   rows for TC-TAG-ASSET-032/033/035, and ideally at least 1 ineligible row for
   TC-TAG-ASSET-034 — that case self-skips (optional-candidate pattern, skill 23)
   when the current grid has none.
 * Before this suite's results can be trusted: run a live system walkthrough
-  (skill 02) to promote the `ASSET.*` locator repository entries from
-  `UNVERIFIED` to `ACTIVE`, per skill 24's discovery-vs-committed distinction.
+  (skill 02) to promote the locator repository entries from `UNVERIFIED` to
+  `ACTIVE`, per skill 24's discovery-vs-committed distinction.

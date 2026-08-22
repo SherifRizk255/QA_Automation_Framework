@@ -21,35 +21,35 @@ test.describe('generic test-case ingestion', () => {
       'Additional business rules', 'Priority', 'Suite/tags',
     ]);
     sheet.addRow([
-      'SAIB-0062', 'Account Management', 'Account Management General', 'Drill-down',
-      '1. Open Accounts\n2. Open transaction', 'Details match',
-      'POST /accountstatement\nTransaction.Reference', '{"role":"retail"}',
-      '{"route":"#/accounts"}', 'Use UI-only selection\nNormalize currency',
-      'P1', 'regression,account-management',
+      'TC-TAG-ASSET-021', 'Tagging', 'Tagging Advanced Filters', 'Matching filter narrows the grid',
+      '1. Expand filters\n2. Apply matching value', 'Grid narrows to matching rows',
+      'GET /assets\nAsset.Category', '{"role":"maker"}',
+      '{"route":"#/tagging"}', 'Derive filter value from a live row\nNever pin a literal',
+      'P1', 'regression,tagging',
     ]);
     await workbook.xlsx.writeFile(workbookPath);
 
     const [parsed] = await parseXlsx(workbookPath);
-    expect(parsed.tcId).toBe('SAIB-0062');
-    expect(parsed.steps).toEqual(['Open Accounts', 'Open transaction']);
-    expect(parsed.businessRules).toEqual(['Use UI-only selection', 'Normalize currency']);
-    expect(parsed.tags).toEqual(['regression', 'account-management']);
+    expect(parsed.tcId).toBe('TC-TAG-ASSET-021');
+    expect(parsed.steps).toEqual(['Expand filters', 'Apply matching value']);
+    expect(parsed.businessRules).toEqual(['Derive filter value from a live row', 'Never pin a literal']);
+    expect(parsed.tags).toEqual(['regression', 'tagging']);
   });
 
   test('rejects duplicate JSON IDs case-insensitively', async () => {
     const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'tc-intake-'));
     const jsonPath = path.join(directory, 'cases.json');
     const base = {
-      module: 'Accounts',
-      subModule: 'History',
+      module: 'Tagging',
+      subModule: 'Advanced Filters',
       title: 'Title',
       steps: ['Step'],
       expectedResult: 'Expected',
     };
     await fs.writeFile(jsonPath, JSON.stringify({
       testCases: [
-        { tcId: 'SAIB-0062', ...base },
-        { tcId: 'saib-0062', ...base },
+        { tcId: 'TC-TAG-ASSET-021', ...base },
+        { tcId: 'tc-tag-asset-021', ...base },
       ],
     }));
 

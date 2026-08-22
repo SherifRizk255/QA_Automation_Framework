@@ -126,7 +126,7 @@ export default class CubicHtmlReporter implements Reporter {
     const runEnd = new Date();
     const html = renderHtml({
       companyName: this.companyName,
-      projectName: process.env.PROJECT_NAME ?? 'SAIB',
+      projectName: process.env.PROJECT_NAME ?? 'ISCORE-ASSETS',
       targetEnv: process.env.TARGET_ENV ?? 'UAT',
       runStart: this.runStart,
       runEnd,

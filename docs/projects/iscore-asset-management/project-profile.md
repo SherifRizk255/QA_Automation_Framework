@@ -1,9 +1,9 @@
 # Project Profile — IScore Fixed Asset Management
 
-> Layer 2 config (skill 22 — Multi-Project Configuration). This profile isolates the
-> IScore Asset Management project's domain, environments, and roles from the
-> currently active SAIB configuration in `docs/projects/README.md`. Switching to this
-> project never requires editing framework code — only `.env` + this profile.
+> Layer 2 config (skill 22 — Multi-Project Configuration). This is the only client
+> project this repository currently automates. Onboarding a second project later
+> means adding its own `docs/projects/<project-name>/` profile and env vars — never
+> editing this one or the shared framework layer to fit it.
 
 ---
 
@@ -31,19 +31,19 @@ active role is a field on the CRM `cis_users` record, not a portal-side setting:
 
 | Role | CRM field value | Storage state |
 |---|---|---|
-| Maker | `Maker` | `.auth/asset-maker-state.json` |
-| Checker | `Checker` | `.auth/asset-checker-state.json` |
-| Finance Checker | `Finance Checker` | `.auth/asset-finance-checker-state.json` |
+| Maker | `Maker` | `.auth/maker-state.json` |
+| Checker | `Checker` | `.auth/checker-state.json` |
+| Finance Checker | `Finance Checker` | `.auth/finance-checker-state.json` |
 
 To test as a given role: write the role field on the CRM record → clear the portal
 session → fresh portal login → read back the active role label from the portal shell
-to confirm the switch took effect. See `utils/asset-management/RoleSwitchOrchestrator.ts`.
+to confirm the switch took effect. See `utils/roles/RoleSwitchOrchestrator.ts`.
 
 ## Environments
 
 | Env | TARGET_ENV | Notes |
 |---|---|---|
-| UAT | `UAT` | Only environment currently configured. Never PROD (skill 22 guard). |
+| DEMO | `DEMO` | Only environment currently configured (demo03.cubicsystems.com). Never PROD (skill 22 guard). |
 
 ## Compliance / restrictions
 
@@ -52,37 +52,37 @@ to confirm the switch took effect. See `utils/asset-management/RoleSwitchOrchest
 * Never weaken assertions to force a green run.
 * Never use `waitForTimeout`.
 * No hardcoded URLs, credentials, module names, or role labels in specs/pages —
-  resolve through `config/resources.ts` (`ENV.assetPortal`, `ENV.assetCrm`, `ROLES`)
-  and the locator repository (skill 24).
+  resolve through `config/resources.ts` (`ENV.portal`, `ENV.crm`, `ROLES`) and the
+  locator repository (skill 24).
 
 ## Artifact roots for this project
 
-* Locators: `docs/analysis/locator-repository.json`, `elementId` prefix `ASSET.*`
-  (shared single file per skill 24 — never a second locator repository; namespaced
-  entries coexist with `PORTAL.*` / `CRM.*` SAIB entries the same way Transfers and
-  Accounts already coexist).
+* Locators: `docs/analysis/locator-repository.json` — `PORTAL.*`/`TAGGING.*`/`CRM.*`
+  elementId prefixes (single shared repository file per skill 24 — never a second one).
 * Test design: `docs/projects/iscore-asset-management/test-design/`.
-* Regression suite: `tests/regression-tcs/asset-management/`.
-* Framework self-tests: `tests/framework/asset-management/`.
+* Regression suite: `tests/regression-tcs/{authentication,tagging}/`.
+* Framework self-tests: `tests/framework/{config,locator-repository}/`.
 
 ## Locator verification status
 
-All `ASSET.*` locator repository entries are currently `UNVERIFIED` — reasoned from
-this profile and the requirement set, not yet confirmed against the live IScore
-Asset Management DOM. They must be promoted to `ACTIVE` (or corrected) via a live
+Every locator repository entry is currently `UNVERIFIED` — reasoned from this
+profile and the requirement set, not yet confirmed against the live IScore Asset
+Management DOM. Entries must be promoted to `ACTIVE` (or corrected) via a live
 system walkthrough (skill 02) before the regression suite's results can be trusted
 against the real application. Until then, treat any run of
-`tests/regression-tcs/asset-management/**` as pending live verification — the
-offline framework self-tests in `tests/framework/asset-management/` do not require
-a live app and remain trustworthy as-is.
+`tests/regression-tcs/**` as pending live verification — the offline framework
+self-tests in `tests/framework/{config,locator-repository}/` do not require a live
+app and remain trustworthy as-is.
 
-## Config keys added
+## Config keys
 
-See `.env.example` for the full list. Summary:
+See `.env.example` for the full list, and `config/resources.ts` for how each is
+consumed. Summary:
 
 ```
-ASSET_PORTAL_BASE_URL / ASSET_PORTAL_LOGIN_PATH / ASSET_PORTAL_USERNAME / ASSET_PORTAL_PASSWORD
-ASSET_CRM_BASE_URL / ASSET_CRM_USERNAME / ASSET_CRM_PASSWORD / ASSET_CRM_APP_ID
-ASSET_CRM_ORG_PATH / ASSET_CRM_USER_RECORD_ID
-ASSET_TAGGING_MULTI_SELECT_COUNT / ASSET_TAGGING_FILTER_FIELD_LABEL
+PROJECT_NAME / PROJECT_DOMAIN / TARGET_ENV / AIR_GAPPED
+PORTAL_BASE_URL / PORTAL_LOGIN_PATH / PORTAL_USERNAME / PORTAL_PASSWORD
+CRM_BASE_URL / CRM_ORG_PATH / CRM_USERNAME / CRM_PASSWORD
+CRM_APP_ID / CRM_USER_ENTITY / CRM_AUTOMATION_USER_RECORD_ID
+TAGGING_MULTI_SELECT_COUNT / TAGGING_FILTER_FIELD_LABEL
 ```
