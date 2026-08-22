@@ -18,14 +18,19 @@ import 'dotenv/config';
 
 // ─── Env access helpers ──────────────────────────────────────────────────────
 
-/** Read an optional variable, falling back to the committed default. */
-function env(name: string, fallback: string): string {
-  const value = process.env[name];
-  if (value !== undefined && value !== '') {
-    return value;
-  } else {
-    return fallback;
+/**
+ * Read an optional variable, falling back to the committed default.
+ * Accepts a single name or a list of accepted names (aliases) — the first
+ * set variable wins, so both `ASSET_PORTAL_*` and plain `PORTAL_*` env files work.
+ */
+function env(names: string | string[], fallback: string): string {
+  for (const name of Array.isArray(names) ? names : [names]) {
+    const value = process.env[name];
+    if (value !== undefined && value !== '') {
+      return value;
+    }
   }
+  return fallback;
 }
 
 /** Read an optional boolean-like variable ("true"/"false", any casing). */
@@ -36,13 +41,17 @@ function envBool(name: string, fallback: 'true' | 'false'): boolean {
 /**
  * Read a mandatory variable (credentials are never committed — skill 19).
  * Reading is lazy so `tsc`/reporting tooling can load this module without a `.env`.
+ * Accepts aliases like env(); the STOP message names the primary variable.
  */
-function requireEnv(name: string): string {
-  const value = process.env[name];
-  if (value === undefined || value === '') {
-    throw new Error(`🚫 AUTH BLOCKED — Missing environment variable: ${name} (see .env.example)`);
+function requireEnv(names: string | string[]): string {
+  const nameList = Array.isArray(names) ? names : [names];
+  for (const name of nameList) {
+    const value = process.env[name];
+    if (value !== undefined && value !== '') {
+      return value;
+    }
   }
-  return value;
+  throw new Error(`🚫 AUTH BLOCKED — Missing environment variable: ${nameList[0]} (see .env.example)`);
 }
 
 // ─── Project context (skill 22 guard rules) ──────────────────────────────────
@@ -63,17 +72,25 @@ if (PROJECT.targetEnv.toUpperCase() === 'PROD') {
 }
 
 // ─── Committed defaults for the active project (override via .env) ───────────
+// Each value accepts the ASSET_-prefixed name (primary) and the plain name as
+// an alias, so both existing .env layouts resolve to the same configuration.
 
-const PORTAL_BASE_URL = env('PORTAL_BASE_URL', '');
-const PORTAL_LOGIN_PATH = env('PORTAL_LOGIN_PATH', '');
+const PORTAL_BASE_URL = env(
+  ['ASSET_PORTAL_BASE_URL', 'PORTAL_BASE_URL'],
+  'https://demo03.cubicsystems.com:8443/IScore-Assets/IScore-FixedAsset-Portal/'
+);
+const PORTAL_LOGIN_PATH = env(['ASSET_PORTAL_LOGIN_PATH', 'PORTAL_LOGIN_PATH'], '#/login');
 
-const CRM_BASE_URL = env('CRM_BASE_URL', 'https://crm.cubicsystems.com');
-const CRM_ORG_PATH = env('CRM_ORG_PATH', '/ISCORE');
-const CRM_APP_ID = env('CRM_APP_ID', 'a33fc2ad-6922-4822-92c5-4ec79ed129b0');
+const CRM_BASE_URL = env(['ASSET_CRM_BASE_URL', 'CRM_BASE_URL'], 'https://crm.cubicsystems.com');
+const CRM_ORG_PATH = env(['ASSET_CRM_ORG_PATH', 'CRM_ORG_PATH'], '/ISCORE');
+const CRM_APP_ID = env(['ASSET_CRM_APP_ID', 'CRM_APP_ID'], 'a33fc2ad-6922-4822-92c5-4ec79ed129b0');
 /** D365 entity holding the Maker/Checker/Finance Checker role field. */
-const CRM_USER_ENTITY = env('CRM_USER_ENTITY', 'cis_users');
+const CRM_USER_ENTITY = env(['ASSET_CRM_USER_ENTITY', 'CRM_USER_ENTITY'], 'cis_users');
 /** The specific cis_users record whose role field this suite drives. */
-const CRM_AUTOMATION_USER_RECORD_ID = env('CRM_AUTOMATION_USER_RECORD_ID', 'fd45443c-c79b-f111-a74f-000c290f08a3');
+const CRM_AUTOMATION_USER_RECORD_ID = env(
+  ['ASSET_CRM_USER_RECORD_ID', 'CRM_AUTOMATION_USER_RECORD_ID'],
+  'fd45443c-c79b-f111-a74f-000c290f08a3'
+);
 
 // ─── ENV: runtime environment values ─────────────────────────────────────────
 
@@ -81,13 +98,13 @@ export const ENV = {
   portal: {
     baseUrl: PORTAL_BASE_URL,
     loginPath: PORTAL_LOGIN_PATH,
-    /** Full login URL; PORTAL_LOGIN_URL wins when set, else base + path. */
-    loginUrl: env('PORTAL_LOGIN_URL', `${PORTAL_BASE_URL}${PORTAL_LOGIN_PATH}`),
+    /** Full login URL; ASSET_PORTAL_LOGIN_URL/PORTAL_LOGIN_URL wins when set, else base + path. */
+    loginUrl: env(['ASSET_PORTAL_LOGIN_URL', 'PORTAL_LOGIN_URL'], `${PORTAL_BASE_URL}${PORTAL_LOGIN_PATH}`),
     get username(): string {
-      return requireEnv('PORTAL_USERNAME');
+      return requireEnv(['ASSET_PORTAL_USERNAME', 'PORTAL_USERNAME']);
     },
     get password(): string {
-      return requireEnv('PORTAL_PASSWORD');
+      return requireEnv(['ASSET_PORTAL_PASSWORD', 'PORTAL_PASSWORD']);
     },
   },
   crm: {
@@ -97,10 +114,10 @@ export const ENV = {
     /** Route-interception glob for the httpntlm fallback helper. */
     routePattern: `${new URL(CRM_BASE_URL).origin}/**`,
     get username(): string {
-      return requireEnv('CRM_USERNAME');
+      return requireEnv(['ASSET_CRM_USERNAME', 'CRM_USERNAME']);
     },
     get password(): string {
-      return requireEnv('CRM_PASSWORD');
+      return requireEnv(['ASSET_CRM_PASSWORD', 'CRM_PASSWORD']);
     },
   },
 } as const;
