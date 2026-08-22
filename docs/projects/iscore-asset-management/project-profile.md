@@ -64,9 +64,19 @@ Use `signInAs` only for a test that must prove or actively switch the active rol
 
 * Locators: `docs/analysis/locator-repository.json` — `PORTAL.*`/`TAGGING.*`/`CRM.*`
   elementId prefixes (single shared repository file per skill 24 — never a second one).
-* Test design: `docs/projects/iscore-asset-management/test-design/`.
 * Regression suite: `tests/regression-tcs/{authentication,tagging}/`.
 * Framework self-tests: `tests/framework/{config,locator-repository}/`.
+
+### Pipeline artifact chain (Tagging module, master-workflow stages 09A–12)
+
+Produced in this order — each is a prerequisite for the next per
+master-workflow Rules 5–7:
+
+1. `analysis/tagging-qa-analysis.md` — QA Analyzer (stage 09A): risk scoring, dependencies, gaps.
+2. `test-design/tagging-traceability-matrix.md` — Traceability Manager (stage 10): REQ → IU → SCN → TC → AUT chain.
+3. `test-design/tagging-manual-test-cases.md` — TC Generator (stage 11): full manual cases.
+4. `test-design/tagging-test-lifecycle.md` — setup/teardown/data-ownership required before execution (Rule 8).
+5. `test-design/tagging-automation-coverage.md` — Automation Implementation (stage 12) output: TC → code mapping, DoD status.
 
 ## Locator verification status
 
