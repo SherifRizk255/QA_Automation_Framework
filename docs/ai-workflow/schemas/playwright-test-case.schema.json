@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "playwright-test-case.schema.json",
+  "title": "Playwright Test Case Intake",
+  "type": "object",
+  "required": ["testCases"],
+  "additionalProperties": false,
+  "properties": {
+    "testCases": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "tcId",
+          "module",
+          "subModule",
+          "title",
+          "steps",
+          "expectedResult"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "tcId": { "type": "string", "minLength": 1 },
+          "module": { "type": "string", "minLength": 1 },
+          "subModule": { "type": "string", "minLength": 1 },
+          "title": { "type": "string", "minLength": 1 },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 }
+          },
+          "expectedResult": { "type": "string", "minLength": 1 },
+          "knownApiContracts": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": []
+          },
+          "knownTestData": {
+            "type": "object",
+            "additionalProperties": true,
+            "default": {}
+          },
+          "knownNavigation": {
+            "type": "object",
+            "additionalProperties": true,
+            "default": {}
+          },
+          "businessRules": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": []
+          },
+          "priority": { "type": "string" },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "default": []
+          }
+        }
+      }
+    }
+  }
+}

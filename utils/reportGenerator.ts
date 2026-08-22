@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { classifyFailureMessage, stripAnsi } from './failureClassification';
+import { classifyFailureMessage, stripAnsi } from './failureClassification.ts';
 
 interface Attachment {
   name?: string;
@@ -172,6 +172,9 @@ function writeMarkdown(summary: Summary, attachments: CollectedAttachments): voi
   }
 
   fs.mkdirSync(path.dirname(reportPath), { recursive: true });
+  while (lines.at(-1) === '') {
+    lines.pop();
+  }
   fs.writeFileSync(reportPath, `${lines.join('\n')}\n`);
 }
 

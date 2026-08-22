@@ -161,6 +161,8 @@ export const ROUTES = {
     customerProducts: '/api/v1/customer/products',
     customerCards: '/api/v1/customer/cards',
     exchangeRates: '/api/v1/masterdata/exchange-rates',
+    accountDetails: '/api/v1/customer/accounts/details',
+    accountStatement: '/api/v1/customer/accounts/statement',
   },
   crm: {
     smsLogs: crmEntityListUrl({

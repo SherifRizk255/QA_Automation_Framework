@@ -7,6 +7,58 @@ Source artifacts:
 - System map: `docs/analysis/accounts-management-system-map.md`
 - Navigation map: `docs/analysis/accounts-management-navigation-map.md`
 
+## Transaction History Drill-down
+
+```text
+REQ-8
+â†“
+IU Account Management / Transaction History
+â†“
+SCN Selected-account transaction drill-down
+â†“
+SAIB-0062
+â†“
+tests/regression-tcs/accounts/saib-0062-transaction-history-drill-down.spec.ts
+â†“
+pages/portal-pages/accounts/AccountManagementPage.ts
+
+Status:
+Automated - focused UAT execution blocked by TEST_DATA after Phase 1 passed
+
+Lifecycle:
+TC_SETUP = authenticated retail Portal fixture
+Execution = read-only account selection and transaction drill-down
+Teardown = no business data created; browser fixture closes the session
+Retry Eligible = NO for test-data or business assertion failures
+Self-Healing = locator/navigation automation failures only
+```
+
+## Real-time Account Details
+
+```text
+REQ-6
+â†“
+IU Account Management / Account Details
+â†“
+SCN Real-time CBS Account Details
+â†“
+SAIB-0059
+â†“
+tests/regression-tcs/accounts/saib-0059-account-details.spec.ts
+â†“
+pages/portal-pages/accounts/AccountManagementPage.ts
+
+Status:
+Automated - PASSED in focused UAT execution
+
+Lifecycle:
+TC_SETUP = authenticated retail Portal fixture
+Execution = read-only Accounts navigation and same-action API/UI comparison
+Teardown = no business data created; browser fixture closes the session
+Retry Eligible = NO for business assertion failures
+Self-Healing = locator/navigation automation failures only
+```
+
 ## Login & Authentication - Credentials Login
 
 Source artifact:

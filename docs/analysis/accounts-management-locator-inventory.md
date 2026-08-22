@@ -25,3 +25,36 @@
 | Account Statements | Statement date controls | Not discovered | Not finalized | Low | Statement screen and date controls were not observed. |
 | Account Statements | Download button | Not discovered | Not finalized | Low | Download control was not observed. |
 
+## SAIB-0062 live and client-contract additions
+
+| Screen | Element | Repository Key | Primary Locator | Confidence | Evidence / Risk |
+| --- | --- | --- | --- | --- | --- |
+| Accounts | Product selector | `PORTAL.ACCOUNTS.SELECTOR.ROOT` | `cubic-product-selector` | High | Unique live UAT component root. |
+| Accounts | Selector trigger | `PORTAL.ACCOUNTS.SELECTOR.TRIGGER` | `.product-selector-trigger` | High | Live UAT button; disabled for a single-account set. |
+| Accounts | Dynamic position | `PORTAL.ACCOUNTS.SELECTOR.POSITION` | `.product-selector-position` | High | Live text validated with a dynamic current-of-total integer pattern. |
+| Accounts | Account options | `PORTAL.ACCOUNTS.SELECTOR.OPTIONS` | `getByRole('option')` | High | Live listbox options with `aria-selected` and visible identity fields. |
+| Accounts | Recent transaction rows | `PORTAL.ACCOUNTS.TRANSACTIONS.ROWS` | `.recent-tx-table tbody tr` | High | Stable semantic table structure; live UAT iteration reached a populated account and validated visible rows. |
+| Accounts | Row details action | `PORTAL.ACCOUNTS.TRANSACTIONS.ROW.DETAILS` | `.recent-tx-link` | High | Deployed recent-transactions component template. |
+| Transaction Details | Dialog | `PORTAL.ACCOUNTS.TRANSACTION_DETAILS.DIALOG` | `.txn-details-dialog` | High | Live UAT dialog opened successfully from a populated account. |
+| Transaction Details | Label/value rows | `PORTAL.ACCOUNTS.TRANSACTION_DETAILS.LABELS` / `VALUES` | `.txn-row dt` / `.txn-row dd` | High | Live semantic description list exposes dates, `Transaction reference No.`, Transaction Name, and Account number; required Running Balance is absent. |
+
+All runtime consumers resolve these keys through the central Locator
+Repository. Collection indexing is bounded and is used only after a visible
+business identity has been enumerated; it is not used to guess an account or
+transaction.
+
+## SAIB-0059 Account Details additions
+
+| Region | Element | Repository Key | Primary Locator | Confidence |
+| --- | --- | --- | --- | --- |
+| Product selector | Selected product name | `PORTAL.ACCOUNTS.SELECTOR.SELECTED_PRODUCT_NAME` | `.product-selector-name` | High |
+| Account Details | Root | `PORTAL.ACCOUNTS.DETAILS.ROOT` | `cubic-product-details` | High |
+| Account Details | Field collection | `PORTAL.ACCOUNTS.DETAILS.FIELDS` | `.account-info-stat` | High |
+| Account Details | Field label/value | `PORTAL.ACCOUNTS.DETAILS.FIELD.LABEL` / `VALUE` | `.account-info-field-head span` / `strong` | High |
+| Selected product card | Root | `PORTAL.ACCOUNTS.PRODUCT_CARD.ROOT` | `cubic-product-card` | High |
+| Selected product card | Balance collection | `PORTAL.ACCOUNTS.PRODUCT_CARD.BALANCES` | `.acct-balance` | High |
+| Selected product card | Balance label/value/currency | `PORTAL.ACCOUNTS.PRODUCT_CARD.BALANCE.*` | Stable `acct-balance-*` classes | High |
+
+All entries were verified against the live UAT DOM. The response-to-display
+mapping was correlated without logging customer values.
+

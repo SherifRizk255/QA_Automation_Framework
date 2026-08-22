@@ -3,6 +3,7 @@ import { ENV } from '../config/resources';
 import { LoginPage } from '../pages/portal-pages/LoginPage.js';
 import { DashboardPage } from '../pages/portal-pages/DashboardPage.js';
 import { TransferRepositoryPage } from '../pages/portal-pages/transfers/TransferRepositoryPage.js';
+import { AccountManagementPage } from '../pages/portal-pages/accounts/AccountManagementPage.js';
 import {
   DashboardApiObserver,
   type DashboardApiSnapshot,
@@ -16,6 +17,8 @@ type PortalRepositoryFixtures = {
   dashboardApi: DashboardApiSnapshot;
   /** Logged-in portal session already on the Transfer hub. */
   authenticatedTransferPage: TransferRepositoryPage;
+  /** Logged-in Portal account-management facade; navigation remains a test phase. */
+  authenticatedAccountManagementPage: AccountManagementPage;
 };
 
 export const test = base.extend<PortalRepositoryFixtures>({
@@ -59,6 +62,15 @@ export const test = base.extend<PortalRepositoryFixtures>({
     const transferPage = new TransferRepositoryPage(page);
     await transferPage.gotoTransferHub();
     await use(transferPage);
+  },
+
+  authenticatedAccountManagementPage: async (
+    { authenticatedDashboardPage, page },
+    use,
+    testInfo
+  ) => {
+    void authenticatedDashboardPage;
+    await use(new AccountManagementPage(page, testInfo));
   },
 });
 

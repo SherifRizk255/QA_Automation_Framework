@@ -51,13 +51,16 @@ export function classifyFailureMessage(message: string): FailureClassification {
 
   // Known application-defect signatures for the active project.
   if (
+    /app_ui|app_validation|app_functional/i.test(text) ||
     /active session blocker appeared and was handled/i.test(text) ||
     /transfer between my accounts form did not display|from account dropdown|to account dropdown/i.test(text)
   ) {
     return { ...CLASSES.F2, recommendation: recommendationFor('F2', message) };
   }
 
-  if (/portal_username|portal_password|crm_username|crm_password|credentials|unauthorized|invalid user|invalid password|auth blocked/i.test(text)) {
+  if (
+    /test_data|test data|no visible recent transactions|no transactions|portal_username|portal_password|crm_username|crm_password|credentials|unauthorized|invalid user|invalid password|auth blocked/i.test(text)
+  ) {
     return { ...CLASSES.F3, recommendation: recommendationFor('F3', message) };
   }
 

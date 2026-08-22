@@ -109,6 +109,67 @@ export const COMPONENT_CATALOG = {
       'Proves that carousel navigation changes the active item without interpreting business fields.',
     ],
   },
+  ACCOUNT_MANAGEMENT_SELECTOR: {
+    name: 'AccountSelectorComponent',
+    path: 'pages/components/portal/accounts/AccountSelectorComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'AccountManagementPage',
+    ],
+    responsibilities: [
+      'Owns the Accounts-page product selector and its dynamic current-of-total state.',
+      'Reads the currently displayed product name for Account Details validation.',
+      'Enumerates enabled account options and returns typed visible UI identities.',
+      'Selects a page-chosen option without receiving API expected data.',
+    ],
+  },
+  ACCOUNT_MANAGEMENT_DETAILS: {
+    name: 'AccountDetailsComponent',
+    path: 'pages/components/portal/accounts/AccountDetailsComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'AccountManagementPage',
+    ],
+    responsibilities: [
+      'Owns the scoped Account Details field collection and selected product card.',
+      'Returns typed displayed identity, balance, currency, status, date, and branch values.',
+      'Keeps API mapping, normalization, Allure reporting, and expected values in the page and utility layers.',
+    ],
+  },
+  ACCOUNT_MANAGEMENT_TRANSACTION_LIST: {
+    name: 'TransactionListComponent',
+    path: 'pages/components/portal/accounts/TransactionListComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'AccountManagementPage',
+    ],
+    responsibilities: [
+      'Owns the scoped recent-transactions table and row collection.',
+      'Returns typed visible transaction identities for page-level deterministic selection.',
+      'Opens the details action for a previously identified row.',
+    ],
+  },
+  ACCOUNT_MANAGEMENT_TRANSACTION_DETAILS: {
+    name: 'TransactionDetailsComponent',
+    path: 'pages/components/portal/accounts/TransactionDetailsComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'AccountManagementPage',
+    ],
+    responsibilities: [
+      'Owns the transaction-details dialog and semantic label/value collection.',
+      'Returns actual displayed transaction fields without API data or comparison logic.',
+      'Reports missing mandatory approved fields instead of weakening assertions.',
+    ],
+  },
   DASHBOARD_WELCOME: {
     name: 'DashboardWelcomeComponent',
     path: 'pages/components/portal/dashboard/DashboardWelcomeComponent.ts',

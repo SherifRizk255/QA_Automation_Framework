@@ -14,6 +14,38 @@ Use this skill only after TC generation is complete.
 
 ---
 
+## External Test-Case Intake
+
+When approved or candidate test cases arrive as JSON or Excel `.xlsx`, run the
+generic intake defined in:
+
+`docs/ai-workflow/references/test-case-automation-intake.md`
+
+The intake schema is:
+
+`docs/ai-workflow/schemas/playwright-test-case.schema.json`
+
+The executable parser is:
+
+`scripts/test-case-ingestion/parse-test-cases.ts`
+
+The intake stage preserves supplied TC IDs, validates mandatory fields, rejects
+duplicate IDs, identifies missing API/UI/navigation/data/formatting/conditional
+contracts, and produces an automation-readiness result plus a proposed
+finalized contract.
+
+Candidate intake does not authorize implementation. Stop after the review
+artifact and obtain explicit user approval for the finalized contracts,
+selection rules, mappings, skill changes, and proposed files. Only approved
+cases may continue through this Automation Implementation Agent.
+
+JSON/XLSX expected data must never influence UI record selection. When a test
+compares a UI result with an API response caused by a UI action, install the
+observer before that action and use the response from that same action and
+session.
+
+---
+
 ## Inputs
 
 ### Mandatory

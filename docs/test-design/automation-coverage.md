@@ -1,5 +1,17 @@
 # Automation Coverage
 
+## Account Management - Transaction History Drill-down
+
+| TC ID | Coverage Status | Automation File | Notes |
+| --- | --- | --- | --- |
+| SAIB-0062 | Automated - Application UI Failure | `tests/regression-tcs/accounts/saib-0062-transaction-history-drill-down.spec.ts` | Phase 1 checks the current account, then selects each enabled account through the UI in stable order until the same-action statement response contains transactions. The focused UAT run reached the third account and opened a transaction. Phase 2 failed because the deployed details popup omits required Running Balance. |
+
+## Account Management - Real-time Account Details
+
+| TC ID | Coverage Status | Automation File | Notes |
+| --- | --- | --- | --- |
+| SAIB-0059 | Automated - Passed | `tests/regression-tcs/accounts/saib-0059-account-details.spec.ts` | Captures `POST /accounts/details` from the same Accounts navigation and validates all currently applicable visible fields. Collateral is asserted only when an explicit API field exists. |
+
 ## Transfer - Local Transfer To Another SAIB Account
 
 Source workbook:
