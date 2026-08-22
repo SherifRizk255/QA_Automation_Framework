@@ -1,5 +1,6 @@
 import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
+import { ENV } from './config/resources.ts';
 
 dotenv.config();
 
@@ -27,7 +28,9 @@ export default defineConfig({
   ],
 
   use: {
-    baseURL: process.env.PORTAL_BASE_URL,
+    // Single source of truth for env values (skill 24) — never a raw process.env
+    // read here, so this always matches what LoginPage/TaggingPage actually navigate to.
+    baseURL: ENV.portal.baseUrl,
 
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
