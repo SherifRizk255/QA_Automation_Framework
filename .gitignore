@@ -3,7 +3,7 @@ test-results/
 playwright-report/
 .env
 .DS_Store
-reports
+/reports
 .auth/
 allure-results/
 allure-report/
