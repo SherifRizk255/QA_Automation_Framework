@@ -95,6 +95,20 @@ export const COMPONENT_CATALOG = {
     responsibilities: [
       'Owns the Add Tracking creation dialog: open-for-creation and closed-state assertions.',
       'Supports cancel and Escape dismissal, and reads the dialog title / editable-field presence.',
+      'Reused for the Add Assets dialog (proven equivalent DOM: same filter form + grid + Save/Cancel footer, verified live) — owns the Fixed Asset Number search/clear, selectable-row checking, selected-asset counter, attachment upload (Add Tracking only), and Save.',
+    ],
+  },
+  TAGGING_CONTAINER_DETAILS: {
+    name: 'TrackingContainerDetailsComponent',
+    path: 'pages/components/portal/tagging/TrackingContainerDetailsComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'TaggingPage',
+    ],
+    responsibilities: [
+      'Owns the Show Details dialog: the "Show Assets (N)" tab, its asset rows (Fixed Asset Number reads), and the close (X) control.',
     ],
   },
 } satisfies Record<string, ComponentCatalogEntry>;

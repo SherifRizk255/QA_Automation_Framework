@@ -49,11 +49,16 @@ test.describe('IScore Asset Management - locator repository integrity', () => {
     }
   });
 
-  test('TC-FW-ASSET-014 | Every entry is flagged UNVERIFIED pending a live system walkthrough', () => {
+  test('TC-FW-ASSET-014 | Every entry carries a valid repository status, and ACTIVE entries record when they were verified', () => {
     const { entries } = loadRepository();
+    const VALID_STATUSES = new Set(['UNVERIFIED', 'ACTIVE', 'HEALED', 'DEPRECATED']);
 
     for (const entry of entries) {
-      expect(entry.repositoryStatus, entry.elementId).toBe('UNVERIFIED');
+      expect(VALID_STATUSES.has(entry.repositoryStatus ?? ''), entry.elementId).toBe(true);
+
+      if (entry.repositoryStatus === 'ACTIVE') {
+        expect((entry as { lastVerifiedDate?: string | null }).lastVerifiedDate, entry.elementId).toBeTruthy();
+      }
     }
   });
 

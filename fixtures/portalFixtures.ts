@@ -65,8 +65,15 @@ export const test = base.extend<PortalFixtures, PortalWorkerFixtures>({
     }
   },
 
-  makerTaggingPage: async ({ authenticatedPortal }, use, testInfo) => {
-    const taggingPage = new TaggingPage(authenticatedPortal, testInfo);
+  makerTaggingPage: async ({ page, loginPage, roleApplier }, use, testInfo) => {
+    // Ensures Maker regardless of which role a prior test (e.g. the Maker->Checker
+    // smoke test) left the shared demo account in — see skill 19/20 role model.
+    await roleApplier.ensureRoleApplied('MAKER');
+    await loginPage.goto();
+    await loginPage.loginWithConfiguredUser();
+    await loginPage.assertLoginRouteLeft();
+
+    const taggingPage = new TaggingPage(page, testInfo);
     await taggingPage.openFromHeader();
     await use(taggingPage);
   },

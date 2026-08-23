@@ -29,7 +29,8 @@ export class UserRolePage extends BaseCrmPage {
 
   async setRole(crmFieldValue: string): Promise<void> {
     await allure.step(`Set the user's role field to "${crmFieldValue}"`, async () => {
-      await this.repository.locator('CRM.USERS.ROLE_FIELD').fill(crmFieldValue);
+      // cis_role is a D365 OptionSet field (native <select>), not free text.
+      await this.repository.locator('CRM.USERS.ROLE_FIELD').selectOption({ label: crmFieldValue });
       await this.repository.locator('CRM.USERS.SAVE_BUTTON').click();
       await this.waitForDynamicsReady();
     });
@@ -39,7 +40,8 @@ export class UserRolePage extends BaseCrmPage {
 
   async assertRoleFieldValue(expectedCrmFieldValue: string): Promise<void> {
     await allure.step(`Assert the role field reads "${expectedCrmFieldValue}"`, async () => {
-      await expect(this.repository.locator('CRM.USERS.ROLE_FIELD')).toHaveValue(expectedCrmFieldValue);
+      // The select's title attribute mirrors the currently selected option's label.
+      await expect(this.repository.locator('CRM.USERS.ROLE_FIELD')).toHaveAttribute('title', expectedCrmFieldValue);
     });
   }
 }

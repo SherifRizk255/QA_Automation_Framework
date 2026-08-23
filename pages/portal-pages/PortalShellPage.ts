@@ -1,4 +1,5 @@
-import type { Page } from '@playwright/test';
+import { expect, type Page } from '@playwright/test';
+import * as allure from 'allure-js-commons';
 import { BasePortalPage } from './BasePortalPage';
 
 /**
@@ -9,5 +10,13 @@ import { BasePortalPage } from './BasePortalPage';
 export class PortalShellPage extends BasePortalPage {
   constructor(page: Page) {
     super(page);
+  }
+
+  // ─── Assertions ──────────────────────────────────────────
+
+  async assertDashboardVisible(): Promise<void> {
+    await allure.step('Assert the Dashboard page is visible', async () => {
+      await expect(this.repository.locator('PORTAL.SHELL.DASHBOARD_HEADING')).toBeVisible({ timeout: 30_000 });
+    });
   }
 }

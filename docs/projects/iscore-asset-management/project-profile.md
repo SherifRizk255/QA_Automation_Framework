@@ -65,6 +65,7 @@ Use `signInAs` only for a test that must prove or actively switch the active rol
 * Locators: `docs/analysis/locator-repository.json` — `PORTAL.*`/`TAGGING.*`/`CRM.*`
   elementId prefixes (single shared repository file per skill 24 — never a second one).
 * Regression suite: `tests/regression-tcs/{authentication,tagging}/`.
+* Smoke suite: `tests/smoke/` — cross-system (Portal + CRM) end-to-end scenarios, run via `npm run test:smoke`. The Maker->Checker Tracking Container smoke test (TC-TAG-ASSET-040) ends by switching the shared demo account's CRM role to Checker; the `makerTaggingPage` fixture re-asserts Maker via `roleApplier.ensureRoleApplied('MAKER')` before every Maker-scoped regression test, so running the regression suite after the smoke suite self-heals the role state.
 * Framework self-tests: `tests/framework/{config,locator-repository}/`.
 
 ### Pipeline artifact chain (Tagging module, master-workflow stages 09A–12)

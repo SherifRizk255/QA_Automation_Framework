@@ -1,11 +1,11 @@
 {
   "repositoryVersion": "1.0.0",
   "module": "IScore Asset Management - Portal Login, Shell, Header, Tagging, CRM Role",
-  "lastUpdated": "2026-08-22",
+  "lastUpdated": "2026-08-23",
   "statistics": {
-    "totalEntries": 29,
-    "activeEntries": 0,
-    "unverifiedEntries": 29,
+    "totalEntries": 56,
+    "activeEntries": 47,
+    "unverifiedEntries": 9,
     "healedEntries": 0,
     "blockedSubflows": 0,
     "repositoryReuseCount": 0
@@ -17,19 +17,38 @@
       "elementName": "Username Input",
       "owner": "LoginPage",
       "scope": "GLOBAL",
-      "locatorType": "ACCESSIBLE_LABEL",
-      "primaryLocator": "/user\\s*name|username|user id/i (label)",
-      "primary": { "type": "label", "value": "/user\\s*name|username|user id/i" },
-      "fallbackLocatorChain": ["input[name*=\"user\" i]", "input[id*=\"user\" i]"],
-      "fallbackChain": [
-        { "type": "css", "value": "input[name*=\"user\" i]" },
-        { "type": "css", "value": "input[id*=\"user\" i]" }
+      "locatorType": "CSS_ID",
+      "primaryLocator": "#UserName",
+      "primary": {
+        "type": "css",
+        "value": "#UserName"
+      },
+      "fallbackLocatorChain": [
+        "input[formcontrolname=\"UserName\"]",
+        "input[placeholder=\"User Name\"]"
       ],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "input[formcontrolname=\"UserName\"]"
+        },
+        {
+          "type": "css",
+          "value": "input[placeholder=\"User Name\"]"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "PORTAL.LOGIN.PASSWORD_INPUT",
@@ -39,14 +58,31 @@
       "scope": "GLOBAL",
       "locatorType": "CSS_INPUT_TYPE",
       "primaryLocator": "input[type=\"password\"]",
-      "primary": { "type": "css", "value": "input[type=\"password\"]" },
-      "fallbackLocatorChain": [],
-      "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 45, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "primary": {
+        "type": "css",
+        "value": "input[type=\"password\"]"
+      },
+      "fallbackLocatorChain": [
+        "input[formcontrolname=\"Password\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "p-password input[type=\"password\"]"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "PORTAL.LOGIN.SUBMIT_BUTTON",
@@ -54,16 +90,34 @@
       "elementName": "Sign In Button",
       "owner": "LoginPage",
       "scope": "GLOBAL",
-      "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=button[name=/sign in|log in|login/i]",
-      "primary": { "type": "role", "value": "button", "name": "/sign in|log in|login/i" },
-      "fallbackLocatorChain": ["button[type=\"submit\"]"],
-      "fallbackChain": [{ "type": "css", "value": "button[type=\"submit\"]" }],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "locatorType": "CSS_ID",
+      "primaryLocator": "#signIn",
+      "primary": {
+        "type": "css",
+        "value": "#signIn"
+      },
+      "fallbackLocatorChain": [
+        "button[type=\"submit\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "button",
+          "hasText": "Sign In"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "PORTAL.LOGIN.FORM_ROOT",
@@ -73,14 +127,24 @@
       "scope": "GLOBAL",
       "locatorType": "CSS_SEMANTIC",
       "primaryLocator": "form",
-      "primary": { "type": "css", "value": "form" },
+      "primary": {
+        "type": "css",
+        "value": "form"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "PORTAL.SHELL.ACTIVE_ROLE_LABEL",
@@ -90,14 +154,24 @@
       "scope": "GLOBAL",
       "locatorType": "CSS_STABLE_CLASS",
       "primaryLocator": "[data-role-label], .active-role",
-      "primary": { "type": "css", "value": "[data-role-label], .active-role" },
+      "primary": {
+        "type": "css",
+        "value": "[data-role-label], .active-role"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 35,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile role model; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "PORTAL.SHELL.LOGOUT_BUTTON",
@@ -107,14 +181,33 @@
       "scope": "GLOBAL",
       "locatorType": "ACCESSIBLE_ROLE",
       "primaryLocator": "role=button[name=/log ?out|sign ?out/i]",
-      "primary": { "type": "role", "value": "button", "name": "/log ?out|sign ?out/i" },
-      "fallbackLocatorChain": ["role=link[name=/log ?out|sign ?out/i]"],
-      "fallbackChain": [{ "type": "role", "value": "link", "name": "/log ?out|sign ?out/i" }],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/log ?out|sign ?out/i"
+      },
+      "fallbackLocatorChain": [
+        "role=link[name=/log ?out|sign ?out/i]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "link",
+          "name": "/log ?out|sign ?out/i"
+        }
+      ],
+      "confidence": "LOW",
+      "confidenceScore": 40,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "PORTAL.HEADER.MODULE_LINK",
@@ -123,16 +216,38 @@
       "owner": "PortalHeaderComponent",
       "scope": "GLOBAL",
       "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=link[name={{moduleName}}]",
-      "primary": { "type": "role", "value": "link", "name": "{{moduleName}}" },
-      "fallbackLocatorChain": ["role=button[name={{moduleName}}]"],
-      "fallbackChain": [{ "type": "role", "value": "button", "name": "{{moduleName}}" }],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": [],
-      "parameters": ["moduleName"]
+      "primaryLocator": "role=link[name={{moduleName}}] (exact)",
+      "primary": {
+        "type": "role",
+        "value": "link",
+        "name": "{{moduleName}}",
+        "exact": true
+      },
+      "fallbackLocatorChain": [
+        "a.p-menuitem-link:has-text(\"{{moduleName}}\")"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "a.p-menuitem-link",
+          "hasText": "{{moduleName}}"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "parameters": [
+        "moduleName"
+      ]
     },
     {
       "elementId": "PORTAL.HEADER.ACTIVE_MODULE_LABEL",
@@ -141,15 +256,32 @@
       "owner": "PortalHeaderComponent",
       "scope": "GLOBAL",
       "locatorType": "CSS_ARIA_STATE",
-      "primaryLocator": "[aria-current=\"page\"]",
-      "primary": { "type": "css", "value": "[aria-current=\"page\"]" },
-      "fallbackLocatorChain": [".active-module"],
-      "fallbackChain": [{ "type": "css", "value": ".active-module" }],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile; not yet confirmed against live IScore Asset Management DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "primaryLocator": "a.p-menuitem-link.router-link-active",
+      "primary": {
+        "type": "css",
+        "value": "a.router-link-active .p-menuitem-text, a.router-link-active"
+      },
+      "fallbackLocatorChain": [
+        ".active-module"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".active-module"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.ADD_TRACKING_BUTTON",
@@ -158,15 +290,26 @@
       "owner": "TaggingPage",
       "scope": "GLOBAL",
       "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=button[name=/add tracking/i]",
-      "primary": { "type": "role", "value": "button", "name": "/add tracking/i" },
+      "primaryLocator": "role=button + hasText Add Tracking",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Add Tracking"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #4 (Add Tracking dialog); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.GRID_ROOT",
@@ -174,16 +317,33 @@
       "elementName": "Asset Selection Grid Root",
       "owner": "AssetSelectionGridComponent",
       "scope": "GLOBAL",
-      "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=grid",
-      "primary": { "type": "role", "value": "grid" },
-      "fallbackLocatorChain": [".tagging-grid"],
-      "fallbackChain": [{ "type": "css", "value": ".tagging-grid" }],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #6 (asset selection grid); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "locatorType": "CSS_SEMANTIC",
+      "primaryLocator": "table",
+      "primary": {
+        "type": "css",
+        "value": "table"
+      },
+      "fallbackLocatorChain": [
+        ".p-datatable table"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".p-datatable-table"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.ROW",
@@ -191,16 +351,26 @@
       "elementName": "Grid Row",
       "owner": "AssetSelectionGridComponent",
       "scope": "TAGGING.GRID_ROOT",
-      "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=row",
-      "primary": { "type": "role", "value": "row" },
+      "locatorType": "CSS_SEMANTIC",
+      "primaryLocator": "tbody tr",
+      "primary": {
+        "type": "css",
+        "value": "tbody tr"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile; role=row matches both header and data rows — filter by ROW_CELL (skill 24)",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.ROW_CELL",
@@ -208,16 +378,26 @@
       "elementName": "Grid Data Cell (used to exclude the header row)",
       "owner": "AssetSelectionGridComponent",
       "scope": "TAGGING.ROW",
-      "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=cell",
-      "primary": { "type": "role", "value": "cell" },
+      "locatorType": "CSS_SEMANTIC",
+      "primaryLocator": "td",
+      "primary": {
+        "type": "css",
+        "value": "td"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Header cells are role=columnheader, not role=cell — filtering dataRows() by this entry excludes the header without positional nth() hacks",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.ROW_CHECKBOX",
@@ -225,16 +405,33 @@
       "elementName": "Row Selection Checkbox",
       "owner": "AssetSelectionGridComponent",
       "scope": "TAGGING.ROW",
-      "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=checkbox",
-      "primary": { "type": "role", "value": "checkbox" },
-      "fallbackLocatorChain": [],
-      "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #6 (checkbox selection); absent/disabled on ineligible rows per live UI, never inferred from a status label",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "locatorType": "CSS_STABLE_CLASS",
+      "primaryLocator": "td .p-checkbox-box",
+      "primary": {
+        "type": "css",
+        "value": "td .p-checkbox-box"
+      },
+      "fallbackLocatorChain": [
+        "td input[type=\"checkbox\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "td input[type=\"checkbox\"]"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.SELECT_ALL_CHECKBOX",
@@ -242,16 +439,26 @@
       "elementName": "Select-All Checkbox (header row)",
       "owner": "AssetSelectionGridComponent",
       "scope": "TAGGING.GRID_ROOT",
-      "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=checkbox[name=/select all/i]",
-      "primary": { "type": "role", "value": "checkbox", "name": "/select all/i" },
+      "locatorType": "CSS_STABLE_CLASS",
+      "primaryLocator": "thead .p-checkbox-box",
+      "primary": {
+        "type": "css",
+        "value": "thead .p-checkbox-box"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #6 (select-all); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.ASSET_IDENTIFIER_CELL",
@@ -259,16 +466,26 @@
       "elementName": "Row Asset Identifier Cell",
       "owner": "AssetSelectionGridComponent",
       "scope": "TAGGING.ROW",
-      "locatorType": "CSS_STABLE_CLASS",
-      "primaryLocator": ".asset-id-cell",
-      "primary": { "type": "css", "value": ".asset-id-cell" },
+      "locatorType": "CSS_NTH_COLUMN",
+      "primaryLocator": "td:nth-child(2)",
+      "primary": {
+        "type": "css",
+        "value": "td:nth-child(2)"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile row-identity correlation needs; not yet confirmed against live DOM",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.SUBMIT_BUTTON",
@@ -278,14 +495,25 @@
       "scope": "GLOBAL",
       "locatorType": "ACCESSIBLE_ROLE",
       "primaryLocator": "role=button[name=/submit/i]",
-      "primary": { "type": "role", "value": "button", "name": "/submit/i" },
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/submit/i"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 40,
+      "volatility": "LOW",
       "discoverySource": "Reasoned from project profile requirement #7 (submit to container); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.EMPTY_STATE",
@@ -295,14 +523,24 @@
       "scope": "GLOBAL",
       "locatorType": "TEXT_PATTERN",
       "primaryLocator": "/no (assets|records|results) found/i (text)",
-      "primary": { "type": "text", "value": "/no (assets|records|results) found/i" },
+      "primary": {
+        "type": "text",
+        "value": "/no (assets|records|results) found/i"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 35,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile requirement #5 (empty/no-match filter state); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.DIALOG.ROOT",
@@ -312,14 +550,24 @@
       "scope": "GLOBAL",
       "locatorType": "ACCESSIBLE_ROLE",
       "primaryLocator": "role=dialog",
-      "primary": { "type": "role", "value": "dialog" },
+      "primary": {
+        "type": "role",
+        "value": "dialog"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #4 (Add Tracking dialog); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.DIALOG.TITLE",
@@ -327,16 +575,26 @@
       "elementName": "Add Tracking Dialog Title",
       "owner": "AddTrackingDialogComponent",
       "scope": "TAGGING.DIALOG.ROOT",
-      "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=heading",
-      "primary": { "type": "role", "value": "heading" },
+      "locatorType": "CSS_STABLE_CLASS",
+      "primaryLocator": ".p-dialog-header span.font-bold",
+      "primary": {
+        "type": "css",
+        "value": ".p-dialog-header .font-bold"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #4 (dialog title check); not yet confirmed against live DOM",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.DIALOG.FIELD_CONTAINER",
@@ -345,15 +603,25 @@
       "owner": "AddTrackingDialogComponent",
       "scope": "TAGGING.DIALOG.ROOT",
       "locatorType": "CSS_INPUT_GROUP",
-      "primaryLocator": "input, select, textarea",
-      "primary": { "type": "css", "value": "input, select, textarea" },
+      "primaryLocator": "input, select, textarea, p-dropdown",
+      "primary": {
+        "type": "css",
+        "value": "input, select, textarea, p-dropdown"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #4 (editable fields present); not yet confirmed against live DOM",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.DIALOG.CANCEL_BUTTON",
@@ -362,15 +630,26 @@
       "owner": "AddTrackingDialogComponent",
       "scope": "TAGGING.DIALOG.ROOT",
       "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=button[name=/cancel/i]",
-      "primary": { "type": "role", "value": "button", "name": "/cancel/i" },
+      "primaryLocator": "role=button + hasText Cancel",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Cancel"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile requirement #4 (cancel behavior); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.FILTERS.TOGGLE",
@@ -380,14 +659,25 @@
       "scope": "GLOBAL",
       "locatorType": "ACCESSIBLE_ROLE",
       "primaryLocator": "role=button[name=/advanced filters?/i]",
-      "primary": { "type": "role", "value": "button", "name": "/advanced filters?/i" },
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/advanced filters?/i"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 40,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile requirement #5 (advanced filters); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.FILTERS.PANEL",
@@ -397,14 +687,32 @@
       "scope": "GLOBAL",
       "locatorType": "CSS_STABLE_CLASS",
       "primaryLocator": ".advanced-filter-panel",
-      "primary": { "type": "css", "value": ".advanced-filter-panel" },
-      "fallbackLocatorChain": ["role=region[name=/filters?/i]"],
-      "fallbackChain": [{ "type": "role", "value": "region", "name": "/filters?/i" }],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
+      "primary": {
+        "type": "css",
+        "value": ".advanced-filter-panel"
+      },
+      "fallbackLocatorChain": [
+        "role=region[name=/filters?/i]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "role",
+          "value": "region",
+          "name": "/filters?/i"
+        }
+      ],
+      "confidence": "LOW",
+      "confidenceScore": 35,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile requirement #5 (advanced filters); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.FILTERS.FIELD",
@@ -414,15 +722,27 @@
       "scope": "TAGGING.FILTERS.PANEL",
       "locatorType": "ACCESSIBLE_LABEL",
       "primaryLocator": "label={{fieldLabel}}",
-      "primary": { "type": "label", "value": "{{fieldLabel}}" },
+      "primary": {
+        "type": "label",
+        "value": "{{fieldLabel}}"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 40,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile requirement #5 (filter by field); not yet confirmed against live DOM",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": [],
-      "parameters": ["fieldLabel"]
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "parameters": [
+        "fieldLabel"
+      ]
     },
     {
       "elementId": "TAGGING.FILTERS.APPLY_BUTTON",
@@ -432,14 +752,25 @@
       "scope": "TAGGING.FILTERS.PANEL",
       "locatorType": "ACCESSIBLE_ROLE",
       "primaryLocator": "role=button[name=/apply/i]",
-      "primary": { "type": "role", "value": "button", "name": "/apply/i" },
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/apply/i"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 40,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile requirement #5 (apply filters); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.FILTERS.RESET_BUTTON",
@@ -449,14 +780,25 @@
       "scope": "TAGGING.FILTERS.PANEL",
       "locatorType": "ACCESSIBLE_ROLE",
       "primaryLocator": "role=button[name=/reset|clear/i]",
-      "primary": { "type": "role", "value": "button", "name": "/reset|clear/i" },
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "/reset|clear/i"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 40,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile requirement #5 (reset filters); not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "TAGGING.FILTERS.ACTIVE_FILTER_CHIP",
@@ -466,14 +808,24 @@
       "scope": "TAGGING.FILTERS.PANEL",
       "locatorType": "CSS_STABLE_CLASS",
       "primaryLocator": ".filter-chip, .active-filter",
-      "primary": { "type": "css", "value": ".filter-chip, .active-filter" },
+      "primary": {
+        "type": "css",
+        "value": ".filter-chip, .active-filter"
+      },
       "fallbackLocatorChain": [],
       "fallbackChain": [],
-      "confidence": "LOW", "confidenceScore": 35, "volatility": "UNKNOWN",
+      "confidence": "LOW",
+      "confidenceScore": 35,
+      "volatility": "UNKNOWN",
       "discoverySource": "Reasoned from project profile requirement #5 (filter persistence/value readback); not yet confirmed against live DOM",
-      "uniqueness": "CONTEXTUAL", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": null,
+      "verificationCount": 0,
+      "successCount": 0,
+      "failureCount": 0,
+      "repositoryStatus": "UNVERIFIED",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "CRM.USERS.ROLE_FIELD",
@@ -482,17 +834,32 @@
       "owner": "UserRolePage",
       "scope": "GLOBAL",
       "locatorType": "D365_DATA_ID",
-      "primaryLocator": "[data-id=\"cis_role\"]",
-      "primary": { "type": "css", "value": "[data-id=\"cis_role\"]" },
-      "fallbackLocatorChain": ["[data-id=\"cis_role\"], [data-control-name=\"cis_role\"]"],
-      "fallbackChain": [
-        { "type": "css", "value": "[data-id=\"cis_role\"], [data-control-name=\"cis_role\"]" }
+      "primaryLocator": "[data-id=\"cis_role.fieldControl-option-set-select\"]",
+      "primary": {
+        "type": "css",
+        "value": "[data-id=\"cis_role.fieldControl-option-set-select\"]"
+      },
+      "fallbackLocatorChain": [
+        "select[aria-label=\"Role\"]"
       ],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from project profile role model and this CRM solution's cis_ field naming convention; not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "select[aria-label=\"Role\"]"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against crm.cubicsystems.com (NTLM): cis_role is a D365 OptionSet field rendered as a native <select data-id=\"cis_role.fieldControl-option-set-select\" aria-label=\"Role\" title=\"<current label>\">, with option labels Maker/Checker/Finance Checker. Requires selectOption(), not fill().",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     },
     {
       "elementId": "CRM.USERS.SAVE_BUTTON",
@@ -500,16 +867,798 @@
       "elementName": "Save Button",
       "owner": "UserRolePage",
       "scope": "GLOBAL",
+      "locatorType": "D365_DATA_ID",
+      "primaryLocator": "[data-id=\"cis_users|NoRelationship|Form|Mscrm.Form.cis_users.Save\"]",
+      "primary": {
+        "type": "css",
+        "value": "[data-id=\"cis_users|NoRelationship|Form|Mscrm.Form.cis_users.Save\"]"
+      },
+      "fallbackLocatorChain": [
+        "[data-id=\"edit-form-save-btn\"]"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "[data-id=\"edit-form-save-btn\"]"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live against crm.cubicsystems.com (NTLM): standard D365 command-bar Save button data-id for the cis_users entity form.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
+    },
+    {
+      "owner": "PortalShellPage",
+      "scope": "GLOBAL",
       "locatorType": "ACCESSIBLE_ROLE",
-      "primaryLocator": "role=button[name=/^save$/i]",
-      "primary": { "type": "role", "value": "button", "name": "/^save$/i" },
-      "fallbackLocatorChain": ["[data-id=\"save\"]"],
-      "fallbackChain": [{ "type": "css", "value": "[data-id=\"save\"]" }],
-      "confidence": "LOW", "confidenceScore": 40, "volatility": "UNKNOWN",
-      "discoverySource": "Reasoned from standard D365 command bar Save; not yet confirmed against live DOM",
-      "uniqueness": "UNIQUE", "lastVerifiedDate": null,
-      "verificationCount": 0, "successCount": 0, "failureCount": 0,
-      "repositoryStatus": "UNVERIFIED", "originalLocatorHistory": [], "healingMetadata": []
+      "primaryLocator": "role=heading + hasText Dashboard",
+      "primary": {
+        "type": "role",
+        "value": "heading",
+        "hasText": "Dashboard"
+      },
+      "fallbackLocatorChain": [
+        ".dash-title h2"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".dash-title h2"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "PORTAL.SHELL.DASHBOARD_HEADING",
+      "screenName": "IScore Asset Portal Shell",
+      "elementName": "Dashboard Page Heading"
+    },
+    {
+      "owner": "LoginPage",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBLE_ALT_TEXT",
+      "primaryLocator": "img[alt=\"iScore\"]",
+      "primary": {
+        "type": "css",
+        "value": "img[alt=\"iScore\"]"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "PORTAL.LOGIN.ISCORE_LOGO",
+      "screenName": "IScore Asset Portal Login",
+      "elementName": "iScore Logo (alt text)"
+    },
+    {
+      "owner": "BasePortalPage",
+      "scope": "GLOBAL",
+      "locatorType": "CSS_STABLE_CLASS",
+      "primaryLocator": "button.user-btn:visible",
+      "primary": {
+        "type": "css",
+        "value": "button.user-btn:visible"
+      },
+      "fallbackLocatorChain": [
+        "button.nav-icon-btn:has(i.pi-user)"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": "button.nav-icon-btn:has(i.pi-user)"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live: the header renders a duplicate (responsive/mobile) nav structure, so button.nav-icon-btn:has(i.pi-user) alone matches 2 elements; the visible trigger carries an additional .user-btn class that is unique.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "PORTAL.SHELL.USER_MENU_TRIGGER",
+      "screenName": "IScore Asset Portal Shell",
+      "elementName": "User Menu Trigger (top-right)"
+    },
+    {
+      "owner": "BasePortalPage",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=menuitem[name=\"Log Out\"]",
+      "primary": {
+        "type": "role",
+        "value": "menuitem",
+        "name": "Log Out"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "PORTAL.SHELL.LOGOUT_MENU_ITEM",
+      "screenName": "IScore Asset Portal Shell",
+      "elementName": "Log Out Menu Item"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "TAGGING.ROW",
+      "locatorType": "CSS_NTH_COLUMN",
+      "primaryLocator": "td:nth-child(1)",
+      "primary": {
+        "type": "css",
+        "value": "td:nth-child(1)"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.ROW_TRACKING_NUMBER_CELL",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Row Tracking Number Cell"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "TAGGING.ROW",
+      "locatorType": "CSS_NTH_COLUMN",
+      "primaryLocator": "td:nth-child(3)",
+      "primary": {
+        "type": "css",
+        "value": "td:nth-child(3)"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.ROW_STATUS_CELL",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Row Status Cell"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "TAGGING.ROW",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=button + hasText Actions",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Actions"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.ROW_ACTIONS_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Row Actions Button"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "TAGGING.ROW",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=button + hasText Show Details",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Show Details"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.ROW_SHOW_DETAILS_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Row Show Details Button"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=menuitem[name=\"Add Assets\"]",
+      "primary": {
+        "type": "role",
+        "value": "menuitem",
+        "name": "Add Assets"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.ACTIONS_MENU.ADD_ASSETS_ITEM",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Row Actions Menu Add Assets Item"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=menuitem[name=\"Submit\"]",
+      "primary": {
+        "type": "role",
+        "value": "menuitem",
+        "name": "Submit"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.ACTIONS_MENU.SUBMIT_ITEM",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Row Actions Menu Submit Item"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "CSS_STABLE_CLASS",
+      "primaryLocator": ".p-dialog-header-close",
+      "primary": {
+        "type": "css",
+        "value": ".p-dialog-header-close"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.CLOSE_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Dialog Header Close X Button"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "CSS_CONTEXTUAL_LABEL",
+      "primaryLocator": ".field:has(label:text-is({{fieldLabel}}))",
+      "primary": {
+        "type": "css",
+        "value": ".field:has(label:text-is(\"{{fieldLabel}}\"))"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live: the Add Tracking / Add Assets filter form renders label elements with no for/id association to their input, so getByLabel does not resolve them. Each field is wrapped in a .field container, used as the contextual anchor per skill 13. The 8 verified labels are Fixed Asset Number, Reference Number, Asset Responsible Name, Asset Category, Asset Sub Category, Current Location, Business Unit, Department.",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.PICKER_FILTER_FIELD",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Asset Picker Filter Field parameterized, Add Tracking / Add Assets dialogs",
+      "parameters": [
+        "fieldLabel"
+      ]
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "CSS_CONTEXTUAL_LABEL",
+      "primaryLocator": ".field:has(label:text-is(\"Fixed Asset Number\")) input",
+      "primary": {
+        "type": "css",
+        "value": ".field:has(label:text-is(\"Fixed Asset Number\")) input"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.FIXED_ASSET_NUMBER_INPUT",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Fixed Asset Number Filter Input"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=button + hasText Search",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Search"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.SEARCH_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Picker Filter Search Button"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=button + hasText Clear",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Clear"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.CLEAR_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Picker Filter Clear Button"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=button + hasText Save",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Save"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.SAVE_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Picker Dialog Save Button Add Tracking / Add Assets footer"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "TEXT_PATTERN",
+      "primaryLocator": "/Show Assets/ (text)",
+      "primary": {
+        "type": "text",
+        "value": "/Show Assets/"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.SELECTED_COUNT_LABEL",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Picker Dialog Selected Asset Counter N Show Assets"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "CSS_SEMANTIC",
+      "primaryLocator": "table tbody tr",
+      "primary": {
+        "type": "css",
+        "value": "table tbody tr"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.ASSET_ROW",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Picker Dialog Grid Row"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "CSS_INPUT_TYPE",
+      "primaryLocator": "input[type=\"file\"]",
+      "primary": {
+        "type": "css",
+        "value": "input[type=\"file\"]"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live: PrimeNG p-fileupload mode=basic accepts .pdf,.doc,.docx,.jpg,.jpeg,.png up to 5MB; present on the Add Tracking dialog only, not on Add Assets.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.ATTACHMENT_INPUT",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Attachment File Input Add Tracking dialog only"
+    },
+    {
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "CSS_STABLE_CLASS",
+      "primaryLocator": ".p-fileupload-choose .p-button-label",
+      "primary": {
+        "type": "css",
+        "value": ".p-fileupload-choose .p-button-label"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live: after setInputFiles, the choose-button label span text changes from the default label to the picked filename, used as the upload-success signal.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DIALOG.ATTACHMENT_CHOOSE_LABEL",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Attachment Choose Button Label shows chosen filename after upload"
+    },
+    {
+      "owner": "TrackingContainerDetailsComponent",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=dialog",
+      "primary": {
+        "type": "role",
+        "value": "dialog"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DETAILS.ROOT",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Show Details Dialog Root"
+    },
+    {
+      "owner": "TrackingContainerDetailsComponent",
+      "scope": "TAGGING.DETAILS.ROOT",
+      "locatorType": "TEXT_PATTERN",
+      "primaryLocator": "/Show Assets \\(\\d+\\)/ (text)",
+      "primary": {
+        "type": "text",
+        "value": "/Show Assets \\(\\d+\\)/"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DETAILS.TAB_LABEL",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Show Details Show Assets N Tab Label"
+    },
+    {
+      "owner": "TrackingContainerDetailsComponent",
+      "scope": "TAGGING.DETAILS.ROOT",
+      "locatorType": "CSS_SEMANTIC",
+      "primaryLocator": "table tbody tr",
+      "primary": {
+        "type": "css",
+        "value": "table tbody tr"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "CONTEXTUAL",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DETAILS.ASSET_ROW",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Show Details Asset Row"
+    },
+    {
+      "owner": "TrackingContainerDetailsComponent",
+      "scope": "TAGGING.DETAILS.ROOT",
+      "locatorType": "CSS_STABLE_CLASS",
+      "primaryLocator": ".p-dialog-header-close",
+      "primary": {
+        "type": "css",
+        "value": ".p-dialog-header-close"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.DETAILS.CLOSE_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Show Details Close X Button"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "GLOBAL",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=alertdialog[name=\"Confirmation\"]",
+      "primary": {
+        "type": "role",
+        "value": "alertdialog",
+        "name": "Confirmation"
+      },
+      "fallbackLocatorChain": [
+        ".p-confirmdialog"
+      ],
+      "fallbackChain": [
+        {
+          "type": "css",
+          "value": ".p-confirmdialog"
+        }
+      ],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live: PrimeNG ConfirmDialog renders role=alertdialog with accessible name Confirmation.",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.CONFIRM_DIALOG.ROOT",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "PrimeNG Confirmation Dialog Root"
+    },
+    {
+      "owner": "TaggingPage",
+      "scope": "TAGGING.CONFIRM_DIALOG.ROOT",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=button + hasText Accept",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "hasText": "Accept"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Discovered live against demo03.cubicsystems.com IScore Asset Management portal (headless Playwright discovery run).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": [],
+      "elementId": "TAGGING.CONFIRM_DIALOG.ACCEPT_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Confirmation Dialog Accept Button"
+    },
+    {
+      "elementId": "TAGGING.DIALOG.NEXT_PAGE_BUTTON",
+      "screenName": "IScore Asset Tagging",
+      "elementName": "Picker Dialog Grid Next Page Button",
+      "owner": "AddTrackingDialogComponent",
+      "scope": "TAGGING.DIALOG.ROOT",
+      "locatorType": "ACCESSIBLE_ROLE",
+      "primaryLocator": "role=button[name=\"Next Page\"]",
+      "primary": {
+        "type": "role",
+        "value": "button",
+        "name": "Next Page"
+      },
+      "fallbackLocatorChain": [],
+      "fallbackChain": [],
+      "confidence": "HIGH",
+      "confidenceScore": 90,
+      "volatility": "LOW",
+      "discoverySource": "Verified live: PrimeNG paginator renders an accessible Next Page button (disabled on the last page).",
+      "uniqueness": "UNIQUE",
+      "lastVerifiedDate": "2026-08-23",
+      "verificationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "repositoryStatus": "ACTIVE",
+      "originalLocatorHistory": [],
+      "healingMetadata": []
     }
   ],
   "blockedDiscovery": []

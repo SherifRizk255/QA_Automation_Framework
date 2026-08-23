@@ -29,7 +29,8 @@ export abstract class BasePortalPage {
 
   async logout(): Promise<void> {
     await allure.step('Sign out of the IScore Asset Management portal', async () => {
-      await this.repository.locator('PORTAL.SHELL.LOGOUT_BUTTON').click();
+      await this.repository.locator('PORTAL.SHELL.USER_MENU_TRIGGER').click();
+      await this.repository.locator('PORTAL.SHELL.LOGOUT_MENU_ITEM').click();
       await expect(this.page).toHaveURL(/login/, { timeout: 30_000 });
     });
   }

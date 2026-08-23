@@ -200,6 +200,19 @@ export const TEST_DATA = {
     filterMatchValue: env('TAGGING_FILTER_MATCH_VALUE', ''),
     /** A value guaranteed not to match any row, to exercise the empty-state case. */
     filterNoMatchValue: env('TAGGING_FILTER_NO_MATCH_VALUE', 'Unmatched-Filter-Value-QA'),
+    /**
+     * Preferred Fixed Asset Numbers for the Maker→Checker tracking-container smoke
+     * test (TC-TAG-ASSET-040). Selected via the Add Tracking dialog's Fixed Asset
+     * Number search when eligible; the test falls back to the next selectable grid
+     * asset and reports the substitution when a preferred asset is unavailable or
+     * already linked to another container.
+     */
+    preferredTrackingAssetNumbers: env('TAGGING_PREFERRED_ASSET_NUMBERS', 'COMP-000001,BUIL-000007')
+      .split(',')
+      .map((value) => value.trim())
+      .filter(Boolean),
+    /** Attachment fixture uploaded when creating a tracking container (skill 24 — no hardcoded local paths). */
+    attachmentFixturePath: env('TAGGING_ATTACHMENT_FIXTURE_PATH', 'test-data/attachments/asset-tagging-sample.png'),
   },
 } as const;
 

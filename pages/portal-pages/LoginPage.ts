@@ -46,6 +46,12 @@ export class LoginPage {
     });
   }
 
+  async assertIscoreBrandingVisible(): Promise<void> {
+    await allure.step('Assert the iScore branding is visible on the login page', async () => {
+      await expect(this.repository.locator('PORTAL.LOGIN.ISCORE_LOGO')).toBeVisible({ timeout: 30_000 });
+    });
+  }
+
   // ─── Helpers (private) ──────────────────────────────────
 
   private usernameInput(): Locator {
