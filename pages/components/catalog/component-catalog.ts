@@ -83,6 +83,22 @@ export const COMPONENT_CATALOG = {
       'Reads back active filter chip labels and a given field\'s current value.',
     ],
   },
+  TAGGING_CONTAINER_LIST_FILTER: {
+    name: 'ContainerListFilterComponent',
+    path: 'pages/components/portal/tagging/ContainerListFilterComponent.ts',
+    scope: 'Portal',
+    status: 'active',
+    owner: 'QA Automation',
+    usedBy: [
+      'TaggingPage',
+    ],
+    responsibilities: [
+      'Owns the container-list Advanced Filters panel (.adv-filters): Search text, Status multiselect, Date From / Date To calendars, and the Search / Clear actions.',
+      'Reads the Status options from the live dropdown so specs never hardcode a status list.',
+      'Asserts every filter control is back to its default state after Clear (controls, not just the grid).',
+      'Distinct from AdvancedFilterComponent, which drives the asset-picker filter form inside the Add Tracking dialog — different DOM, different fields.',
+    ],
+  },
   TAGGING_ADD_TRACKING_DIALOG: {
     name: 'AddTrackingDialogComponent',
     path: 'pages/components/portal/tagging/AddTrackingDialogComponent.ts',
@@ -96,6 +112,8 @@ export const COMPONENT_CATALOG = {
       'Owns the Add Tracking creation dialog: open-for-creation and closed-state assertions.',
       'Supports cancel and Escape dismissal, and reads the dialog title / editable-field presence.',
       'Reused for the Add Assets dialog (proven equivalent DOM: same filter form + grid + Save/Cancel footer, verified live) — owns the Fixed Asset Number search/clear, selectable-row checking, selected-asset counter, attachment upload (Add Tracking only), and Save.',
+      'Owns all 8 picker filters: free-text (Fixed Asset Number, Reference Number, Asset Responsible Name) and dropdown (Asset Category, Asset Sub Category, Current Location, Business Unit, Department), plus Search and per-field enablement reads.',
+      'Encodes the location cascade: Business Unit is gated on Current Location, and Department on Business Unit — both disabled on a fresh dialog by design.',
     ],
   },
   TAGGING_CONTAINER_DETAILS: {

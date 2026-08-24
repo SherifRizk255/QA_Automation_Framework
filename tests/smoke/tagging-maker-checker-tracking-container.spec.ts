@@ -43,7 +43,9 @@ test.describe('IScore Asset Management - Maker Creates & Submits Tracking Contai
     roleApplier,
     browser,
   }, testInfo) => {
-    testInfo.setTimeout(240_000);
+    // Complete's blocking loader (label printing) can run up to ~90s on its own
+    // in an environment with no printer configured — budget accordingly.
+    testInfo.setTimeout(330_000);
 
     await allure.feature('IScore Asset Management');
     await allure.story('Maker to Checker Tracking Container Lifecycle');
@@ -160,11 +162,47 @@ test.describe('IScore Asset Management - Maker Creates & Submits Tracking Contai
     const checkerPage = await checkerContext.newPage();
     const checkerLoginPage = new LoginPage(checkerPage);
     const checkerShell = new PortalShellPage(checkerPage);
+    const checkerTaggingPage = new TaggingPage(checkerPage, testInfo);
 
     await checkerLoginPage.goto();
     await checkerLoginPage.loginWithConfiguredUser();
     await checkerLoginPage.assertLoginRouteLeft();
     await checkerShell.assertDashboardVisible();
+
+    // ─── Checker: review and complete the container the Maker just submitted ──
+    await checkerTaggingPage.openFromHeader();
+    await checkerTaggingPage.assertTaggingModuleLoaded();
+
+    await checkerTaggingPage.openShowDetails(createdTrackingNumber);
+    await checkerTaggingPage.assertShowDetailsAssetCount(expectedAssetCount);
+
+    const initialReviewCounts = await checkerTaggingPage.readReviewCounts();
+    expect(
+      initialReviewCounts,
+      'Expected every asset in a freshly submitted container to start pending Checker review'
+    ).toEqual({ selected: 0, pending: expectedAssetCount });
+
+    await checkerTaggingPage.assertApproveSelectedDisabled();
+    await checkerTaggingPage.assertCompleteReviewDisabled();
+
+    await checkerTaggingPage.selectAllAssetsForReview();
+    await checkerTaggingPage.assertApproveSelectedEnabled();
+
+    await checkerTaggingPage.approveSelectedAssets();
+    const postApprovalCounts = await checkerTaggingPage.readReviewCounts();
+    expect(
+      postApprovalCounts.pending,
+      'Expected approving every ticked asset to leave none pending'
+    ).toBe(0);
+
+    await checkerTaggingPage.assertCompleteReviewEnabled();
+    await checkerTaggingPage.completeContainerReview();
+    await checkerTaggingPage.closeShowDetails();
+
+    // The dialog's own Status tag does not reflect the terminal status until
+    // the container list is refreshed (verified live) — reload before reading it.
+    await checkerTaggingPage.openByRoute();
+    await checkerTaggingPage.assertContainerStatus(createdTrackingNumber, 'Approved - Ready to Print');
 
     await checkerContext.close();
     checkerContext = undefined;

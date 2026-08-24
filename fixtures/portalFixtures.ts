@@ -18,6 +18,8 @@ type PortalFixtures = {
   signInAs: (role: PortalRole) => Promise<PortalSession>;
   /** Pre-authenticated (portal-only, no CRM), already on the Tagging module. */
   makerTaggingPage: TaggingPage;
+  /** Authenticated but NOT navigated — for tests that assert navigation itself (header link vs. direct route). */
+  taggingPage: TaggingPage;
 };
 
 type PortalWorkerFixtures = {
@@ -63,6 +65,10 @@ export const test = base.extend<PortalFixtures, PortalWorkerFixtures>({
     for (const context of openedContexts) {
       await context.close();
     }
+  },
+
+  taggingPage: async ({ authenticatedPortal }, use, testInfo) => {
+    await use(new TaggingPage(authenticatedPortal, testInfo));
   },
 
   makerTaggingPage: async ({ page, loginPage, roleApplier }, use, testInfo) => {

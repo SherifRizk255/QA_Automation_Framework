@@ -151,8 +151,15 @@ export function portalHashRoute(hashRoute: string, fromUrl: string = ENV.portal.
 export const ROUTES = {
   portal: {
     login: ENV.portal.loginUrl,
-    /** Hash route for the Tagging module; compose with portalHashRoute() to navigate directly. */
-    tagging: '#/tagging',
+    /**
+     * Hash route for the Tagging module; compose with portalHashRoute() to
+     * navigate directly. Verified live 2026-08-24: the header's own Tagging
+     * link resolves to "#/asset-tagging", not "#/tagging" — the old value
+     * was never actually exercised (openByRoute() was blocked by a
+     * `new TaggingPage()` GUIDELINES violation in the only spec that called
+     * it) and silently fell through to the app's default Dashboard route.
+     */
+    tagging: '#/asset-tagging',
   },
   crm: {
     /** cis_users record whose role field drives Maker/Checker/Finance Checker portal access. */
@@ -213,6 +220,13 @@ export const TEST_DATA = {
       .filter(Boolean),
     /** Attachment fixture uploaded when creating a tracking container (skill 24 — no hardcoded local paths). */
     attachmentFixturePath: env('TAGGING_ATTACHMENT_FIXTURE_PATH', 'test-data/attachments/asset-tagging-sample.png'),
+    /**
+     * Seed for the Current Location → Business Unit → Department cascade. Only
+     * some locations have a business unit attached, and only some business
+     * units have departments, so the cascade tests try this location first and
+     * fall back to probing every option when it is absent or childless.
+     */
+    preferredCascadeLocation: env('TAGGING_CASCADE_LOCATION', 'Smart Village'),
   },
 } as const;
 

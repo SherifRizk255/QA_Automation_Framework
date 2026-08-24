@@ -1,9 +1,10 @@
 import { expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import * as allure from 'allure-js-commons';
-import { ENV, portalHashRoute, ROUTES } from '../../../config/resources';
+import { ENV, portalHashRoute, ROUTES, TEST_DATA } from '../../../config/resources';
 import { AddTrackingDialogComponent } from '../../components/portal/tagging/AddTrackingDialogComponent';
 import { AdvancedFilterComponent } from '../../components/portal/tagging/AdvancedFilterComponent';
 import { AssetSelectionGridComponent } from '../../components/portal/tagging/AssetSelectionGridComponent';
+import { ContainerListFilterComponent } from '../../components/portal/tagging/ContainerListFilterComponent';
 import { TrackingContainerDetailsComponent } from '../../components/portal/tagging/TrackingContainerDetailsComponent';
 import { PortalHeaderComponent } from '../../components/portal/navigation/PortalHeaderComponent';
 import { BasePortalPage } from '../BasePortalPage';
@@ -19,6 +20,7 @@ export class TaggingPage extends BasePortalPage {
   private readonly filters: AdvancedFilterComponent;
   private readonly dialog: AddTrackingDialogComponent;
   private readonly details: TrackingContainerDetailsComponent;
+  private readonly listFilters: ContainerListFilterComponent;
 
   constructor(page: Page, private readonly testInfo?: TestInfo) {
     super(page);
@@ -28,6 +30,7 @@ export class TaggingPage extends BasePortalPage {
     this.filters = new AdvancedFilterComponent(page, this.repository);
     this.dialog = new AddTrackingDialogComponent(page, this.repository);
     this.details = new TrackingContainerDetailsComponent(page, this.repository);
+    this.listFilters = new ContainerListFilterComponent(page, this.repository);
   }
 
   // ─── Navigation ──────────────────────────────────────────
@@ -100,6 +103,176 @@ export class TaggingPage extends BasePortalPage {
     await allure.step('Submit the selected assets to the container', async () => {
       await this.submitButton().click();
     });
+  }
+
+  // ─── Add Tracking Picker Filter Actions ──────────────────
+
+  async setTrackingDialogTextFilter(fieldLabel: string, value: string): Promise<void> {
+    await this.dialog.setTextFilter(fieldLabel, value);
+  }
+
+  async selectTrackingDialogDropdownFilter(fieldLabel: string, optionLabel: string): Promise<void> {
+    await this.dialog.selectDropdownFilter(fieldLabel, optionLabel);
+  }
+
+  async searchTrackingDialogFilters(): Promise<void> {
+    await this.dialog.search();
+  }
+
+  async clearTrackingDialogFilters(): Promise<void> {
+    await this.dialog.clearSearch();
+  }
+
+  async countTrackingDialogAssetRows(): Promise<number> {
+    return this.dialog.countAssetRows();
+  }
+
+  async readTrackingDialogAssetColumn(columnIndex: number): Promise<string[]> {
+    return this.dialog.readAssetColumnValues(columnIndex);
+  }
+
+  async readTrackingDialogColumnHeaders(): Promise<string[]> {
+    return this.dialog.readColumnHeaders();
+  }
+
+  async readTrackingDialogDropdownOptions(fieldLabel: string): Promise<string[]> {
+    return this.dialog.readDropdownOptions(fieldLabel);
+  }
+
+  async isTrackingDialogFilterEnabled(fieldLabel: string): Promise<boolean> {
+    return this.dialog.isFilterFieldEnabled(fieldLabel);
+  }
+
+  /** Undefined when no probed Current Location has a Business Unit attached (cascade is data-dependent). */
+  async findLocationEnablingBusinessUnit(preferredLocation?: string): Promise<string | undefined> {
+    return this.dialog.findLocationEnablingBusinessUnit(
+      preferredLocation ?? TEST_DATA.tagging.preferredCascadeLocation
+    );
+  }
+
+  /** Undefined when no probed Business Unit has a Department attached (cascade is data-dependent). */
+  async findBusinessUnitEnablingDepartment(): Promise<string | undefined> {
+    return this.dialog.findBusinessUnitEnablingDepartment();
+  }
+
+  async readTrackingDialogTextFilter(fieldLabel: string): Promise<string> {
+    return this.dialog.readTextFilter(fieldLabel);
+  }
+
+  async readTrackingDialogDropdownLabel(fieldLabel: string): Promise<string> {
+    return this.dialog.readDropdownFilterLabel(fieldLabel);
+  }
+
+  async selectFirstEligibleTrackingDialogAsset(excludedFixedAssetNumbers: readonly string[] = []): Promise<string> {
+    return this.dialog.selectFirstEligibleAsset(excludedFixedAssetNumbers);
+  }
+
+  async assertTrackingDialogNoAssetRows(): Promise<void> {
+    await this.dialog.assertNoAssetRows();
+  }
+
+  async assertTrackingDialogSaveDisabled(): Promise<void> {
+    await this.dialog.assertSaveDisabled();
+  }
+
+  async assertTrackingDialogSaveEnabled(): Promise<void> {
+    await this.dialog.assertSaveEnabled();
+  }
+
+  async assertTrackingDialogAssetChecked(fixedAssetNumber: string): Promise<void> {
+    await this.dialog.assertAssetChecked(fixedAssetNumber);
+  }
+
+  async assertTrackingDialogAssetUnchecked(fixedAssetNumber: string): Promise<void> {
+    await this.dialog.assertAssetUnchecked(fixedAssetNumber);
+  }
+
+  async toggleTrackingDialogAsset(fixedAssetNumber: string): Promise<void> {
+    await this.dialog.selectAssetByFixedAssetNumber(fixedAssetNumber);
+  }
+
+  async selectEligibleTrackingDialogAssets(
+    count: number,
+    excludedFixedAssetNumbers: readonly string[] = []
+  ): Promise<string[]> {
+    return this.dialog.selectEligibleAssets(count, excludedFixedAssetNumbers);
+  }
+
+  async unselectTrackingDialogAsset(fixedAssetNumber: string): Promise<void> {
+    await this.dialog.unselectAsset(fixedAssetNumber);
+  }
+
+  async countCheckedTrackingDialogAssetsOnCurrentPage(): Promise<number> {
+    return this.dialog.countCheckedAssetsOnCurrentPage();
+  }
+
+  async countEligibleTrackingDialogAssetsOnCurrentPage(): Promise<number> {
+    return this.dialog.countEligibleAssetsOnCurrentPage();
+  }
+
+  // ─── Container List Filter Actions ───────────────────────
+
+  async expandContainerListFilters(): Promise<void> {
+    await this.listFilters.expand();
+  }
+
+  async filterContainersBySearch(value: string): Promise<void> {
+    await this.listFilters.expand();
+    await this.listFilters.setSearch(value);
+    await this.listFilters.search();
+  }
+
+  async filterContainersByStatus(statusLabel: string): Promise<void> {
+    await this.listFilters.expand();
+    await this.listFilters.selectStatus(statusLabel);
+    await this.listFilters.search();
+  }
+
+  async filterContainersByDateRange(dateFrom?: string, dateTo?: string): Promise<void> {
+    await this.listFilters.expand();
+
+    if (dateFrom) {
+      await this.listFilters.setDateFrom(dateFrom);
+    }
+
+    if (dateTo) {
+      await this.listFilters.setDateTo(dateTo);
+    }
+
+    await this.listFilters.search();
+  }
+
+  async applyContainerListSearch(): Promise<void> {
+    await this.listFilters.search();
+  }
+
+  async clearContainerListFilters(): Promise<void> {
+    await this.listFilters.clear();
+  }
+
+  async assertContainerListFilterControlsReset(): Promise<void> {
+    await this.listFilters.assertControlsReset();
+  }
+
+  async readAvailableContainerStatuses(): Promise<string[]> {
+    await this.listFilters.expand();
+    return this.listFilters.readAvailableStatuses();
+  }
+
+  async readContainerListSearchValue(): Promise<string> {
+    return this.listFilters.readSearch();
+  }
+
+  async readContainerListDateFromValue(): Promise<string> {
+    return this.listFilters.readDateFrom();
+  }
+
+  async readContainerListStatusLabel(): Promise<string> {
+    return this.listFilters.readStatusLabel();
+  }
+
+  async assertContainerListFiltersExpanded(): Promise<void> {
+    await this.listFilters.assertExpanded();
   }
 
   // ─── Tracking Container Actions ──────────────────────────
@@ -192,6 +365,60 @@ export class TaggingPage extends BasePortalPage {
 
   async closeShowDetails(): Promise<void> {
     await this.details.close();
+  }
+
+  // ─── Checker Review (Show Details) ───────────────────────
+
+  async selectAssetForReview(fixedAssetNumber: string): Promise<void> {
+    await this.details.selectAsset(fixedAssetNumber);
+  }
+
+  async deselectAssetForReview(fixedAssetNumber: string): Promise<void> {
+    await this.details.deselectAsset(fixedAssetNumber);
+  }
+
+  async selectAllAssetsForReview(): Promise<void> {
+    await this.details.selectAllAssets();
+  }
+
+  async approveSelectedAssets(): Promise<void> {
+    await this.details.approveSelected();
+  }
+
+  async rejectSelectedAssets(): Promise<void> {
+    await this.details.rejectSelected();
+  }
+
+  async completeContainerReview(): Promise<void> {
+    await this.details.complete();
+  }
+
+  async readReviewCounts(): Promise<{ selected: number; pending: number }> {
+    return this.details.readReviewCounts();
+  }
+
+  async readShowDetailsAssetStatus(fixedAssetNumber: string): Promise<string> {
+    return this.details.readAssetStatus(fixedAssetNumber);
+  }
+
+  async assertApproveSelectedDisabled(): Promise<void> {
+    await this.details.assertApproveSelectedDisabled();
+  }
+
+  async assertApproveSelectedEnabled(): Promise<void> {
+    await this.details.assertApproveSelectedEnabled();
+  }
+
+  async assertRejectSelectedDisabled(): Promise<void> {
+    await this.details.assertRejectSelectedDisabled();
+  }
+
+  async assertCompleteReviewDisabled(): Promise<void> {
+    await this.details.assertCompleteDisabled();
+  }
+
+  async assertCompleteReviewEnabled(): Promise<void> {
+    await this.details.assertCompleteEnabled();
   }
 
   async openActionsMenu(trackingNumber: string): Promise<void> {
@@ -313,8 +540,34 @@ export class TaggingPage extends BasePortalPage {
     });
   }
 
+  async countContainerRows(): Promise<number> {
+    return this.containerRows().count();
+  }
+
+  async readAllTrackingNumbers(): Promise<string[]> {
+    return this.readContainerColumn('TAGGING.ROW_TRACKING_NUMBER_CELL');
+  }
+
+  async readAllContainerStatuses(): Promise<string[]> {
+    return this.readContainerColumn('TAGGING.ROW_STATUS_CELL');
+  }
+
+  async readAllContainerCreatedDates(): Promise<string[]> {
+    return this.readContainerColumn('TAGGING.ROW_CREATED_ON_CELL');
+  }
+
   async readContainerStatus(trackingNumber: string): Promise<string> {
     return (await this.containerStatusCell(trackingNumber).innerText()).trim();
+  }
+
+  /** Undefined when no container on the current (unfiltered) grid page has this status. */
+  async findContainerTrackingNumberByStatus(status: string): Promise<string | undefined> {
+    return allure.step(`Find a container with status "${status}"`, async () => {
+      const trackingNumbers = await this.readAllTrackingNumbers();
+      const statuses = await this.readAllContainerStatuses();
+      const index = statuses.findIndex((value) => value === status);
+      return index === -1 ? undefined : trackingNumbers[index];
+    });
   }
 
   async readShowDetailsAssetCount(): Promise<number> {
@@ -373,9 +626,34 @@ export class TaggingPage extends BasePortalPage {
     return this.repository.locator('TAGGING.GRID_ROOT');
   }
 
-  private containerRow(trackingNumber: string): Locator {
+  /** Reads one column across the real container rows, skipping the empty-state row. */
+  private async readContainerColumn(cellElementId: string): Promise<string[]> {
+    const rows = this.containerRows();
+    const rowCount = await rows.count();
+    const values: string[] = [];
+
+    for (let index = 0; index < rowCount; index += 1) {
+      const cell = this.repository.locator(cellElementId, { scope: rows.nth(index) });
+      values.push((await cell.innerText()).trim());
+    }
+
+    return values.filter(Boolean);
+  }
+
+  /**
+   * Real container rows only. A no-match search still renders one row whose
+   * cell reads "No Tracking Activity" (verified live) — counting it would make
+   * an empty result look like a single match, so it is excluded here.
+   */
+  private containerRows(): Locator {
     const rows = this.repository.locator('TAGGING.ROW', { scope: this.gridRoot() });
-    return rows.filter({ has: this.repository.locator('TAGGING.ROW_CELL') }).filter({ hasText: trackingNumber });
+    return rows
+      .filter({ has: this.repository.locator('TAGGING.ROW_CELL') })
+      .filter({ hasNot: this.repository.locator('TAGGING.EMPTY_STATE_CELL') });
+  }
+
+  private containerRow(trackingNumber: string): Locator {
+    return this.containerRows().filter({ hasText: trackingNumber });
   }
 
   private containerStatusCell(trackingNumber: string): Locator {

@@ -1,0 +1,6 @@
+{
+  // Use the project's own TypeScript (6.0.3) instead of the editor's bundled
+  // copy, so the IDE reports exactly what `npx tsc --noEmit` reports.
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
