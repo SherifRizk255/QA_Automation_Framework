@@ -36,29 +36,29 @@ function toRegex(value: string) {
   return value;
 }
 
-function buildLocator(page: Page, definition: LocatorDefinition): Locator {
+function buildLocator(root: Page | Locator, definition: LocatorDefinition): Locator {
   const value = toRegex(definition.value);
 
   if (definition.type === 'role') {
-    return page.getByRole(definition.value as Parameters<Page['getByRole']>[0], {
+    return root.getByRole(definition.value as Parameters<Page['getByRole']>[0], {
       name: definition.name ? toRegex(definition.name) : undefined,
       exact: definition.exact,
     });
   }
 
   if (definition.type === 'text') {
-    return page.getByText(value, { exact: definition.exact });
+    return root.getByText(value, { exact: definition.exact });
   }
 
   if (definition.type === 'label') {
-    return page.getByLabel(value, { exact: definition.exact });
+    return root.getByLabel(value, { exact: definition.exact });
   }
 
   if (definition.type === 'placeholder') {
-    return page.getByPlaceholder(value);
+    return root.getByPlaceholder(value);
   }
 
-  return page.locator(definition.value);
+  return root.locator(definition.value);
 }
 
 export class LocatorRepository {
@@ -74,6 +74,19 @@ export class LocatorRepository {
     usage[elementId] = (usage[elementId] ?? 0) + 1;
 
     return buildLocator(this.page, entry.primary);
+  }
+
+  /** Resolve a repository locator inside a business-specific container. */
+  locatorWithin(root: Locator, elementId: string): Locator {
+    const entry = loadRepository().entries.find((item) => item.elementId === elementId);
+
+    if (!entry) {
+      throw new Error(`Locator repository entry not found: ${elementId}`);
+    }
+
+    usage[elementId] = (usage[elementId] ?? 0) + 1;
+
+    return buildLocator(root, entry.primary);
   }
 
   async validateVisible(elementId: string) {

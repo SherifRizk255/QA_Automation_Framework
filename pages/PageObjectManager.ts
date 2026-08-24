@@ -1,4 +1,8 @@
 import type { Page } from '@playwright/test';
+import { KioskLoginPage } from './cvm/kiosk/KioskLoginPage';
+import { KioskJourneyPage } from './cvm/kiosk/KioskJourneyPage';
+import { AgentLoginPage } from './cvm/agent/AgentLoginPage';
+import { AgentQueuePage } from './cvm/agent/AgentQueuePage';
 
 /**
  * One controlled access point to every page object for a given Page (GUIDELINES §8).
@@ -33,8 +37,23 @@ export class PageObjectManager {
     return this.cache.get(key) as T;
   }
 
-  // ─── Portal ──────────────────────────────────────────────
-  // Add portal page-object getters here.
+  // ─── CVM Kiosk Portal ────────────────────────────────────
+  get kioskLoginPage(): KioskLoginPage {
+    return this.resolve('kioskLoginPage', () => new KioskLoginPage(this.page));
+  }
+
+  get kioskJourneyPage(): KioskJourneyPage {
+    return this.resolve('kioskJourneyPage', () => new KioskJourneyPage(this.page));
+  }
+
+  // ─── CVM Agent Portal ────────────────────────────────────
+  get agentLoginPage(): AgentLoginPage {
+    return this.resolve('agentLoginPage', () => new AgentLoginPage(this.page));
+  }
+
+  get agentQueuePage(): AgentQueuePage {
+    return this.resolve('agentQueuePage', () => new AgentQueuePage(this.page));
+  }
 
   // ─── CRM (Dynamics 365 — auth rules in skill 26) ─────────
   // Add CRM page-object getters here (each page extends BaseCrmPage).

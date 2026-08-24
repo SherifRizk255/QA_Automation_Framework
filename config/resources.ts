@@ -149,6 +149,54 @@ export const ROUTES = {
 
 export const TEST_DATA = {} as const;
 
+// ─── CVM (Customer Visit Management — Kiosk + Agent portals) ──────────────────
+
+/**
+ * CVM config. Agents are keyed by logical role (data/cvm/serviceCatalog.ts):
+ * Tellers → teller, Operations → operations, Customer Services → customerService.
+ * `customerCount` is the one place to set how many customers a run simulates
+ * (override per run with CVM_CUSTOMER_COUNT — brief §9).
+ */
+export const CVM = {
+  kioskUrl: env('CVM_KIOSK_URL', ''),
+  agentUrl: env('CVM_AGENT_URL', ''),
+  customerCount: Number(env('CVM_CUSTOMER_COUNT', '8')),
+  desk: {
+    get username(): string {
+      return requireEnv('CVM_KIOSK_USERNAME');
+    },
+    get password(): string {
+      return requireEnv('CVM_KIOSK_PASSWORD');
+    },
+  },
+  agents: {
+    teller: {
+      get username(): string {
+        return requireEnv('CVM_AGENT_TELLER_USERNAME');
+      },
+      get password(): string {
+        return requireEnv('CVM_AGENT_PASSWORD');
+      },
+    },
+    operations: {
+      get username(): string {
+        return requireEnv('CVM_AGENT_OPS_USERNAME');
+      },
+      get password(): string {
+        return requireEnv('CVM_AGENT_PASSWORD');
+      },
+    },
+    customerService: {
+      get username(): string {
+        return requireEnv('CVM_AGENT_CS_USERNAME');
+      },
+      get password(): string {
+        return requireEnv('CVM_AGENT_PASSWORD');
+      },
+    },
+  },
+} as const;
+
 // ─── Reporting identity (skill 25 — Cubic HTML Execution Report) ─────────────
 
 export const REPORTING = {

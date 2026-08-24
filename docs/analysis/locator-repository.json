@@ -1,13 +1,92 @@
 {
   "repositoryVersion": "1.0.0",
-  "module": "",
-  "lastUpdated": "",
+  "module": "CVM",
+  "lastUpdated": "2026-08-24",
   "statistics": {
-    "totalEntries": 0,
-    "activeEntries": 0,
-    "healedEntries": 0,
+    "totalEntries": 3,
+    "activeEntries": 3,
+    "healedEntries": 3,
     "blockedSubflows": 0,
-    "repositoryReuseCount": 0
+    "repositoryReuseCount": 2
   },
-  "entries": []
+  "entries": [
+    {
+      "elementId": "CVM_AGENT.SERVICE_SUMMARY_DROPDOWN_PANEL",
+      "screenName": "CVM Agent Service Summary",
+      "elementName": "Visible Sub-Service Dropdown Panel",
+      "primary": {
+        "type": "css",
+        "value": ".p-multiselect-panel"
+      },
+      "fallbackChain": [],
+      "discoverySource": "LIVE_DOM_AND_SUCCESSFUL_EXECUTION",
+      "uniqueness": "CONTEXTUAL_VISIBLE",
+      "confidence": "MEDIUM",
+      "volatility": "MEDIUM",
+      "locatorScore": 90,
+      "knownRisks": "PrimeNG retains hidden animation containers; filter to visible before interaction.",
+      "lastValidated": "2026-08-24",
+      "validationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "lastUpdatedBy": "SELF_HEALING_AGENT",
+      "repositoryStatus": "ACTIVE",
+      "healingMetadata": {
+        "failureId": "FAILURE-CVM-003",
+        "reason": "Replaced unscoped transient overlay interaction with the single visible panel."
+      }
+    },
+    {
+      "elementId": "CVM_AGENT.SUCCESS_CONFIRM_BUTTON",
+      "screenName": "CVM Agent Confirmation Dialog",
+      "elementName": "Success Confirm Button",
+      "primary": {
+        "type": "css",
+        "value": ".p-confirm-dialog-accept"
+      },
+      "fallbackChain": [],
+      "discoverySource": "LIVE_DOM_AND_SUCCESSFUL_EXECUTION",
+      "uniqueness": "UNIQUE_WHEN_DIALOG_VISIBLE",
+      "confidence": "MEDIUM",
+      "volatility": "MEDIUM",
+      "locatorScore": 90,
+      "knownRisks": "PrimeNG semantic CSS class; validate within the visible confirm-dialog lifecycle.",
+      "lastValidated": "2026-08-24",
+      "validationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "lastUpdatedBy": "SELF_HEALING_AGENT",
+      "repositoryStatus": "ACTIVE",
+      "healingMetadata": {
+        "failureId": "FAILURE-CVM-003",
+        "reason": "Explicitly synchronize with and accept the success confirmation dialog."
+      }
+    },
+    {
+      "elementId": "CVM_AGENT.SUBSERVICE_CHECKBOX_BOX",
+      "screenName": "CVM Agent Service Summary",
+      "elementName": "Sub-Service Option Checkbox Box",
+      "primary": {
+        "type": "css",
+        "value": ".p-checkbox-box"
+      },
+      "fallbackChain": [],
+      "discoverySource": "LIVE_DOM_AND_THREE_CUSTOMER_EXECUTION",
+      "uniqueness": "CONTEXTUAL_OPTION_ROW",
+      "confidence": "MEDIUM",
+      "volatility": "MEDIUM",
+      "locatorScore": 90,
+      "knownRisks": "Must be resolved within the exact sub-service option row.",
+      "lastValidated": "2026-08-24",
+      "validationCount": 1,
+      "successCount": 1,
+      "failureCount": 0,
+      "lastUpdatedBy": "SELF_HEALING_AGENT",
+      "repositoryStatus": "ACTIVE",
+      "healingMetadata": {
+        "failureId": "FAILURE-CVM-004",
+        "reason": "Text-only clicks did not consistently toggle PrimeNG checkbox state."
+      }
+    }
+  ]
 }
