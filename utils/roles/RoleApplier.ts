@@ -11,8 +11,13 @@ export class RoleApplier {
 
   constructor(private readonly browser: Browser) {}
 
-  async ensureRoleApplied(role: PortalRole): Promise<void> {
-    if (this.appliedRoles.has(role)) {
+  /**
+   * `force` bypasses the once-per-worker cache — needed by suites that
+   * deliberately switch the shared account's role away and back again
+   * (e.g. a Maker->Checker lifecycle test resetting to Maker in teardown).
+   */
+  async ensureRoleApplied(role: PortalRole, options?: { force?: boolean }): Promise<void> {
+    if (!options?.force && this.appliedRoles.has(role)) {
       return;
     }
 
@@ -34,6 +39,9 @@ export class RoleApplier {
     await userRolePage.assertRoleFieldValue(crmFieldValue);
 
     await crmContext.close();
+    // Only one role can be active on the shared CRM record at a time, so a
+    // fresh apply supersedes whatever the cache previously believed was active.
+    this.appliedRoles.clear();
     this.appliedRoles.add(role);
   }
 }

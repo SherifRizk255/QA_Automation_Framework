@@ -1,4 +1,4 @@
-import { expect } from '@playwright/test';
+import { expect, type BrowserContext } from '@playwright/test';
 import * as allure from 'allure-js-commons';
 import path from 'node:path';
 import { TEST_DATA } from '../../config/resources';
@@ -10,7 +10,34 @@ import { test } from '../../fixtures/portalFixtures';
 const ATTACHMENT_FIXTURE_PATH = path.resolve(process.cwd(), TEST_DATA.tagging.attachmentFixturePath);
 const ADDITIONAL_ASSET_COUNT = 1;
 
+const computeNextTrackingNumber = (trackingNumber: string): string => {
+  const match = trackingNumber.match(/^(.*?)(\d+)$/);
+  if (!match) {
+    throw new Error(`Unable to compute the next tracking number from "${trackingNumber}"`);
+  }
+
+  const [, prefix, numericPart] = match;
+  return `${prefix}${String(Number(numericPart) + 1).padStart(numericPart.length, '0')}`;
+};
+
 test.describe('IScore Asset Management - Maker Creates & Submits Tracking Container, Then Checker Login', () => {
+  let checkerContext: BrowserContext | undefined;
+
+  test.beforeEach(async ({ roleApplier }) => {
+    // Start state: force the shared demo account back to Maker before this test
+    // drives its own Maker->Checker switch, even if a prior attempt failed mid-run.
+    await roleApplier.ensureRoleApplied('MAKER', { force: true });
+  });
+
+  test.afterEach(async ({ roleApplier }) => {
+    if (checkerContext) {
+      await checkerContext.close();
+      checkerContext = undefined;
+    }
+    // Restore start state on pass or failure so the next run begins Maker again.
+    await roleApplier.ensureRoleApplied('MAKER', { force: true });
+  });
+
   test('TC-TAG-ASSET-040 | Maker creates, updates and submits a tracking container; role then switches to Checker', async ({
     authenticatedPortal,
     roleApplier,
@@ -35,7 +62,7 @@ test.describe('IScore Asset Management - Maker Creates & Submits Tracking Contai
 
     // ─── Capture the current latest Tracking Number and compute the next one ──
     const previousTrackingNumber = await taggingPage.findLatestTrackingNumber();
-    const expectedTrackingNumber = taggingPage.computeNextTrackingNumber(previousTrackingNumber);
+    const expectedTrackingNumber = computeNextTrackingNumber(previousTrackingNumber);
     await allure.attachment(
       'tracking-number-sequence',
       `previous=${previousTrackingNumber} expected=${expectedTrackingNumber}`,
@@ -129,7 +156,7 @@ test.describe('IScore Asset Management - Maker Creates & Submits Tracking Contai
     });
 
     // ─── Checker: fresh portal login reflects the new role ──────────────────
-    const checkerContext = await browser.newContext();
+    checkerContext = await browser.newContext();
     const checkerPage = await checkerContext.newPage();
     const checkerLoginPage = new LoginPage(checkerPage);
     const checkerShell = new PortalShellPage(checkerPage);
@@ -140,5 +167,6 @@ test.describe('IScore Asset Management - Maker Creates & Submits Tracking Contai
     await checkerShell.assertDashboardVisible();
 
     await checkerContext.close();
+    checkerContext = undefined;
   });
 });
