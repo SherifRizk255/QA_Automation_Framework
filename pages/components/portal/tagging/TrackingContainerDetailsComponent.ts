@@ -67,11 +67,21 @@ export class TrackingContainerDetailsComponent {
     });
   }
 
-  async rejectSelected(): Promise<void> {
+  /**
+   * Reject opens a DIFFERENT modal than Approve/Complete (verified live
+   * 2026-08-25 on Disposal): a "Reject Selected" dialog with a required
+   * Notes textarea and a Save button — not the generic "Confirmation"/Accept
+   * dialog `acceptReviewConfirmation()` handles. `reason` defaults to a
+   * generic automation note since the field is mandatory.
+   */
+  async rejectSelected(reason = 'Rejected via automation'): Promise<void> {
     await allure.step('Reject the ticked assets', async () => {
       const before = await this.readReviewHint();
       await this.rejectSelectedButton().click();
-      await this.acceptReviewConfirmation();
+      await expect(this.rejectNotesTextarea()).toBeVisible({ timeout: 10_000 });
+      await this.rejectNotesTextarea().fill(reason);
+      await this.rejectNotesSaveButton().click();
+      await expect(this.rejectNotesDialogRoot()).not.toBeAttached({ timeout: 20_000 });
       await expect(this.reviewHint()).not.toHaveText(before, { timeout: 20_000 });
     });
   }
@@ -97,11 +107,25 @@ export class TrackingContainerDetailsComponent {
     });
   }
 
+  /**
+   * Waits for the WHOLE confirmation dialog (not just its Accept button) to
+   * fully detach after accepting. Verified live: performing a SECOND review
+   * action (e.g. Reject right after Approve) in the same Show Details session
+   * reproducibly fails to find the second confirmation dialog's Accept button
+   * — waiting on just the button's own `toBeHidden`/`not.toBeAttached` was not
+   * enough to prevent it, so this now also waits for the dialog ROOT
+   * (`TAGGING.DETAILS.REVIEW_CONFIRM_DIALOG.ROOT`, matched by its
+   * "Confirmation" title text) to detach before returning — PrimeNG's
+   * confirm-dialog service appears to need the previous instance's mask/
+   * overlay fully torn down before it will render a new one. Tagging's own
+   * tests never exercise two sequential actions in one session, so this
+   * never surfaced there.
+   */
   private async acceptReviewConfirmation(): Promise<void> {
     await allure.step('Accept the review action confirmation dialog', async () => {
       await expect(this.reviewConfirmAcceptButton()).toBeVisible({ timeout: 10_000 });
       await this.reviewConfirmAcceptButton().click();
-      await expect(this.reviewConfirmAcceptButton()).toBeHidden({ timeout: 15_000 });
+      await expect(this.reviewConfirmDialogRoot()).not.toBeAttached({ timeout: 20_000 });
     });
   }
 
@@ -169,14 +193,35 @@ export class TrackingContainerDetailsComponent {
     return fixedAssetNumbers;
   }
 
-  async readAssetStatus(fixedAssetNumber: string): Promise<string> {
+  /**
+   * `statusCellElementId` defaults to Tagging's own status column
+   * (`TAGGING.DETAILS.ASSET_STATUS_CELL`, `td:last-child`). Disposal's table
+   * has one extra trailing "Reason" column after Status (verified live
+   * 2026-08-25), so `td:last-child` reads Reason instead there — Disposal
+   * callers must pass `DISPOSAL.DETAILS.ASSET_STATUS_CELL` explicitly.
+   */
+  async readAssetStatus(
+    fixedAssetNumber: string,
+    statusCellElementId = 'TAGGING.DETAILS.ASSET_STATUS_CELL'
+  ): Promise<string> {
     const row = this.assetRowByFixedAssetNumber(fixedAssetNumber);
-    return (await this.repository.locator('TAGGING.DETAILS.ASSET_STATUS_CELL', { scope: row }).innerText()).trim();
+    return (await this.repository.locator(statusCellElementId, { scope: row }).innerText()).trim();
   }
 
   /** Reads the live "N selected · M pending" review hint text verbatim. */
   async readReviewHint(): Promise<string> {
     return (await this.reviewHint().innerText()).trim();
+  }
+
+  /**
+   * False when the asset's row checkbox is disabled — used to prove an
+   * already-decided asset (e.g. rejected by Admin Checker) is read-only to a
+   * later review stage rather than actionable again.
+   */
+  async isAssetSelectableForReview(fixedAssetNumber: string): Promise<boolean> {
+    const row = this.assetRowByFixedAssetNumber(fixedAssetNumber);
+    const disabled = await this.rowCheckbox(row).getAttribute('data-p-disabled');
+    return disabled !== 'true';
   }
 
   /** Parses the selected/pending counts out of the review hint (undefined fields when not present, e.g. no hint at all). */
@@ -235,6 +280,26 @@ export class TrackingContainerDetailsComponent {
   /** Matched globally by role+text, not scoped to a dialog root — this modal is not exposed with role=dialog (verified live). */
   private reviewConfirmAcceptButton(): Locator {
     return this.repository.locator('TAGGING.DETAILS.REVIEW_CONFIRM_DIALOG.ACCEPT_BUTTON');
+  }
+
+  private reviewConfirmDialogRoot(): Locator {
+    return this.repository.locator('TAGGING.DETAILS.REVIEW_CONFIRM_DIALOG.ROOT');
+  }
+
+  private rejectNotesDialogRoot(): Locator {
+    return this.repository.locator('TAGGING.DETAILS.REJECT_NOTES_DIALOG.ROOT');
+  }
+
+  private rejectNotesTextarea(): Locator {
+    return this.repository.locator('TAGGING.DETAILS.REJECT_NOTES_DIALOG.NOTES_TEXTAREA', {
+      scope: this.rejectNotesDialogRoot(),
+    });
+  }
+
+  private rejectNotesSaveButton(): Locator {
+    return this.repository.locator('TAGGING.DETAILS.REJECT_NOTES_DIALOG.SAVE_BUTTON', {
+      scope: this.rejectNotesDialogRoot(),
+    });
   }
 
   private completeButton(): Locator {

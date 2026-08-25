@@ -160,6 +160,10 @@ export const ROUTES = {
      * it) and silently fell through to the app's default Dashboard route.
      */
     tagging: '#/asset-tagging',
+    /** Verified live 2026-08-24 from the header link's own href. */
+    assetProfile: '#/AssetsProfileDetails',
+    disposal: '#/asset-disposal',
+    reports: '#/reports',
   },
   crm: {
     /** cis_users record whose role field drives Maker/Checker/Finance Checker portal access. */

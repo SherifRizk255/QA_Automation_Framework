@@ -1,7 +1,10 @@
 import { test as base } from '@playwright/test';
 import type { BrowserContext, Page } from '@playwright/test';
 import type { PortalRole } from '../config/resources';
+import { AssetProfilePage } from '../pages/portal-pages/asset-profile/AssetProfilePage';
+import { DisposalPage } from '../pages/portal-pages/disposal/DisposalPage';
 import { LoginPage } from '../pages/portal-pages/LoginPage';
+import { ReportsPage } from '../pages/portal-pages/reports/ReportsPage';
 import { TaggingPage } from '../pages/portal-pages/tagging/TaggingPage';
 import { RoleApplier } from '../utils/roles/RoleApplier';
 import { RoleSwitchOrchestrator, type PortalSession } from '../utils/roles/RoleSwitchOrchestrator';
@@ -20,6 +23,18 @@ type PortalFixtures = {
   makerTaggingPage: TaggingPage;
   /** Authenticated but NOT navigated — for tests that assert navigation itself (header link vs. direct route). */
   taggingPage: TaggingPage;
+  /** Authenticated but NOT navigated — Asset Profile module. */
+  assetProfilePage: AssetProfilePage;
+  /** Pre-authenticated and already on the Asset Profile module. */
+  openAssetProfilePage: AssetProfilePage;
+  /** Authenticated but NOT navigated — Disposal module. */
+  disposalPage: DisposalPage;
+  /** Pre-authenticated and already on the Disposal module. */
+  openDisposalPage: DisposalPage;
+  /** Authenticated but NOT navigated — Reports module. */
+  reportsPage: ReportsPage;
+  /** Pre-authenticated and already on the Reports module. */
+  openReportsPage: ReportsPage;
 };
 
 type PortalWorkerFixtures = {
@@ -69,6 +84,36 @@ export const test = base.extend<PortalFixtures, PortalWorkerFixtures>({
 
   taggingPage: async ({ authenticatedPortal }, use, testInfo) => {
     await use(new TaggingPage(authenticatedPortal, testInfo));
+  },
+
+  assetProfilePage: async ({ authenticatedPortal }, use, testInfo) => {
+    await use(new AssetProfilePage(authenticatedPortal, testInfo));
+  },
+
+  openAssetProfilePage: async ({ authenticatedPortal }, use, testInfo) => {
+    const assetProfilePage = new AssetProfilePage(authenticatedPortal, testInfo);
+    await assetProfilePage.openFromHeader();
+    await use(assetProfilePage);
+  },
+
+  disposalPage: async ({ authenticatedPortal }, use, testInfo) => {
+    await use(new DisposalPage(authenticatedPortal, testInfo));
+  },
+
+  openDisposalPage: async ({ authenticatedPortal }, use, testInfo) => {
+    const disposalPage = new DisposalPage(authenticatedPortal, testInfo);
+    await disposalPage.openFromHeader();
+    await use(disposalPage);
+  },
+
+  reportsPage: async ({ authenticatedPortal }, use, testInfo) => {
+    await use(new ReportsPage(authenticatedPortal, testInfo));
+  },
+
+  openReportsPage: async ({ authenticatedPortal }, use, testInfo) => {
+    const reportsPage = new ReportsPage(authenticatedPortal, testInfo);
+    await reportsPage.openFromHeader();
+    await use(reportsPage);
   },
 
   makerTaggingPage: async ({ page, loginPage, roleApplier }, use, testInfo) => {

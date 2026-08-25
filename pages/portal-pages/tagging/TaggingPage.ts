@@ -385,8 +385,8 @@ export class TaggingPage extends BasePortalPage {
     await this.details.approveSelected();
   }
 
-  async rejectSelectedAssets(): Promise<void> {
-    await this.details.rejectSelected();
+  async rejectSelectedAssets(reason?: string): Promise<void> {
+    await this.details.rejectSelected(reason);
   }
 
   async completeContainerReview(): Promise<void> {

@@ -52,6 +52,23 @@ export class LoginPage {
     });
   }
 
+  // ─── Getters (values) ────────────────────────────────────
+
+  /**
+   * True when the portal rejected the just-attempted login with
+   * "Your Role Not Accessible This Portal" (verified live 2026-08-25: the
+   * demo account's Finance Checker CRM role is applied and read back
+   * correctly, but the portal itself refuses that role at login) — used to
+   * skip a role stage gracefully instead of failing on an environment/
+   * entitlement gap that automation cannot fix.
+   *
+   * The banner renders twice (an inline `p-messages` block AND a `p-toastitem`
+   * toast, verified live) — `.first()` avoids a strict-mode violation.
+   */
+  async isRoleNotAccessibleErrorVisible(): Promise<boolean> {
+    return this.repository.locator('PORTAL.LOGIN.ROLE_NOT_ACCESSIBLE_ERROR').first().isVisible();
+  }
+
   // ─── Helpers (private) ──────────────────────────────────
 
   private usernameInput(): Locator {

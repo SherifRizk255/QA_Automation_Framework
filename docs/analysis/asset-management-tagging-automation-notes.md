@@ -215,7 +215,39 @@ works regardless of which punctuation the caller's string came from. Apply
 the same normalization if any other status-bearing value is ever compared
 across the grid and a filter/dropdown surface.
 
-## 14. Future Category/Subcategory master-data standardization (not yet live — do not test against it)
+## 14. Never combine `makerTaggingPage` with another `authenticatedPortal`-based fixture in one test
+
+`makerTaggingPage` runs its own inline `loginPage.goto()` + login (plus
+`roleApplier.ensureRoleApplied('MAKER')`) — it does **not** depend on the
+`authenticatedPortal` fixture. Any other fixture that *does* depend on
+`authenticatedPortal` (e.g. `assetProfilePage`, `taggingPage`,
+`openAssetProfilePage`) triggers a second, independent
+`loginPage.goto()` + login when combined with `makerTaggingPage` in the same
+test. The app does not re-render the login form for an already-authenticated
+session, so the second `LoginPage.goto()`'s `#UserName` wait times out —
+reproduced consistently across 3 different tests, not environment flakiness.
+
+**Fix**: when a test needs both Tagging data and another module's page
+object, use `{ roleApplier, taggingPage, ...otherModulePage }` instead of
+`makerTaggingPage` — `taggingPage` depends on the same `authenticatedPortal`
+as every other module fixture, so it's cached and reused (one login), and
+`roleApplier.ensureRoleApplied('MAKER')` gets you the same Maker role
+`makerTaggingPage` would have applied. Call `taggingPage.openFromHeader()`
+yourself since (unlike `makerTaggingPage`) it doesn't auto-navigate.
+
+## 16. Asset Profile Recent Transactions: don't assume uniform `<li>` structure
+
+`AssetProfilePage.readTransactions()` originally read `.ap-ev-module` /
+`.ap-ev-status` / `.ap-ev-date` with a blind `innerText()` per transaction
+list item and timed out on a live asset (reproducible structural variation,
+not a wait/race issue — increasing the timeout would not have helped). Fixed
+to count-check each sub-locator per item and default to `''` when absent,
+so one oddly-shaped transaction entry doesn't crash the read for every other
+entry. If you need per-field guarantees again, read the live data first
+(`readTransactions()` + an `allure.attachment` dump, see TC-AP-104) rather
+than assuming every module/status/date is always present.
+
+## 17. Future Category/Subcategory master-data standardization (not yet live — do not test against it)
 
 `iScore_Asset_Category_Subcategory_Mapping.xlsx` (shared 2026-08-24) defines a
 **proposed** standardized 4-category mapping: `HW` Hardware & IT
@@ -233,3 +265,169 @@ correct-for-now behavior. Re-check this note once master data is migrated,
 then gotcha #6's "Sub Category is not scoped by Category" finding should be
 re-verified — this reference file implies category-scoped subcategories are
 the intended end state, so that may become a real gap worth testing once live.
+
+## 18. Disposal's Add/Show-Details dialogs reuse Tagging's components directly — verified byte-identical DOM
+
+Live discovery 2026-08-24/25 confirmed the Add Disposal dialog and its Show
+Details dialog share the exact same `.tracking-dialog` / `.details-body` /
+`.review-bar` markup as Tagging's Add Tracking / Show Details (same 8-field
+asset picker, same pagination, same Save/Cancel footer, same Approve
+Selected/Reject Selected/Complete review controls). `DisposalPage`
+instantiates `AddTrackingDialogComponent` and `TrackingContainerDetailsComponent`
+directly (same pattern `TaggingPage` already uses) rather than duplicating
+them — only the two Disposal-only fields (Disposal Method dropdown, Disposal
+Reason textarea) and the outer container-list structure are module-specific.
+Disposal Method's live options: `Scrapped`, `Sold`, `Suspended`. Disposal's
+Show Details has a third tab reading "Disposal Reason" (plain text) where
+Tagging has "Return Reasons" — otherwise the tab set matches ("Show Assets
+(N)", "Attachments (N)").
+
+## 19. `TAGGING.DIALOG.DROPDOWN_OPTION` (bare global text locator) can collide with an unrelated grid cell
+
+`AddTrackingDialogComponent.selectDropdownFilter()` clicks a `.p-dropdown-item`
+option via a page-wide `getByText(optionLabel, {exact:true})` locator
+(`TAGGING.DIALOG.DROPDOWN_OPTION`, scope GLOBAL). For Tagging's own filter
+values this apparently never collided in practice, but wiring Disposal's new
+Disposal Method dropdown the same way failed live: `getByText('Scrapped',
+{exact:true})` resolved to an asset-grid `<td>Scrapped</td>` behind the open
+dialog (a category value in the picker data happens to read "Scrapped" too),
+and the click hung waiting for that background cell to become clickable.
+Fixed in `DisposalPage.selectDisposalMethod()` by filtering the *class-scoped*
+`TAGGING.DIALOG.DROPDOWN_ANY_OPTION` (`.p-dropdown-item`) list by an
+exact-anchored regex instead of using the bare global text locator — left
+`AddTrackingDialogComponent`/`TAGGING.DIALOG.DROPDOWN_OPTION` itself untouched
+since Tagging's own tests still pass against it. If you add another dropdown
+field anywhere, prefer the class-scoped-list-plus-filter pattern over the bare
+global text locator.
+
+## 20. Combining `page`/`authenticatedPortal` with a second inline login on the SAME page silently bounces to the dashboard
+
+A second flavor of gotcha #14's double-login bug: destructuring both
+`authenticatedPortal` and `page` as separate fixture params gives you the
+**same underlying `Page` object** (the `authenticatedPortal` fixture just
+wraps `page` after logging it in). Calling `loginPage.goto()` +
+`loginWithConfiguredUser()` again on that same page to pick up a role switch
+does not show a stale/broken login form — the SPA just redirects `#/login`
+straight back to the Dashboard because the session is already authenticated,
+so the CRM role switch you meant to pick up silently never took effect. Fix:
+open a genuine new browser context (`browser.newContext()` +
+`context.newPage()`, exactly like `tests/smoke/tagging-maker-checker-tracking-container.spec.ts`
+already does for its Checker stage) for every role-switch stage after the
+Maker stage, and use `browser`/`roleApplier` fixtures instead of `page` when
+the test needs more than one authenticated role in sequence.
+
+## 21. `signInAs()` / `PORTAL.SHELL.ACTIVE_ROLE_LABEL` is unverified and currently broken — use the `roleApplier` + fresh-login pattern instead
+
+`RoleSwitchOrchestrator.signInAs()` (backing the `signInAs` fixture) reads
+back the active role via `BasePortalPage.readActiveRoleLabel()`, which
+resolves `PORTAL.SHELL.ACTIVE_ROLE_LABEL` (`[data-role-label], .active-role`).
+That locator's own repository entry is `repositoryStatus: 'UNVERIFIED'`,
+`confidence: 'LOW'`, discoverySource "Reasoned from project profile role
+model; not yet confirmed against live DOM" — and live testing 2026-08-25
+confirmed it: the element is not present anywhere in the portal shell (the
+header only shows the user's name + a chevron, no separate role label), so
+`signInAs()` times out on every role every time. Until someone finds where
+(or whether) the app surfaces the active role visibly and fixes that locator,
+do not use `signInAs`/`roleSwitchOrchestrator` in new tests — use the
+established `roleApplier.ensureRoleApplied(role)` + fresh
+`browser.newContext()` + `loginPage.goto()`/`loginWithConfiguredUser()`
+pattern instead (see gotcha #20 and `makerTaggingPage`).
+
+## 22. Finance Checker role is CRM-valid but portal-rejected — "Your Role Not Accessible This Portal"
+
+Live testing 2026-08-25: `roleApplier.ensureRoleApplied('FINANCE_CHECKER')`
+successfully sets and reads back `cis_users`' role field as "Finance Checker"
+on CRM (`UserRolePage.assertRoleFieldValue` passes) — the CRM side is fine.
+But logging into the portal under that role fails with a red banner reading
+exactly **"Your Role Not Accessible This Portal"** (see
+`LoginPage.isRoleNotAccessibleErrorVisible()` /
+`PORTAL.LOGIN.ROLE_NOT_ACCESSIBLE_ERROR`). This looks like an
+environment/entitlement gap on this specific demo tenant (Finance Checker not
+provisioned for this portal instance) rather than an automation defect or a
+real product bug — but it currently blocks ALL Finance Checker regression
+coverage for Disposal. Every Finance Checker test should probe for this
+banner immediately after login and `testInfo.skip(...)` with a clear reason
+(see `tests/smoke/disposal-maker-checker-financechecker.spec.ts` and
+`tests/regression-tcs/disposal/disposal-maker-checker-financechecker.spec.ts`)
+rather than failing or silently omitting the stage. Re-run those tests after
+this gap is resolved — the Admin Checker → Finance Checker handoff logic
+(only Admin-approved assets are actionable; Admin-rejected assets are visible
+but read-only, per `TrackingContainerDetailsComponent.isAssetSelectableForReview`)
+is already written and should just start passing.
+
+## 23. This environment had a sustained flaky stretch on 2026-08-25 — expect repeated transient failures, not a code regression
+
+Across roughly 90 minutes of Disposal discovery/testing on 2026-08-25, the
+SAME shared tenant repeatedly failed in different ways on different attempts
+of otherwise-identical steps: `net::ERR_UNEXPECTED` navigating to a CRM user
+record, `#UserName` never appearing on a fresh login-page navigation,
+`page.goto` outright timing out at 60s on the login route. Each one resolved
+cleanly on a bare retry with zero code changes. This is a more severe
+instance of gotcha #9, not a new class of problem — if you hit one of these
+three exact symptoms while testing Disposal/Finance Checker flows, retry
+before assuming a regression in `DisposalPage`, `RoleApplier`, or `LoginPage`.
+
+## 24. Reject Selected opens a DIFFERENT modal than Approve/Complete — a required "Notes" dialog, not the generic Confirmation
+
+Live-verified 2026-08-25 on Disposal (screenshot evidence, not a guess):
+clicking **Reject Selected** in Show Details opens a dialog titled "Reject
+Selected" with a required **Notes** textarea (red asterisk) and Cancel/Save
+buttons — a completely different flow from Approve Selected/Complete, which
+open the generic "Confirmation" dialog with Accept/Reject buttons (see
+gotcha's `acceptReviewConfirmation()`). `TrackingContainerDetailsComponent.rejectSelected()`
+previously (wrongly) reused the same generic-confirmation flow as Approve and
+reproducibly timed out waiting for a nonexistent "Accept" button — this
+looked exactly like a flaky race at first (4 consecutive identical failures
+across environment retries) until a failure screenshot showed the real Notes
+dialog sitting there unaddressed. Fixed: `rejectSelected(reason = 'Rejected
+via automation')` now fills the Notes textarea and clicks Save, waiting for
+that dialog to fully detach. This is the SAME shared component Tagging uses,
+so the same fix should apply there — but this session only re-verified it
+live against Disposal; if you write a Tagging test that calls
+`rejectSelectedAssets()`, treat the Notes-dialog behavior as presumed, not
+independently re-confirmed against Tagging's own UI, and re-verify once.
+
+**Lesson**: when a "flaky" failure repeats at the exact same step across
+otherwise-varied retries, stop assuming environment flakiness and pull a
+failure screenshot — this one was a real, deterministic product-UX
+difference (gotcha #23's genuine flakiness was a red herring that delayed
+finding it).
+
+## 25. Reports export XLSX needs namespace-prefix normalization AND dynamic header-row detection — see `utils/excelWorkbookReader.ts`
+
+Two independent, real quirks in the Reports module's downloaded `.xlsx`
+(verified live 2026-08-25, reproduced outside Playwright with a raw
+ExcelJS call, so these are genuine file-format issues, not test-harness
+bugs):
+
+1. **Element namespace prefixes vary PER FILE inside the same workbook.**
+   `xl/workbook.xml` uses `<x:workbook>`/`<x:sheets>`/`<x:sheet>` (prefix
+   `x:`), but `docProps/app.xml` uses a DIFFERENT prefix (`<ap:Properties>`,
+   prefix `ap:`) for its own elements. Both are valid OOXML (the prefix is
+   just bound to the element's namespace via `xmlns:x=...`/`xmlns:ap=...`),
+   but ExcelJS's reader does not recognize prefixed elements at all and
+   fails immediately with `Cannot read properties of undefined (reading
+   'sheets')`. Fixed by `stripXmlNamespacePrefix()`: unzip with `jszip`,
+   regex-strip `<prefix:`/`</prefix:` down to `<`/`</` in EVERY `.xml` part
+   (not hardcoded to one prefix), rezip, then hand the buffer to
+   `workbook.xlsx.load()`.
+2. **The real header row is not row 1.** Every export leads with a 4-row
+   title/metadata banner (`"Asset Register Report"` / `"Period: All"` /
+   `"Generated: <timestamp>"` / `"Total assets: N"`, each value repeated
+   identically across every column via merged cells) plus one blank spacer
+   row, THEN the real header row (`Fixed Asset Number`, `Asset Name`,
+   `Serial Number`, `Model`, `Reference Number`, `Old Reference Number`,
+   `Status`, `Category`, `Sub-Category`, `Brand`, `Location`, `Business
+   Unit`, `Department`, `Responsible`, `HR Code`, `PO Number`, `Created On`
+   — live-verified list for the Asset Profile Report; Asset Movement Report
+   was not independently checked). `findHeaderRowNumber()` detects it
+   generically: a banner row has exactly one DISTINCT non-empty value across
+   its cells (because of the identical repeated text); the header row is the
+   first row with more than one distinct value, scanned within the first 20
+   rows.
+
+Any new report-validation test should go through
+`utils/excelWorkbookReader.ts` (`readExcelWorkbook`,
+`everyRowMatchesColumnValue`, `distinctColumnValues`) rather than calling
+ExcelJS directly — calling ExcelJS directly on a raw download will hit
+finding #1 immediately.

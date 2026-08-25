@@ -46,6 +46,9 @@ export const COMPONENT_CATALOG = {
     owner: 'QA Automation',
     usedBy: [
       'TaggingPage',
+      'AssetProfilePage',
+      'DisposalPage',
+      'ReportsPage',
     ],
     responsibilities: [
       'Owns parameterized header module-link resolution (Tagging, and any module added later).',
@@ -107,6 +110,7 @@ export const COMPONENT_CATALOG = {
     owner: 'QA Automation',
     usedBy: [
       'TaggingPage',
+      'DisposalPage',
     ],
     responsibilities: [
       'Owns the Add Tracking creation dialog: open-for-creation and closed-state assertions.',
@@ -114,6 +118,7 @@ export const COMPONENT_CATALOG = {
       'Reused for the Add Assets dialog (proven equivalent DOM: same filter form + grid + Save/Cancel footer, verified live) — owns the Fixed Asset Number search/clear, selectable-row checking, selected-asset counter, attachment upload (Add Tracking only), and Save.',
       'Owns all 8 picker filters: free-text (Fixed Asset Number, Reference Number, Asset Responsible Name) and dropdown (Asset Category, Asset Sub Category, Current Location, Business Unit, Department), plus Search and per-field enablement reads.',
       'Encodes the location cascade: Business Unit is gated on Current Location, and Department on Business Unit — both disabled on a fresh dialog by design.',
+      'Reused unmodified for Disposal\'s Add Disposal dialog (verified live 2026-08-25: byte-identical DOM to Add Tracking) — DisposalPage adds only the Disposal Method dropdown and Disposal Reason textarea alongside it, since neither is part of this component\'s scope.',
     ],
   },
   TAGGING_CONTAINER_DETAILS: {
@@ -124,9 +129,14 @@ export const COMPONENT_CATALOG = {
     owner: 'QA Automation',
     usedBy: [
       'TaggingPage',
+      'DisposalPage',
     ],
     responsibilities: [
       'Owns the Show Details dialog: the "Show Assets (N)" tab, its asset rows (Fixed Asset Number reads), and the close (X) control.',
+      'Owns the Checker/Admin Checker review controls: per-row + select-all ticking, Approve Selected / Reject Selected / Complete, and the live "N selected · M pending" review-hint readback.',
+      'Reject opens a separate required-Notes dialog (Notes textarea + Save) rather than the generic Accept confirmation Approve/Complete use — rejectSelected(reason) handles both flows.',
+      'readAssetStatus() accepts an optional status-cell locator key since Disposal\'s Show Details table has one extra trailing "Reason" column after Status, unlike Tagging\'s (whose last column IS Status) — DisposalPage passes DISPOSAL.DETAILS.ASSET_STATUS_CELL explicitly.',
+      'Reused unmodified for Disposal\'s Show Details (verified live 2026-08-25: byte-identical review-bar/tab structure to Tagging\'s, aside from the column-count difference above and an extra "Disposal Reason" tab DisposalPage reads separately).',
     ],
   },
 } satisfies Record<string, ComponentCatalogEntry>;
