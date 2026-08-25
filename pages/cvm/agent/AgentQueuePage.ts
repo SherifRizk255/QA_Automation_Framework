@@ -107,45 +107,95 @@ export class AgentQueuePage {
     const doneRouting = this.page.locator('.p-dialog').filter({ hasText: /Routing/ });
     await doneRouting.getByText('Done', { exact: true }).click();
 
-    // "summary of services" dialog — pick the served sub-service, then Confirm.
-    const summary = this.page.locator('.p-dialog').filter({ hasText: /summary of services/i });
-    const subServiceSelectTrigger = summary.getByText('Select Sub-Services', { exact: true });
-    await expect(subServiceSelectTrigger).toHaveCount(1);
-    await expect(subServiceSelectTrigger).toBeVisible();
-    await expect(subServiceSelectTrigger).toBeEnabled();
-    await subServiceSelectTrigger.click();
+    await this.confirmServedSubService(subService);
+  }
 
-    // PrimeNG may retain hidden animation containers, so interact only with the visible panel.
+  /** Select the completed sub-service and accept both confirmation steps. */
+  async confirmServedSubService(subService: string): Promise<void> {
+    const summary = this.page.locator('.p-dialog').filter({ hasText: /summary of services/i });
     const activePanel = this.repository
       .locator('CVM_AGENT.SERVICE_SUMMARY_DROPDOWN_PANEL')
       .filter({ visible: true });
-    await expect(activePanel).toHaveCount(1);
-    await expect(activePanel).toBeVisible();
-
-    const activeSubServiceOption = activePanel.locator('li').filter({ hasText: subService });
-    await expect(activeSubServiceOption).toHaveCount(1);
-    await expect(activeSubServiceOption).toBeVisible();
-
-    const subServiceCheckbox = this.repository.locatorWithin(
-      activeSubServiceOption,
-      'CVM_AGENT.SUBSERVICE_CHECKBOX_BOX',
+    const dropdownTrigger = this.repository.locatorWithin(
+      summary,
+      'CVM_AGENT.SERVICE_SUMMARY_DROPDOWN_TRIGGER',
     );
-    await expect(subServiceCheckbox).toHaveCount(1);
-    await expect(subServiceCheckbox).toBeVisible();
-    await expect(subServiceCheckbox).toBeEnabled();
-    await subServiceCheckbox.click();
-    await expect(activeSubServiceOption).toContainClass('p-highlight');
-
+    const selectedSubServiceToken = this.repository
+      .locatorWithin(summary, 'CVM_AGENT.SELECTED_SUBSERVICE_TOKEN')
+      .filter({ hasText: subService });
     const confirmButton = summary.getByRole('button', { name: 'Confirm', exact: true });
+
+    await expect(summary).toBeVisible();
+    await expect(dropdownTrigger).toHaveCount(1);
+    await expect(dropdownTrigger).toBeVisible();
+
+    let selectionConfirmed = false;
+    const maximumSelectionAttempts = 3;
+
+    for (let attempt = 1; attempt <= maximumSelectionAttempts; attempt++) {
+      // Reset any stale or duplicated overlay before each bounded attempt.
+      if ((await activePanel.count()) > 0) {
+        await dropdownTrigger.click();
+        await expect(activePanel).toHaveCount(0);
+      }
+
+      await dropdownTrigger.click();
+      await expect(activePanel).toHaveCount(1);
+      await expect(activePanel).toBeVisible();
+
+      const matchingSubServiceOptions = activePanel.getByRole('listitem', {
+        name: subService,
+        exact: true,
+      });
+
+      // The application exposes two indistinguishable "Others" entries. Both
+      // represent the same expected business label, so use one exact visible match.
+      const activeSubServiceOption = matchingSubServiceOptions.first();
+      await expect(activeSubServiceOption).toHaveCount(1);
+      await expect(activeSubServiceOption).toBeVisible();
+
+      const subServiceCheckbox = this.repository.locatorWithin(
+        activeSubServiceOption,
+        'CVM_AGENT.SUBSERVICE_CHECKBOX_BOX',
+      );
+      await expect(subServiceCheckbox).toHaveCount(1);
+      await expect(subServiceCheckbox).toBeVisible();
+      await expect(subServiceCheckbox).toBeEnabled();
+
+      // Trial actionability gives the animated overlay time to settle without an arbitrary wait.
+      await subServiceCheckbox.click({ trial: true });
+      await subServiceCheckbox.click();
+
+      try {
+        await expect
+          .poll(
+            async () =>
+              (await selectedSubServiceToken.isVisible().catch(() => false)) &&
+              (await confirmButton.isEnabled().catch(() => false)),
+            { timeout: 5_000, intervals: [250, 500, 1_000] },
+          )
+          .toBe(true);
+        selectionConfirmed = true;
+        break;
+      } catch {
+        // Retry only when the application still shows no selected token or enabled Confirm.
+      }
+    }
+
+    expect(selectionConfirmed, `sub-service "${subService}" was not selected after retries`).toBe(true);
+    await expect(selectedSubServiceToken).toHaveCount(1);
+    await expect(selectedSubServiceToken).toBeVisible();
     await expect(confirmButton).toBeEnabled();
 
-    const closeDropdownButton = activePanel.getByRole('button');
-    await expect(closeDropdownButton).toHaveCount(1);
-    await expect(closeDropdownButton).toBeVisible();
-    await expect(closeDropdownButton).toBeEnabled();
-    await closeDropdownButton.click();
-    await expect(activePanel).toHaveCount(0);
-
+    // Prefer confirming immediately; collapse the overlay only when it blocks the button.
+    const confirmIsActionable = await confirmButton
+      .click({ trial: true, timeout: 3_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!confirmIsActionable && (await activePanel.count()) > 0) {
+      await dropdownTrigger.click();
+      await expect(activePanel).toHaveCount(0);
+    }
     await confirmButton.click();
     const successConfirmButton = this.repository.locator('CVM_AGENT.SUCCESS_CONFIRM_BUTTON').filter({ visible: true });
     await expect(successConfirmButton).toHaveCount(1);

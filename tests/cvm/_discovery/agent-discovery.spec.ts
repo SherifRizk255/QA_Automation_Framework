@@ -1,6 +1,8 @@
 import { test, type Page, type BrowserContext } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
+import { serviceByName } from '../../../data/cvm/serviceCatalog';
+import { PageObjectManager } from '../../../pages/PageObjectManager';
 
 /**
  * THROWAWAY discovery (skill 02) — Agent Portal serving flow.
@@ -18,6 +20,7 @@ const KIOSK_PASS = process.env.CVM_KIOSK_PASSWORD!;
 const AGENT_URL = process.env.CVM_AGENT_URL!;
 const AGENT_USER = process.env.CVM_AGENT_OPS_USERNAME!; // CS2
 const AGENT_PASS = process.env.CVM_AGENT_PASSWORD!;
+const OPERATIONS_SUBSERVICE = serviceByName('Operations').subServices[0];
 
 test.use({ headless: false, viewport: null, launchOptions: { slowMo: 500, args: ['--start-maximized'] } });
 
@@ -88,6 +91,7 @@ test('agent discovery — serve one Operations ticket end to end', async ({ brow
 
   const agentCtx = await browser.newContext({ viewport: null });
   const agent = await agentCtx.newPage();
+  const agentPom = new PageObjectManager(agent);
   await agent.goto(AGENT_URL, { waitUntil: 'domcontentloaded' });
   await agent.locator('form input').nth(0).fill(AGENT_USER);
   await agent.locator('input[type="password"]').fill(AGENT_PASS);
@@ -106,16 +110,9 @@ test('agent discovery — serve one Operations ticket end to end', async ({ brow
   await agent.getByRole('button', { name: 'Ticket Served', exact: true }).click();
   await agent.locator('.p-dialog').getByText('Done', { exact: true }).click();
 
-  // "summary of services" dialog: pick a done sub-service, then Confirm.
-  const summary = agent.locator('.p-dialog').filter({ hasText: /summary of services/i });
-  await summary.locator('.p-multiselect').click();
-  await capture(agent, 'agent-07-subservice-panel');
-  await agent.locator('.p-multiselect-panel .p-multiselect-item, .p-multiselect-items li').first().click();
-  await agent.keyboard.press('Escape');
-  await capture(agent, 'agent-08-subservice-picked');
-  await summary.getByRole('button', { name: 'Confirm', exact: true }).click();
-  await capture(agent, 'agent-09-after-confirm');
-  await acceptConfirm(agent, 'final');
+  // Reuse the production page-object flow so Escape cannot dismiss the summary dialog.
+  await capture(agent, 'agent-07-summary');
+  await agentPom.agentQueuePage.confirmServedSubService(OPERATIONS_SUBSERVICE);
   await capture(agent, 'agent-10-idle');
 
   console.log(`\n>>> full serve flow captured (queue ref ${ticket})`);

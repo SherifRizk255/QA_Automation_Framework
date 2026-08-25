@@ -1,13 +1,13 @@
 {
   "repositoryVersion": "1.0.0",
   "module": "CVM",
-  "lastUpdated": "2026-08-24",
+  "lastUpdated": "2026-08-25",
   "statistics": {
-    "totalEntries": 3,
-    "activeEntries": 3,
-    "healedEntries": 3,
+    "totalEntries": 5,
+    "activeEntries": 5,
+    "healedEntries": 5,
     "blockedSubflows": 0,
-    "repositoryReuseCount": 2
+    "repositoryReuseCount": 4
   },
   "entries": [
     {
@@ -76,7 +76,7 @@
       "confidence": "MEDIUM",
       "volatility": "MEDIUM",
       "locatorScore": 90,
-      "knownRisks": "Must be resolved within the exact sub-service option row.",
+      "knownRisks": "Must be resolved within the exact sub-service option row. The application exposes two indistinguishable Others rows, so one exact visible match is selected.",
       "lastValidated": "2026-08-24",
       "validationCount": 1,
       "successCount": 1,
@@ -86,6 +86,58 @@
       "healingMetadata": {
         "failureId": "FAILURE-CVM-004",
         "reason": "Text-only clicks did not consistently toggle PrimeNG checkbox state."
+      }
+    },
+    {
+      "elementId": "CVM_AGENT.SELECTED_SUBSERVICE_TOKEN",
+      "screenName": "CVM Agent Service Summary",
+      "elementName": "Selected Sub-Service Token",
+      "primary": {
+        "type": "css",
+        "value": ".p-multiselect-token"
+      },
+      "fallbackChain": [],
+      "discoverySource": "PLAYWRIGHT_TRACE_DOM",
+      "uniqueness": "CONTEXTUAL_EXACT_SUBSERVICE",
+      "confidence": "HIGH",
+      "volatility": "LOW",
+      "locatorScore": 95,
+      "knownRisks": "Resolve within the Summary of Services dialog and filter by the exact expected sub-service.",
+      "lastValidated": "2026-08-25",
+      "validationCount": 2,
+      "successCount": 1,
+      "failureCount": 0,
+      "lastUpdatedBy": "SELF_HEALING_AGENT",
+      "repositoryStatus": "ACTIVE",
+      "healingMetadata": {
+        "failureId": "FAILURE-CVM-009",
+        "reason": "Option rows duplicate during overlay animation; the selected chip is stable within the summary dialog."
+      }
+    },
+    {
+      "elementId": "CVM_AGENT.SERVICE_SUMMARY_DROPDOWN_TRIGGER",
+      "screenName": "CVM Agent Service Summary",
+      "elementName": "Sub-Service Dropdown Trigger",
+      "primary": {
+        "type": "css",
+        "value": ".p-multiselect-trigger"
+      },
+      "fallbackChain": [],
+      "discoverySource": "PLAYWRIGHT_TRACE_DOM",
+      "uniqueness": "UNIQUE_WITHIN_SUMMARY_DIALOG",
+      "confidence": "HIGH",
+      "volatility": "LOW",
+      "locatorScore": 95,
+      "knownRisks": "Use only when duplicate visible overlay panels make their close controls ambiguous.",
+      "lastValidated": "2026-08-25",
+      "validationCount": 2,
+      "successCount": 1,
+      "failureCount": 0,
+      "lastUpdatedBy": "SELF_HEALING_AGENT",
+      "repositoryStatus": "ACTIVE",
+      "healingMetadata": {
+        "failureId": "FAILURE-CVM-009",
+        "reason": "Provides a unique owner-level close action when Angular renders duplicate visible panels."
       }
     }
   ]
