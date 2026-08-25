@@ -35,7 +35,7 @@ test.describe('CVM Multi-Portal Cycle @cvm @e2e @multi-portal @positive', () => 
       await kiosk.kioskLoginPage.login(CVM.desk.username, CVM.desk.password);
 
       // Agent portals: one isolated context per service-role, opened lazily and
-      // kept open for the whole run (concurrent, like the legacy multi-window design).
+      // retired as soon as its queue and test-created workload are both complete.
       const agents = new Map<AgentRole, PageObjectManager>();
       const ensureAgent = async (role: AgentRole): Promise<PageObjectManager> => {
         const existing = agents.get(role);
@@ -72,24 +72,39 @@ test.describe('CVM Multi-Portal Cycle @cvm @e2e @multi-portal @positive', () => 
 
       // ── Phase 2 — round-robin serve one ticket per service until all empty ──
       const journeyByTicket = new Map(journeys.map((j) => [j.ticketNumber!, j]));
-      const activeRoles = [...agents.keys()];
+      const activeRoles = new Set(agents.keys());
       const maxRounds = journeys.length * 6 + 60; // ample headroom incl. draining leftover demo tickets
+      const hasUnservedCreatedTickets = (role: AgentRole) =>
+        journeys.some((journey) => journey.agentRole === role && !journey.served);
+
+      const closeAgentIfFinished = async (role: AgentRole): Promise<boolean> => {
+        if (hasUnservedCreatedTickets(role)) return false;
+        const agent = agents.get(role)!;
+        if (!(await agent.agentQueuePage.isQueueExhausted())) return false;
+
+        await agent.page.context().close();
+        activeRoles.delete(role);
+        testInfo.annotations.push({
+          type: 'agent-retired',
+          description: `${role} closed after all created tickets were served and no upcoming tickets remained`,
+        });
+        return true;
+      };
 
       for (let round = 0; round < maxRounds; round++) {
-        let anyRemaining = false;
         let anyServed = false;
-        for (const role of activeRoles) {
+        for (const role of [...activeRoles]) {
           const queue = agents.get(role)!.agentQueuePage;
-          if (!(await queue.hasTickets())) continue;
-          anyRemaining = true;
           const served = await queue.serveOneTicket((ticketNumber) => journeyByTicket.get(ticketNumber)?.subService);
           if (served) {
             anyServed = true;
             const journey = journeyByTicket.get(served);
             if (journey) journey.served = true;
           }
+          await closeAgentIfFinished(role);
         }
-        if (!anyRemaining || !anyServed) break;
+        if (activeRoles.size === 0) break;
+        if (!anyServed) break;
       }
 
       // ── Final — no customer lost or mixed up ──
@@ -100,7 +115,7 @@ test.describe('CVM Multi-Portal Cycle @cvm @e2e @multi-portal @positive', () => 
         ).toBe(true);
       }
 
-      for (const agent of agents.values()) await agent.page.context().close();
+      for (const role of activeRoles) await agents.get(role)!.page.context().close();
       await kioskContext.close();
     },
   );

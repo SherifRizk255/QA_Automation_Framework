@@ -76,7 +76,7 @@
       "confidence": "MEDIUM",
       "volatility": "MEDIUM",
       "locatorScore": 90,
-      "knownRisks": "Must be resolved within the exact sub-service option row. The application exposes two indistinguishable Others rows, so one exact visible match is selected.",
+      "knownRisks": "Must be resolved within the exact sub-service option row. PrimeNG may discard checkbox events under load, requiring exact row-click and keyboard fallbacks. The application exposes two indistinguishable Others rows, so one exact visible match is selected.",
       "lastValidated": "2026-08-24",
       "validationCount": 1,
       "successCount": 1,

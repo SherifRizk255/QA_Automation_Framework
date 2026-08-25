@@ -19,26 +19,43 @@ export class AgentQueuePage {
 
   // ─── Queue state (read from the home dashboard) ──────────────────────────
 
-  private async ticketAfter(label: string): Promise<string | null> {
-    const body = await this.page.locator('body').innerText();
+  private ticketAfter(body: string, label: string): string | null {
     const match = body.match(new RegExp(`${label}[\\s\\S]*?Ticket Number\\s*([^\\r\\n]+)`, 'i'));
     const token = match?.[1]?.trim() ?? '';
     return /^[A-Z]-\d+$/.test(token) ? token : null;
   }
 
+  private async readQueueState(): Promise<{ current: string | null; next: string | null }> {
+    const body = await this.page.locator('body').innerText();
+    return {
+      current: this.ticketAfter(body, 'Current Ticket'),
+      next: this.ticketAfter(body, 'Next Serving'),
+    };
+  }
+
   /** Ticket number currently being served, or null ("No tickets to serve"). */
-  readCurrentTicket(): Promise<string | null> {
-    return this.ticketAfter('Current Ticket');
+  async readCurrentTicket(): Promise<string | null> {
+    return (await this.readQueueState()).current;
   }
 
   /** Next ticket waiting in the queue, or null when the queue is empty. */
-  readNextServing(): Promise<string | null> {
-    return this.ticketAfter('Next Serving');
+  async readNextServing(): Promise<string | null> {
+    return (await this.readQueueState()).next;
   }
 
   /** True while this agent still has a current or upcoming ticket. */
   async hasTickets(): Promise<boolean> {
-    return (await this.readCurrentTicket()) !== null || (await this.readNextServing()) !== null;
+    const queue = await this.readQueueState();
+    return queue.current !== null || queue.next !== null;
+  }
+
+  /** True when the dashboard explicitly shows no upcoming or current customer. */
+  async isQueueExhausted(): Promise<boolean> {
+    const noUpcomingTickets = this.page.getByText('No up coming tickets to serve', { exact: true });
+    return (
+      (await this.readCurrentTicket()) === null &&
+      (await noUpcomingTickets.isVisible().catch(() => false))
+    );
   }
 
   // ─── "Customers In Queue" list (arrival verification) ────────────────────
@@ -162,9 +179,19 @@ export class AgentQueuePage {
       await expect(subServiceCheckbox).toBeVisible();
       await expect(subServiceCheckbox).toBeEnabled();
 
-      // Trial actionability gives the animated overlay time to settle without an arbitrary wait.
-      await subServiceCheckbox.click({ trial: true });
-      await subServiceCheckbox.click();
+      // PrimeNG can discard repeated checkbox events under load, so retry with
+      // distinct accessible interactions instead of repeating the same click.
+      if (attempt === 1) {
+        await subServiceCheckbox.click({ trial: true });
+        await subServiceCheckbox.click();
+      } else if (attempt === 2) {
+        await activeSubServiceOption.click({ trial: true });
+        await activeSubServiceOption.click();
+      } else {
+        await activeSubServiceOption.focus();
+        await expect(activeSubServiceOption).toBeFocused();
+        await activeSubServiceOption.press('Enter');
+      }
 
       try {
         await expect
@@ -217,9 +244,10 @@ export class AgentQueuePage {
    */
   async serveOneTicket(resolveSubService: (ticketNumber: string) => string | undefined): Promise<string | null> {
     await this.dismissConfirm();
-    let current = await this.readCurrentTicket();
+    const queue = await this.readQueueState();
+    let current = queue.current;
     if (!current) {
-      if ((await this.readNextServing()) === null) return null;
+      if (queue.next === null) return null;
       await this.callNextCustomer();
       current = await this.readCurrentTicket();
     }
