@@ -7,6 +7,7 @@
     "test": "playwright test",
     "test:auth": "playwright test tests/regression-tcs/authentication",
     "test:tagging": "playwright test tests/regression-tcs/tagging",
+    "test:movement": "playwright test tests/regression-tcs/movement tests/smoke/movement-maker-checker-container.spec.ts --workers=1",
     "test:smoke": "playwright test tests/smoke",
     "test:framework": "playwright test tests/framework",
     "test:report": "playwright test && npm run report:summary || npm run report:summary",
