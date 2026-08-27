@@ -1,0 +1,1232 @@
+{
+  "testCases": [
+    {
+      "tcId": "TC-MOV-001",
+      "module": "Movement",
+      "subModule": "End-to-End Movement Workflow",
+      "title": "Verify that the user can complete a movement request from Maker creation through Checker completion and Asset Profile update",
+      "steps": [
+        "Login to the Asset Management portal as a user with Maker role.",
+        "Click the Movement button in the application header.",
+        "Verify that the Movement page is displayed by confirming the New Movement button is visible.",
+        "Click the New Movement button.",
+        "Verify that a window opens with the title New Movement.",
+        "Select the Selected Assets Movement asset type.",
+        "Optionally enter one or more valid search criteria using Fixed Asset Number, Reference Number, Asset Responsible Name, Asset Category, Asset Sub Category, Current Location, Business Unit, or Department, then click Search. If no filter is required for the run, continue using the assets already displayed in the assets table.",
+        "Select one or more eligible assets by checking the checkbox on the left side of each target asset record.",
+        "Scroll to the movement target section.",
+        "Select a target location different from the selected assets' current location.",
+        "Enter the mandatory location memo.",
+        "Optionally select a target responsible user.",
+        "Import a valid attachment.",
+        "Enter a valid reason in the required Reason field.",
+        "Click Save.",
+        "Verify that a success message confirms that the movement container was created successfully.",
+        "Capture the generated movement container ID from the Movement list.",
+        "Open the created container using Show Assets or Show Details.",
+        "Verify that the request details match the data selected during creation, including movement type, Created status, requested-by user, created date, asset count, target location, target department when applicable, and responsible user when selected.",
+        "Close the details window.",
+        "Click Actions for the created container and select Add Assets.",
+        "Verify that the Add Assets window opens.",
+        "Search for additional eligible assets if required, select one or more additional assets using the row checkboxes, and click Save.",
+        "Verify that a success message confirms that the assets were added successfully.",
+        "Open Show Details for the same container and verify that the newly added assets are included.",
+        "Close the details window.",
+        "Click Actions for the same container and select Submit.",
+        "Accept the confirmation message.",
+        "Verify that the container status changes to Pending Checker Approval.",
+        "Logout from the portal.",
+        "Change the test user's role in CRM from Maker to Checker and save the user record, or use a preconfigured Checker user if the environment supports separate test users.",
+        "Login to the portal as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Locate the same captured container ID and verify that its status is Pending Checker Approval.",
+        "Click Actions for the container and select Review and Approve.",
+        "Review the movement request details and asset records.",
+        "Select all target assets and click Approve.",
+        "Accept the approval confirmation message.",
+        "Click Complete.",
+        "Accept any completion confirmation message that appears.",
+        "Verify that the movement container status changes to Completed.",
+        "Open Show Details and verify that the approved assets have Completed status in the assets table.",
+        "Capture the Fixed Asset Number of each approved asset.",
+        "Navigate to Asset Profile.",
+        "Search each approved asset using its Fixed Asset Number.",
+        "Verify that each approved asset reflects the movement target data used during the request, including the updated Current Location and updated Responsible user when a target responsible user was selected."
+      ],
+      "expectedResult": "The Maker can create, extend, and submit a movement container. The Checker can review and approve the assets and complete the container. The container and approved assets reach Completed status, and Asset Profile reflects the target movement data for approved assets.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "makerUser": "[ENV: MAKER_USER]",
+        "checkerUser": "[ENV: CHECKER_USER_OR_ROLE_SWITCH_USER]",
+        "movementType": "Selected Assets Movement",
+        "initialAssetFixedAssetNumbers": "[ENV: ELIGIBLE_MOVEMENT_ASSETS]",
+        "additionalAssetFixedAssetNumbers": "[ENV: ADDITIONAL_ELIGIBLE_MOVEMENT_ASSETS]",
+        "targetLocation": "[ENV: TARGET_LOCATION_DIFFERENT_FROM_CURRENT]",
+        "targetDepartment": "[ENV: OPTIONAL_TARGET_DEPARTMENT]",
+        "targetResponsible": "[ENV: OPTIONAL_TARGET_RESPONSIBLE]",
+        "locationMemo": "[GENERATED: VALID_LOCATION_MEMO]",
+        "reason": "[GENERATED: VALID_MOVEMENT_REASON]",
+        "attachment": "[ENV: VALID_MOVEMENT_ATTACHMENT]",
+        "containerId": "[RUNTIME: GENERATED_MOVEMENT_CONTAINER_ID]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement",
+        "entryButton": "New Movement"
+      },
+      "businessRules": [
+        "Location memo is mandatory when a target location is selected.",
+        "Reason is required before saving the movement request.",
+        "A submitted movement container must move to Pending Checker Approval.",
+        "The Checker must take an action on every asset before completing the container.",
+        "Approved assets are eligible for the requested movement update.",
+        "Rejected assets must not receive the requested movement update.",
+        "After successful completion, approved asset profile data must reflect the movement target values."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@maker",
+        "@checker",
+        "@asset-profile",
+        "@smoke",
+        "@e2e"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-002",
+      "module": "Movement",
+      "subModule": "Navigation",
+      "title": "Verify that the user can navigate to the Movement module after login as Maker",
+      "steps": [
+        "Login to the Asset Management portal as a user with Maker role.",
+        "Click the Movement button in the application header.",
+        "Observe the loaded page."
+      ],
+      "expectedResult": "The Movement page is displayed and the New Movement button is visible.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "makerUser": "[ENV: MAKER_USER]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement",
+        "entryButton": "New Movement"
+      },
+      "businessRules": [
+        "A user with Maker role must be able to access the Movement module."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@maker",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-003",
+      "module": "Movement",
+      "subModule": "Create Movement",
+      "title": "Verify that the user can open the New Movement window",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to the Movement module.",
+        "Click the New Movement button."
+      ],
+      "expectedResult": "A movement creation window opens and displays the title New Movement.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "makerUser": "[ENV: MAKER_USER]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement",
+        "dialogTitle": "New Movement"
+      },
+      "businessRules": [
+        "The New Movement action must open the movement creation workflow."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@maker",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-004",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Fixed Asset Number",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Enter a valid Fixed Asset Number.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays the asset matching the entered Fixed Asset Number.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "fixedAssetNumber": "[ENV: ELIGIBLE_FIXED_ASSET_NUMBER]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must correspond to the entered Fixed Asset Number."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@search",
+        "@fixed-asset-number",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-005",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Reference Number",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Enter a valid Reference Number.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays the asset or assets matching the entered Reference Number.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "referenceNumber": "[ENV: ELIGIBLE_REFERENCE_NUMBER]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must correspond to the entered Reference Number."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@search",
+        "@reference-number",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-006",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Asset Responsible Name",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Enter or select a valid Asset Responsible Name.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays only assets matching the selected or entered responsible user criteria.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "assetResponsibleName": "[ENV: ASSET_RESPONSIBLE_NAME_WITH_ELIGIBLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must satisfy the selected Asset Responsible Name filter."
+      ],
+      "priority": "P2",
+      "tags": [
+        "@positive",
+        "@P2",
+        "@movement",
+        "@search",
+        "@responsible",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-007",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Asset Category",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select a valid Asset Category.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays assets matching the selected Asset Category.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "assetCategory": "[ENV: ASSET_CATEGORY_WITH_ELIGIBLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must satisfy the selected Asset Category filter."
+      ],
+      "priority": "P2",
+      "tags": [
+        "@positive",
+        "@P2",
+        "@movement",
+        "@search",
+        "@asset-category",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-008",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Asset Sub Category",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select a valid Asset Sub Category.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays assets matching the selected Asset Sub Category.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "assetSubCategory": "[ENV: ASSET_SUBCATEGORY_WITH_ELIGIBLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must satisfy the selected Asset Sub Category filter."
+      ],
+      "priority": "P2",
+      "tags": [
+        "@positive",
+        "@P2",
+        "@movement",
+        "@search",
+        "@asset-subcategory",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-009",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Current Location",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select a valid Current Location.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays assets whose current location matches the selected location.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "currentLocation": "[ENV: CURRENT_LOCATION_WITH_ELIGIBLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must satisfy the selected Current Location filter."
+      ],
+      "priority": "P2",
+      "tags": [
+        "@positive",
+        "@P2",
+        "@movement",
+        "@search",
+        "@current-location",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-010",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Business Unit",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select a valid Business Unit.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays assets matching the selected Business Unit.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "businessUnit": "[ENV: BUSINESS_UNIT_WITH_ELIGIBLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must satisfy the selected Business Unit filter."
+      ],
+      "priority": "P2",
+      "tags": [
+        "@positive",
+        "@P2",
+        "@movement",
+        "@search",
+        "@business-unit",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-011",
+      "module": "Movement",
+      "subModule": "Asset Search",
+      "title": "Verify that the user can search for movement assets using a valid Department",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select a valid Department.",
+        "Click Search."
+      ],
+      "expectedResult": "The assets table displays assets matching the selected Department.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "department": "[ENV: DEPARTMENT_WITH_ELIGIBLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search results must satisfy the selected Department filter."
+      ],
+      "priority": "P2",
+      "tags": [
+        "@positive",
+        "@P2",
+        "@movement",
+        "@search",
+        "@department",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-012",
+      "module": "Movement",
+      "subModule": "Asset Selection",
+      "title": "Verify that the user can select movement assets directly from the assets table without applying search filters",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Do not enter any search filter.",
+        "Locate an eligible asset in the displayed assets table.",
+        "Select the asset using the checkbox on the left side of the row."
+      ],
+      "expectedResult": "The asset can be selected successfully without requiring the user to apply a search filter first.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "eligibleAsset": "[ENV: ELIGIBLE_ASSET_VISIBLE_WITHOUT_FILTER]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Search filters are optional when eligible assets are already available in the assets table."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@asset-selection",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-013",
+      "module": "Movement",
+      "subModule": "Asset Selection",
+      "title": "Verify that the user can select multiple eligible assets in the same movement request",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Locate at least two eligible assets.",
+        "Select each target asset using its row checkbox."
+      ],
+      "expectedResult": "All selected assets remain selected and are included in the movement request selection.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "eligibleAssets": "[ENV: MULTIPLE_ELIGIBLE_MOVEMENT_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "A Selected Assets Movement request can contain more than one asset."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@multiple-assets",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-014",
+      "module": "Movement",
+      "subModule": "Movement Validation",
+      "title": "Verify that the system should reject saving the movement request when a target location is selected without entering the mandatory location memo",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select at least one eligible asset.",
+        "Select a valid target location.",
+        "Leave the location memo empty.",
+        "Enter all other required data including a valid reason.",
+        "Click Save."
+      ],
+      "expectedResult": "The system does not create the movement container and indicates that the location memo is required.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "eligibleAsset": "[ENV: ELIGIBLE_MOVEMENT_ASSET]",
+        "targetLocation": "[ENV: TARGET_LOCATION_DIFFERENT_FROM_CURRENT]",
+        "reason": "[GENERATED: VALID_MOVEMENT_REASON]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Location memo is mandatory when a target location is selected."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@negative",
+        "@validation",
+        "@P1",
+        "@movement",
+        "@location-memo",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-015",
+      "module": "Movement",
+      "subModule": "Movement Validation",
+      "title": "Verify that the system should reject saving the movement request when the required Reason field is empty",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select at least one eligible asset.",
+        "Enter valid movement target data and the mandatory location memo when applicable.",
+        "Leave the Reason field empty.",
+        "Click Save."
+      ],
+      "expectedResult": "The system does not create the movement container and indicates that the Reason field is required.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "eligibleAsset": "[ENV: ELIGIBLE_MOVEMENT_ASSET]",
+        "targetLocation": "[ENV: TARGET_LOCATION_DIFFERENT_FROM_CURRENT]",
+        "locationMemo": "[GENERATED: VALID_LOCATION_MEMO]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Reason is required before saving the movement request."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@negative",
+        "@validation",
+        "@P1",
+        "@movement",
+        "@reason",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-016",
+      "module": "Movement",
+      "subModule": "Create Movement",
+      "title": "Verify that the user can create a Selected Assets Movement request with valid required data",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Navigate to Movement and open New Movement.",
+        "Select Selected Assets Movement.",
+        "Select at least one eligible asset.",
+        "Select a valid target location.",
+        "Enter the mandatory location memo.",
+        "Optionally select a target responsible user.",
+        "Import a valid attachment.",
+        "Enter a valid reason.",
+        "Click Save."
+      ],
+      "expectedResult": "A success message is displayed, a new movement container is created, and the container appears in the Movement list with Created status.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "eligibleAsset": "[ENV: ELIGIBLE_MOVEMENT_ASSET]",
+        "targetLocation": "[ENV: TARGET_LOCATION_DIFFERENT_FROM_CURRENT]",
+        "targetResponsible": "[ENV: OPTIONAL_TARGET_RESPONSIBLE]",
+        "locationMemo": "[GENERATED: VALID_LOCATION_MEMO]",
+        "reason": "[GENERATED: VALID_MOVEMENT_REASON]",
+        "attachment": "[ENV: VALID_MOVEMENT_ATTACHMENT]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "A successfully created movement container starts with Created status.",
+        "Reason is required.",
+        "Location memo is required when a target location is selected."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@create",
+        "@maker",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-017",
+      "module": "Movement",
+      "subModule": "Movement Details",
+      "title": "Verify that the system should display the created movement request details correctly",
+      "steps": [
+        "Create a valid movement request as Maker.",
+        "Capture the generated movement container ID.",
+        "Locate the same container in the Movement list.",
+        "Click Show Assets or Show Details for that container.",
+        "Compare the displayed request data with the values used during creation."
+      ],
+      "expectedResult": "The details window displays the correct movement type, Created status, requested-by user, created date, asset count, target location, target department when applicable, and responsible user when selected.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "containerId": "[RUNTIME: GENERATED_MOVEMENT_CONTAINER_ID]",
+        "expectedMovementType": "Selected Assets Movement",
+        "expectedTargetLocation": "[RUNTIME: SELECTED_TARGET_LOCATION]",
+        "expectedTargetDepartment": "[RUNTIME: SELECTED_TARGET_DEPARTMENT_OR_EMPTY]",
+        "expectedResponsible": "[RUNTIME: SELECTED_TARGET_RESPONSIBLE_OR_EMPTY]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Displayed movement details must match the data stored for the created container."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@details",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-018",
+      "module": "Movement",
+      "subModule": "Add Assets",
+      "title": "Verify that the user can add more eligible assets to a movement container while it is in Created status",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Create a movement container and keep it in Created status.",
+        "Click Actions for the created container.",
+        "Select Add Assets.",
+        "Verify that the Add Assets window opens.",
+        "Search for additional eligible assets if required.",
+        "Select one or more additional assets using the row checkboxes.",
+        "Click Save."
+      ],
+      "expectedResult": "A success message confirms that the selected assets were added to the movement container.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "containerId": "[RUNTIME: CREATED_MOVEMENT_CONTAINER_ID]",
+        "additionalEligibleAssets": "[ENV: ADDITIONAL_ELIGIBLE_MOVEMENT_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement",
+        "action": "Add Assets"
+      },
+      "businessRules": [
+        "The Maker can add eligible assets to a movement container before submission to the Checker."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@add-assets",
+        "@maker",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-019",
+      "module": "Movement",
+      "subModule": "Add Assets",
+      "title": "Verify that the system should display newly added assets in the movement container details",
+      "steps": [
+        "Add one or more eligible assets to an existing Created movement container.",
+        "Close the Add Assets window after the success confirmation.",
+        "Open Show Details for the same movement container.",
+        "Review the assets table."
+      ],
+      "expectedResult": "All newly added assets are displayed in the assets table and the container asset count reflects the updated number of assets.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "containerId": "[RUNTIME: CREATED_MOVEMENT_CONTAINER_ID]",
+        "addedAssets": "[RUNTIME: ADDED_ASSET_FIXED_ASSET_NUMBERS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "The movement container details must reflect assets successfully added to the container."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@add-assets",
+        "@details",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-020",
+      "module": "Movement",
+      "subModule": "Submit to Checker",
+      "title": "Verify that the user can submit a Created movement container to the Checker",
+      "steps": [
+        "Login as a user with Maker role.",
+        "Locate a valid movement container with Created status.",
+        "Click Actions for the container.",
+        "Select Submit.",
+        "Accept the confirmation message."
+      ],
+      "expectedResult": "The movement container is submitted successfully and its status changes from Created to Pending Checker Approval.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "containerId": "[ENV_OR_RUNTIME: CREATED_MOVEMENT_CONTAINER_ID]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Submitting a valid Created movement container moves it to Pending Checker Approval."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@maker",
+        "@submit",
+        "@checker-workflow",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-021",
+      "module": "Movement",
+      "subModule": "Checker Review",
+      "title": "Verify that the Checker can find a submitted movement container with Pending Checker Approval status",
+      "steps": [
+        "Prepare a movement container submitted by Maker and capture its container ID.",
+        "Login to the portal as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Locate the captured movement container ID."
+      ],
+      "expectedResult": "The submitted container is visible to the Checker with Pending Checker Approval status and Checker review actions are available.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "checkerUser": "[ENV: CHECKER_USER]",
+        "containerId": "[RUNTIME: SUBMITTED_MOVEMENT_CONTAINER_ID]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "A movement request submitted by Maker must be available for Checker review."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@pending-checker-approval",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-022",
+      "module": "Movement",
+      "subModule": "Checker Review",
+      "title": "Verify that the Checker can approve all assets in a movement container",
+      "steps": [
+        "Login as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Locate a movement container with Pending Checker Approval status containing multiple assets.",
+        "Click Actions and select Review and Approve.",
+        "Select all asset rows.",
+        "Click Approve.",
+        "Accept the confirmation message."
+      ],
+      "expectedResult": "Every selected asset is marked with the Checker approval action and is ready for container completion.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "checkerUser": "[ENV: CHECKER_USER]",
+        "containerId": "[ENV_OR_RUNTIME: PENDING_MOVEMENT_CONTAINER_WITH_MULTIPLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "The Checker can approve one or more selected assets in the movement container.",
+        "All assets must have an approval or rejection action before completion."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@approve",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-023",
+      "module": "Movement",
+      "subModule": "Checker Review",
+      "title": "Verify that the Checker can reject selected assets in a movement container",
+      "steps": [
+        "Login as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Locate a movement container with Pending Checker Approval status containing multiple assets.",
+        "Click Actions and select Review and Approve.",
+        "Select one or more target asset rows.",
+        "Click Reject.",
+        "Accept the confirmation message."
+      ],
+      "expectedResult": "The selected assets are marked with the Checker rejection action while the remaining assets keep their current review state until an action is taken.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "checkerUser": "[ENV: CHECKER_USER]",
+        "containerId": "[ENV_OR_RUNTIME: PENDING_MOVEMENT_CONTAINER_WITH_MULTIPLE_ASSETS]",
+        "assetsToReject": "[RUNTIME: SELECTED_ASSETS_FOR_REJECTION]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "The Checker can reject selected assets independently from other assets in the same movement container."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@checker",
+        "@reject",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-024",
+      "module": "Movement",
+      "subModule": "Checker Review",
+      "title": "Verify that the Checker can apply different approval and rejection actions to assets in the same movement container",
+      "steps": [
+        "Login as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Locate a movement container with Pending Checker Approval status containing at least two assets.",
+        "Open Review and Approve.",
+        "Select one or more assets and click Approve.",
+        "Accept the approval confirmation message.",
+        "Select different asset records and click Reject.",
+        "Accept the rejection confirmation message.",
+        "Review the action or status shown for every asset."
+      ],
+      "expectedResult": "Approved assets are marked as approved, rejected assets are marked as rejected, and the Checker decisions are maintained independently for each asset in the same container.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "checkerUser": "[ENV: CHECKER_USER]",
+        "containerId": "[ENV_OR_RUNTIME: PENDING_MOVEMENT_CONTAINER_WITH_MULTIPLE_ASSETS]",
+        "assetsToApprove": "[RUNTIME: ASSETS_SELECTED_FOR_APPROVAL]",
+        "assetsToReject": "[RUNTIME: DIFFERENT_ASSETS_SELECTED_FOR_REJECTION]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "A single movement container can contain both approved and rejected asset decisions.",
+        "Checker actions are taken at asset level."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@mixed-decisions",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-025",
+      "module": "Movement",
+      "subModule": "Checker Completion Validation",
+      "title": "Verify that the system should prevent the Checker from completing a movement container when no asset has an approval or rejection action",
+      "steps": [
+        "Login as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Locate a movement container with Pending Checker Approval status containing one or more assets.",
+        "Open Review and Approve.",
+        "Do not approve or reject any asset.",
+        "Attempt to click Complete."
+      ],
+      "expectedResult": "The system prevents completion and the container remains pending Checker review because actions have not been taken on all assets.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "checkerUser": "[ENV: CHECKER_USER]",
+        "containerId": "[ENV_OR_RUNTIME: PENDING_MOVEMENT_CONTAINER]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "The Checker cannot complete a movement container until every asset has either an Approve or Reject action."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@negative",
+        "@validation",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@completion",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-026",
+      "module": "Movement",
+      "subModule": "Checker Completion Validation",
+      "title": "Verify that the system should prevent the Checker from completing a movement container when some assets remain without an approval or rejection action",
+      "steps": [
+        "Login as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Locate a movement container with Pending Checker Approval status containing multiple assets.",
+        "Open Review and Approve.",
+        "Approve or reject only a subset of the assets.",
+        "Leave at least one asset without a Checker action.",
+        "Attempt to click Complete."
+      ],
+      "expectedResult": "The system prevents completion and keeps the container in the Checker review stage until every asset has an approval or rejection action.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "checkerUser": "[ENV: CHECKER_USER]",
+        "containerId": "[ENV_OR_RUNTIME: PENDING_MOVEMENT_CONTAINER_WITH_MULTIPLE_ASSETS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "All assets must receive a Checker action before the movement container can be completed."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@negative",
+        "@validation",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@partial-review",
+        "@completion",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-027",
+      "module": "Movement",
+      "subModule": "Checker Completion",
+      "title": "Verify that the Checker can complete a movement container after actions are taken on all assets",
+      "steps": [
+        "Login as a user with Checker role.",
+        "Navigate to the Movement module.",
+        "Open a movement container with Pending Checker Approval status.",
+        "Approve or reject every asset in the container.",
+        "Click Complete.",
+        "Accept the completion confirmation message when displayed."
+      ],
+      "expectedResult": "The movement container is completed successfully and its status changes to Completed.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "checkerUser": "[ENV: CHECKER_USER]",
+        "containerId": "[ENV_OR_RUNTIME: FULLY_REVIEWED_MOVEMENT_CONTAINER]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Completion is allowed only after every asset has received a Checker decision."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@completion",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-028",
+      "module": "Movement",
+      "subModule": "Completed Container Details",
+      "title": "Verify that the system should display the completed status for approved assets after successful movement completion",
+      "steps": [
+        "Complete a movement container after approving one or more assets.",
+        "Locate the completed container in the Movement list.",
+        "Verify that the container status is Completed.",
+        "Click Show Details.",
+        "Review the approved asset records in the assets table."
+      ],
+      "expectedResult": "The container displays Completed status and every approved asset processed successfully by the movement request displays Completed status in the container details.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "containerId": "[RUNTIME: COMPLETED_MOVEMENT_CONTAINER_ID]",
+        "approvedAssets": "[RUNTIME: APPROVED_ASSET_FIXED_ASSET_NUMBERS]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: MOVEMENT_ROUTE]",
+        "heading": "Movement"
+      },
+      "businessRules": [
+        "Successfully processed approved assets must reflect completion in the movement details."
+      ],
+      "priority": "P1",
+      "tags": [
+        "@positive",
+        "@P1",
+        "@movement",
+        "@completed",
+        "@details",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-029",
+      "module": "Asset Profile",
+      "subModule": "Movement Verification",
+      "title": "Verify that the system should update the Current Location of approved assets after the movement request is completed",
+      "steps": [
+        "Complete a movement request containing one or more approved assets and capture their Fixed Asset Numbers.",
+        "Capture the target location used in the completed movement request.",
+        "Navigate to Asset Profile.",
+        "Search for each approved asset using its Fixed Asset Number.",
+        "Review the Current Location field."
+      ],
+      "expectedResult": "The Current Location of every approved asset matches the target location selected in the completed movement request.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "approvedAssetFixedAssetNumbers": "[RUNTIME: APPROVED_ASSET_FIXED_ASSET_NUMBERS]",
+        "expectedTargetLocation": "[RUNTIME: MOVEMENT_TARGET_LOCATION]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: ASSET_PROFILE_ROUTE]",
+        "heading": "Asset Profile"
+      },
+      "businessRules": [
+        "Approved assets must receive the target location after successful movement completion."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@asset-profile",
+        "@location-update",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-030",
+      "module": "Asset Profile",
+      "subModule": "Movement Verification",
+      "title": "Verify that the system should update the Responsible user of approved assets when a target responsible user is selected in the completed movement request",
+      "steps": [
+        "Complete a movement request that includes a target responsible user and contains one or more approved assets.",
+        "Capture the approved assets' Fixed Asset Numbers and the target responsible user.",
+        "Navigate to Asset Profile.",
+        "Search for each approved asset using its Fixed Asset Number.",
+        "Review the Asset Responsibility section, including Responsible and HR Code when available."
+      ],
+      "expectedResult": "The Responsible user for every approved asset matches the target responsible user selected in the completed movement request, and the related responsibility data is displayed consistently.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "approvedAssetFixedAssetNumbers": "[RUNTIME: APPROVED_ASSET_FIXED_ASSET_NUMBERS]",
+        "expectedTargetResponsible": "[RUNTIME: MOVEMENT_TARGET_RESPONSIBLE]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: ASSET_PROFILE_ROUTE]",
+        "heading": "Asset Profile"
+      },
+      "businessRules": [
+        "When a target responsible user is selected, approved assets must reflect that responsibility after successful movement completion."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@P0",
+        "@movement",
+        "@asset-profile",
+        "@responsible-update",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-031",
+      "module": "Asset Profile",
+      "subModule": "Rejected Asset Verification",
+      "title": "Verify that the system should not change the movement target data of rejected assets after the container is completed",
+      "steps": [
+        "Create a movement container containing multiple assets.",
+        "Record the original Current Location and Responsible user of at least one asset before Checker review.",
+        "Submit the container to the Checker.",
+        "Approve at least one asset and reject the recorded asset.",
+        "Take an action on every remaining asset.",
+        "Complete the movement container.",
+        "Navigate to Asset Profile.",
+        "Search for the rejected asset using its Fixed Asset Number.",
+        "Compare the rejected asset's Current Location and Responsible user with the values recorded before the movement request."
+      ],
+      "expectedResult": "The rejected asset keeps its original Current Location and Responsible user and does not receive the movement target values.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "rejectedAssetFixedAssetNumber": "[RUNTIME: REJECTED_ASSET_FIXED_ASSET_NUMBER]",
+        "originalLocation": "[RUNTIME: REJECTED_ASSET_ORIGINAL_LOCATION]",
+        "originalResponsible": "[RUNTIME: REJECTED_ASSET_ORIGINAL_RESPONSIBLE]",
+        "movementTargetLocation": "[RUNTIME: MOVEMENT_TARGET_LOCATION]",
+        "movementTargetResponsible": "[RUNTIME: MOVEMENT_TARGET_RESPONSIBLE_OR_EMPTY]"
+      },
+      "knownNavigation": {
+        "route": "[ENV: ASSET_PROFILE_ROUTE]",
+        "heading": "Asset Profile"
+      },
+      "businessRules": [
+        "Rejected assets must not receive any movement data changes from the completed request."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@negative",
+        "@business-rule",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@rejected-asset",
+        "@asset-profile",
+        "@regression"
+      ]
+    },
+    {
+      "tcId": "TC-MOV-032",
+      "module": "Movement",
+      "subModule": "Mixed Decision Completion",
+      "title": "Verify that the system should apply movement changes only to approved assets when the completed container contains both approved and rejected assets",
+      "steps": [
+        "Create a movement request containing at least two assets with valid target movement data.",
+        "Submit the movement container to the Checker.",
+        "Approve at least one asset.",
+        "Reject at least one different asset.",
+        "Ensure every asset in the container has a Checker action.",
+        "Complete the movement container.",
+        "Verify that the container reaches Completed status.",
+        "Navigate to Asset Profile.",
+        "Search the approved asset and verify that its movement target data was updated.",
+        "Search the rejected asset and verify that its original data remains unchanged."
+      ],
+      "expectedResult": "The completed movement request updates only approved assets. Rejected assets remain unchanged even though they belong to the same completed container.",
+      "knownApiContracts": [],
+      "knownTestData": {
+        "approvedAssetFixedAssetNumber": "[RUNTIME: APPROVED_ASSET_FIXED_ASSET_NUMBER]",
+        "rejectedAssetFixedAssetNumber": "[RUNTIME: REJECTED_ASSET_FIXED_ASSET_NUMBER]",
+        "targetLocation": "[RUNTIME: MOVEMENT_TARGET_LOCATION]",
+        "targetResponsible": "[RUNTIME: MOVEMENT_TARGET_RESPONSIBLE_OR_EMPTY]"
+      },
+      "knownNavigation": {
+        "movementRoute": "[ENV: MOVEMENT_ROUTE]",
+        "assetProfileRoute": "[ENV: ASSET_PROFILE_ROUTE]"
+      },
+      "businessRules": [
+        "Checker decisions are applied independently at asset level.",
+        "Approved assets receive the movement changes.",
+        "Rejected assets do not receive the movement changes.",
+        "A container may be completed when every asset has either an approval or rejection action."
+      ],
+      "priority": "P0",
+      "tags": [
+        "@positive",
+        "@negative",
+        "@business-rule",
+        "@P0",
+        "@movement",
+        "@checker",
+        "@mixed-decisions",
+        "@asset-profile",
+        "@regression",
+        "@e2e"
+      ]
+    }
+  ]
+}

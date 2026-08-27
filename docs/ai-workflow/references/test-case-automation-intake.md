@@ -6,6 +6,20 @@ Normalize candidate Playwright test cases from JSON or Excel `.xlsx` before
 automation implementation. This is a reusable intake stage owned by the
 Automation Implementation Agent.
 
+## Fillable templates
+
+Ready-to-fill starting points, one worked example row/entry each (matches the
+canonical columns / schema below exactly — regenerate the `.xlsx` via
+`scripts/test-case-ingestion/build-intake-template.ts` if the column set ever
+changes):
+
+- `docs/ai-workflow/templates/test-case-intake-template.xlsx`
+- `docs/ai-workflow/templates/test-case-intake-template.json`
+
+In the `.xlsx` template, `Suite/tags` and other multi-value cells split only
+on comma / semicolon / newline — a plain space between tags will NOT split
+them.
+
 ## Supported inputs
 
 - JSON matching `docs/ai-workflow/schemas/playwright-test-case.schema.json`.
