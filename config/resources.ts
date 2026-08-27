@@ -164,6 +164,19 @@ export const ROUTES = {
     assetProfile: '#/AssetsProfileDetails',
     disposal: '#/asset-disposal',
     reports: '#/reports',
+    /**
+     * Verified live 2026-08-27 from the header Movement link's own href
+     * (`#/asset-movement`). The list grid, "Show Details" record modal, and
+     * the underlying Show Assets/Attachments tabs are reachable and were
+     * inventoried in this pass. The Maker-only "New Movement" creation
+     * dialog (asset search/select, target-location fields, Actions menu
+     * items) was NOT reachable — the discovery session's active CRM role
+     * was not Maker, and the button only renders for that role. That screen
+     * needs one more live pass with `RoleApplier.ensureRoleApplied('MAKER')`
+     * applied first before page objects/locators can be finalized for it.
+     * See docs/analysis/asset-management-movement-automation-notes.md.
+     */
+    movement: '#/asset-movement',
   },
   crm: {
     /** cis_users record whose role field drives Maker/Checker/Finance Checker portal access. */
@@ -231,6 +244,20 @@ export const TEST_DATA = {
      * fall back to probing every option when it is absent or childless.
      */
     preferredCascadeLocation: env('TAGGING_CASCADE_LOCATION', 'Smart Village'),
+  },
+  movement: {
+    /** How many eligible assets the multi-asset movement cases select. */
+    multiAssetCount: Number(env('MOVEMENT_MULTI_ASSET_COUNT', '2')),
+    /** Attachment fixture uploaded when creating a movement container (skill 24 — no hardcoded local paths). */
+    attachmentFixturePath: env('MOVEMENT_ATTACHMENT_FIXTURE_PATH', 'test-data/attachments/asset-tagging-sample.png'),
+    /**
+     * Seed for the New Movement asset-picker Current Location -> Business Unit ->
+     * Department cascade (same data-dependent cascade as Tagging). Tried first;
+     * the tests fall back to probing every option when it is absent or childless.
+     */
+    preferredCascadeLocation: env('MOVEMENT_CASCADE_LOCATION', 'Smart Village Two'),
+    /** A search value guaranteed not to match any asset, to exercise the empty-state case. */
+    filterNoMatchValue: env('MOVEMENT_FILTER_NO_MATCH_VALUE', 'Unmatched-Movement-Value-QA'),
   },
 } as const;
 

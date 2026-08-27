@@ -4,6 +4,7 @@ import type { PortalRole } from '../config/resources';
 import { AssetProfilePage } from '../pages/portal-pages/asset-profile/AssetProfilePage';
 import { DisposalPage } from '../pages/portal-pages/disposal/DisposalPage';
 import { LoginPage } from '../pages/portal-pages/LoginPage';
+import { MovementPage } from '../pages/portal-pages/movement/MovementPage';
 import { ReportsPage } from '../pages/portal-pages/reports/ReportsPage';
 import { TaggingPage } from '../pages/portal-pages/tagging/TaggingPage';
 import { RoleApplier } from '../utils/roles/RoleApplier';
@@ -35,6 +36,10 @@ type PortalFixtures = {
   reportsPage: ReportsPage;
   /** Pre-authenticated and already on the Reports module. */
   openReportsPage: ReportsPage;
+  /** Authenticated but NOT navigated — Movement module. */
+  movementPage: MovementPage;
+  /** Pre-authenticated and already on the Movement module. */
+  openMovementPage: MovementPage;
 };
 
 type PortalWorkerFixtures = {
@@ -114,6 +119,16 @@ export const test = base.extend<PortalFixtures, PortalWorkerFixtures>({
     const reportsPage = new ReportsPage(authenticatedPortal, testInfo);
     await reportsPage.openFromHeader();
     await use(reportsPage);
+  },
+
+  movementPage: async ({ authenticatedPortal }, use, testInfo) => {
+    await use(new MovementPage(authenticatedPortal, testInfo));
+  },
+
+  openMovementPage: async ({ authenticatedPortal }, use, testInfo) => {
+    const movementPage = new MovementPage(authenticatedPortal, testInfo);
+    await movementPage.openFromHeader();
+    await use(movementPage);
   },
 
   makerTaggingPage: async ({ page, loginPage, roleApplier }, use, testInfo) => {
