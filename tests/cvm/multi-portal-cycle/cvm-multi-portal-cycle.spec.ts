@@ -55,14 +55,14 @@ test.describe('CVM Multi-Portal Cycle @cvm @e2e @multi-portal @positive', () => 
       for (const journey of journeys) {
         const ticket = await kiosk.kioskJourneyPage.takeTicket(journey);
         journey.ticketNumber = ticket.number;
-        journey.issuedAt = ticket.issuedAt;
+        journey.ticketServiceName = ticket.serviceName;
 
         const agent = await ensureAgent(journey.agentRole);
         await agent.agentQueuePage.waitForTicketQueued(ticket.number);
 
         testInfo.annotations.push({
           type: 'kiosk→agent',
-          description: `#${journey.customerIndex}  ${journey.mainService} → ${journey.subService}  =  ${ticket.number}  ✓ arrived @ ${journey.agentRole}`,
+          description: `#${journey.customerIndex} [${journey.customerType}/${journey.segment}] ${journey.mainService} → ${journey.subService} = ${ticket.number} ✓ arrived @ ${journey.agentRole}`,
         });
       }
 
